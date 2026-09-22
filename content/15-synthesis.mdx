@@ -129,6 +129,14 @@ Every architecture in this guide answers the same thing: *where does the long-li
 Rendering, routing, transports, auth and delivery are all downstream of that. Decide it; do not inherit it from a starter template.
 </Insight>
 
+<Recap>
+- Decisions differ in cost to undo. Micro-frontends, auth architecture and local-first are one-way doors; bundler, router and transport are cheap. Budget analysis accordingly.
+- Sequence: measure, decide on independent deployment, pick the composition point, design auth, then choose tools.
+- Tree A picks a rendering model for one application, Tree B a composition point for many teams, Tree C an SSR mode per route.
+- Some things are fixed on every leaf: a BFF, one realtime connection per tab, one history owner per document.
+- Every architecture here answers one question: where does the long-lived state live, and who may touch it?
+</Recap>
+
 <Check>
 1. A team spent two weeks choosing a bundler and one afternoon on auth. What is inverted?
 2. Walk Tree B for this case: several teams must render onto the same checkout screen, and SEO is irrelevant because checkout is behind login.
