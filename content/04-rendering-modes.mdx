@@ -35,6 +35,8 @@ And the mechanism, which is exactly the streaming sequence from <Mod to="streami
 <Cite>— [Next.js, Caching with Cache Components](https://nextjs.org/docs/app/getting-started/caching), docs v16.3.5. Cache Components shipped in 16.0.0 and is enabled with `cacheComponents: true`.</Cite>
 </Source>
 
+PPR is also no longer tied to one framework. React 19.2 added the primitives to `react-dom` itself — `prerender` returns a static prelude plus a `postponed` state, and `resume` / `resumeToPipeableStream` continue the render per request — so that you can <q>pre-render the static parts of your app and serve it from a CDN, and then resume rendering the shell to fill it in with dynamic content later</q> ([React 19.2 release notes](https://react.dev/blog/2025/10/01/react-19-2#partial-pre-rendering)).
+
 <Trap title="“Selective SSR” means three different things">
 It is not a standard term, and people use it for at least three unrelated mechanisms. Establish which one is meant before agreeing to anything:
 
