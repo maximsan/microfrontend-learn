@@ -1,0 +1,22 @@
+<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SPA</title><link rel="stylesheet" href="/style.css">
+<h1>SPA</h1>
+<nav><a href="/spa/" data-link>Home</a><a href="/spa/users/42" data-link>User 42</a><a href="/spa/settings" data-link>Settings</a><a href="/">Lab home</a></nav>
+<p id="badge"></p>
+<button id="click">Click to add to in-memory state</button>
+<main id="view"></main>
+<script type="module">
+  import { mountBadge } from '/runtime.js';
+  mountBadge();
+  const view = document.querySelector('#view');
+  const render = () => { view.innerHTML = `<h2>${location.pathname}</h2><p>Rendered by the client router.</p>`; };
+  document.addEventListener('click', (e) => {
+    const a = e.target.closest('a[data-link]');
+    if (!a) return;
+    e.preventDefault();
+    history.pushState(null, '', a.href);   // no event fires — we render ourselves
+    render();
+  });
+  addEventListener('popstate', render);     // only user-initiated back/forward fires this
+  render();
+</script>

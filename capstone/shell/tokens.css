@@ -1,0 +1,34 @@
+/* acme design tokens — served at runtime by the gateway, so a brand change reaches
+   every zone on next load with nobody redeploying. Everything is prefixed --acme-. */
+:root{
+  --acme-ink:#16202a; --acme-muted:#5f6b7a; --acme-paper:#f6f7f9; --acme-surface:#ffffff;
+  --acme-rule:#d5dbe3; --acme-brand:#1f5fbf; --acme-danger:#b3401f; --acme-ok:#16705f;
+  --acme-radius:8px; --acme-space:1rem;
+  --acme-font:system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme:dark){:root{
+  --acme-ink:#e4e8ee; --acme-muted:#95a1b0; --acme-paper:#0f141a; --acme-surface:#171e26;
+  --acme-rule:#2a3440; --acme-brand:#7aa6f0; --acme-danger:#e58a6c; --acme-ok:#58c2ac;
+}}
+*{box-sizing:border-box}
+body{margin:0;font:16px/1.55 var(--acme-font);color:var(--acme-ink);background:var(--acme-paper)}
+a{color:var(--acme-brand)}
+.acme-skip{position:absolute;left:-9999px}.acme-skip:focus{left:var(--acme-space);top:var(--acme-space);background:var(--acme-surface);padding:.5rem;z-index:10}
+.acme-header{display:flex;flex-wrap:wrap;align-items:center;gap:.5rem 1.25rem;padding:.75rem var(--acme-space);background:var(--acme-surface);border-bottom:1px solid var(--acme-rule)}
+.acme-logo{font-weight:700;text-decoration:none;color:var(--acme-ink);font-size:1.1rem}
+.acme-header nav{display:flex;gap:1rem}
+.acme-header nav a{text-decoration:none;padding:.5rem 0}
+.acme-header nav a[aria-current]{font-weight:600;text-decoration:underline;text-underline-offset:6px}
+.acme-session{margin-left:auto;font-size:.9rem;color:var(--acme-muted)}
+.acme-session button{font:inherit;padding:.35rem .7rem;border-radius:var(--acme-radius);border:1px solid var(--acme-rule);background:var(--acme-surface);color:var(--acme-ink);min-height:36px}
+.acme-cart{text-decoration:none;white-space:nowrap}
+.acme-main{max-width:64rem;margin:0 auto;padding:var(--acme-space)}
+.acme-footer{max-width:64rem;margin:2rem auto;padding:0 var(--acme-space);color:var(--acme-muted);font-size:.85rem}
+.acme-footer pre{white-space:pre-wrap;word-break:break-all}
+.acme-card{background:var(--acme-surface);border:1px solid var(--acme-rule);border-radius:var(--acme-radius);padding:var(--acme-space)}
+.acme-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(14rem,1fr));gap:var(--acme-space)}
+.acme-muted{color:var(--acme-muted)}
+.acme-skeleton{color:var(--acme-muted);font-style:italic}
+.acme-fallback{color:var(--acme-danger)}
+.acme-btn{font:inherit;padding:.5rem .9rem;border-radius:var(--acme-radius);border:1px solid var(--acme-brand);background:var(--acme-brand);color:#fff;min-height:44px;cursor:pointer}
+@media (max-width:560px){.acme-session{margin-left:0;width:100%}}

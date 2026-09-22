@@ -1,0 +1,131 @@
+---
+id: "capstone"
+part: "Part IV · Putting it to work"
+title: "Capstone: Acme Shop"
+nav: "Capstone: Acme Shop"
+section: "Capstone"
+standfirst: "Five teams, one origin, no framework: a small working estate that puts the book's defaults together, with acceptance tests you can run against your own build."
+prereqs: ["synthesis", "micro-frontends", "streaming", "auth", "sessions"]
+lab: "capstone/"
+objectives:
+  - "Assemble zones, a shared shell, a streamed fragment, a BFF and one realtime stream into one working system"
+  - "Trace each design decision back to the module that argues for it, and say how costly it is to undo"
+  - "Prove the system's properties with black-box tests rather than by inspection"
+---
+
+Every module so far has isolated one mechanism. This one puts them together. **Acme Shop** is a deliberately small estate of five services owned by five imaginary teams, behind one origin, and it lives in the repository under `capstone/`. It uses Node built-ins only, with no framework and no bundler, so every mechanism is a few dozen lines you can read, and nothing is hidden inside a dependency.
+
+There are two ways to use it. **Read and run it**: `npm start`, then `npm test`, and trace each behaviour to the module that argues for it. Or **rebuild it**: the acceptance tests talk only HTTP to the gateway, so they can check an implementation you write yourself (`CAPSTONE_URL=… npm test`). The milestones below are ordered so that each one leaves you with a working system.
+
+### The estate
+
+| Port | Service | Team | Rendering / role |
+| --- | --- | --- | --- |
+| 5200 | `gateway` | Platform | The only origin the browser sees: zone routing, the BFF, `/events`, the runtime shell |
+| 5201 | `zones/catalog` | Catalog | Server-rendered, streamed, CDN-cacheable |
+| 5202 | `zones/account` | Account | A SPA on the Navigation API |
+| 5203 | `services/recommendations` | Recommendations | An HTML fragment service with a manifest |
+| 5204 | `services/api` | Commerce | The resource server; enforces who may see what |
+
+The shared shell is split exactly as <Mod to="sharing" /> recommends. `shell/header.mjs` is a **build-time** package that every zone renders on the server and upgrades on its own schedule. `shell/tokens.css` and `shell/client.js` are **runtime** assets served centrally, so a brand colour or a session fix reaches every zone on its next load.
+
+### Two requests, end to end
+
+Reading the catalog, anonymously or not:
+
+<Flow>
+<Box title="Browser">Asks for `/catalog`. Holds at most one HttpOnly cookie.</Box>
+<Arrow>GET</Arrow>
+<Box title="Gateway">Mints or honours `x-trace-id`; routes by prefix to a zone.</Box>
+<Arrow>proxy, streamed</Arrow>
+<Box title="Catalog zone">Flushes shell and grid at once, then asks for the fragment.</Box>
+<Arrow>≤ 400 ms<br />trace + locale</Arrow>
+<Box kind="good" title="Recommendations">Returns HTML — or is slow, or down, and gets replaced by a fallback.</Box>
+</Flow>
+<FlowCaption>The catalog HTML is identical for every visitor, so it is sent `Cache-Control: public`. Personal bits — the cart count, the signed-in name — are filled in by the runtime shell after load. That is the cacheability floor from <Mod to="micro-frontends" />, respected on purpose.</FlowCaption>
+
+Adding to the cart:
+
+<Flow>
+<Box title="Browser">`POST /bff/api/cart` with the cookie and an `x-csrf-token` header.</Box>
+<Arrow>same origin</Arrow>
+<Box kind="good" title="Gateway · BFF">Checks session, idle/absolute timeout, `Origin`, CSRF token. Adds identity server-side.</Box>
+<Arrow>internal call</Arrow>
+<Box title="API">Enforces that a user only ever touches their own cart.</Box>
+</Flow>
+<FlowCaption>No token ever reaches the browser. The OAuth half is stubbed here — lab 13 builds it properly — because what matters for the capstone is what the browser ends up holding.</FlowCaption>
+
+### Every decision, and where it comes from
+
+| Decision | Choice in Acme | Argued in | Cost to undo |
+| --- | --- | --- | --- |
+| Split the frontend? | Yes — five teams, independent deploys | <Mod to="micro-frontends" /> | <Rev kind="oneway" /> |
+| Composition point | Routing-level zones, plus one server-side fragment | <Mod to="micro-frontends" />, <Mod to="synthesis" /> | <Rev kind="costly" /> |
+| Rendering per zone | Streamed SSR for the catalog, SPA for the account | <Mod to="rendering-modes" />, <Mod to="choosing" /> | <Rev kind="costly" /> |
+| Auth | BFF, `__Host-` cookie, no tokens in the browser | <Mod to="auth" /> | <Rev kind="oneway" /> |
+| CSRF and sessions | `Origin` check + synchronizer token; rotation, idle and absolute timeouts, server-side logout | <Mod to="sessions" /> | <Rev kind="costly" /> |
+| History | One router per document; plain `<a>` between zones | <Mod to="navigation" /> | <Rev kind="cheap" /> |
+| Shared state | URL, the BFF session, and a tiny shell contract — nothing else | <Mod to="sharing" /> | <Rev kind="cheap" /> |
+| Realtime | One SSE stream per browser, leader tab via Web Locks | <Mod to="transports" /> | <Rev kind="cheap" /> |
+| Observability | Trace id minted at the edge; every part publishes its build id | <Mod to="delivery" /> | <Rev kind="cheap" /> |
+
+Module Federation is absent on purpose. Tree B in <Mod to="synthesis" /> sends you to federation only when several teams must render onto the *same* screen without SEO. Acme's one shared screen is SEO-relevant, so it composes on the server instead. Lab 10 covers federation on its own.
+
+### Milestones
+
+Each milestone ends green on one group of acceptance tests. Build them in order; each leaves a system you could ship.
+
+#### M1 · Zones behind one origin
+
+A gateway that routes `/catalog…` and `/account…` to two independently running servers and redirects `/` to the catalog. Each zone answers with its own `x-build-id`. Links between zones are plain `<a>` tags; the account zone's router must leave them alone. *Tests: M1.* *Pitfall:* intercepting a cross-zone link in the client router “works” in development and then serves the wrong zone's document in production.
+
+#### M2 · The shared shell
+
+A header package both zones render, and runtime `tokens.css` served by the gateway with every custom property prefixed `--acme-`. Change `--acme-brand` and reload both zones: neither redeployed. *Tests: M2.* *Pitfall:* putting global resets in a zone's own CSS — only the platform team writes at document scope.
+
+#### M3 · A streamed fragment with a budget
+
+The catalog flushes its shell and product grid at once, fetches the recommendations fragment with `AbortSignal.timeout(400)`, then appends it as a hidden block plus an inline script that moves it into place — or a fallback if the fragment is slow or failing. This is the wire format from <Mod to="streaming" />, written by hand. *Tests: M3.* *Pitfall:* awaiting the fragment *before* the first `res.write`, which turns one slow team into everyone's time-to-first-byte.
+
+#### M4 · Context propagation and knowing what is running
+
+The gateway mints `x-trace-id` (or honours an incoming one); the catalog forwards it, with `accept-language`, to the fragment; every service logs it. The page carries a `<meta name="acme:build:…">` for every part it was assembled from, and the footer's *What is running* panel lists them. *Tests: M4.* *Pitfall:* a trace id that stops at the first hop — then a slow page is five unrelated traces.
+
+#### M5 · Respect the cacheability floor
+
+Signed in or not, `/catalog` must be byte-for-byte the same document and `Cache-Control: public`. Anything personal is rendered by the runtime shell from `/bff/me` and `/bff/api/cart` after load. *Tests: M5.* *Pitfall:* “just print the user's name in the header server-side” — and the whole catalog becomes uncacheable, or worse, one user's name is cached for everyone.
+
+#### M6 · A BFF session
+
+Sign-in issues a fresh `__Host-` cookie (`Secure; HttpOnly; SameSite=Strict; Path=/`, no `Domain`). `/bff/me` returns a user and a CSRF token and nothing else. Writes through `/bff/api/*` need a same-origin `Origin` *and* the CSRF header. Logout destroys the server-side session. Idle sessions expire. The API, not the browser, stops Bob from reading Alice's cart. *Tests: M6.* *Pitfall:* enforcing “your own cart only” in the account zone's UI and nowhere else.
+
+#### M7 · One realtime stream per browser
+
+The gateway exposes `/events`; the runtime shell elects one leader tab with the Web Locks API, holds the only `EventSource`, relays over `BroadcastChannel`, and replays the latest value to late subscribers. Open five tabs: the gateway still holds one stream. *Tests: M7.* *Pitfall:* letting each zone open its own stream “because it only needs stock levels”.
+
+### Stretch goals
+
+- **A second fragment with a different TTL.** Add a *price* fragment next to the stock level and cache each fragment separately at the gateway. Then find the bug the chapter predicts: two fragments of different ages on one screen.
+- **Instant zone crossings.** Add a `<script type="speculationrules">` to the catalog that prerenders `/account` on hover, and cross-document View Transitions. Check it degrades cleanly in Firefox.
+- **Federate one widget.** Put a “recently viewed” widget on *both* zones via Module Federation (lab 10's setup), and write down what you are now coupled to.
+- **Real sign-in.** Replace the stubbed login with lab 13's authorization-code flow, including refresh in the BFF.
+- **A second version live.** Run two catalog builds behind the gateway at once and route 10% of traffic to the new one. Make the *What is running* panel and the logs tell you which one a user saw.
+
+<Recap>
+- The capstone composes zones, a two-part shared shell, one streamed fragment, a BFF, one realtime stream and traceable builds — each argued for in an earlier module.
+- Every behaviour is pinned by a black-box acceptance test against the gateway, so the same tests can check a rebuild.
+- The one-way doors (splitting the frontend, auth) were decided first; the cheap ones (router, transport, observability details) can change freely.
+- What is deliberately missing — federation, real OAuth — is missing for a stated reason, and lives in labs 10 and 13.
+</Recap>
+
+<Check>
+1. The catalog page must stay `Cache-Control: public`, yet the header shows the signed-in user's name and cart count. How?
+2. The recommendations service starts taking three seconds per request. What does a user see, and why does the rest of the page not wait?
+3. A new engineer proposes letting the account zone's router handle `/catalog` links “for a smoother transition”. What breaks, and what would you do instead?
+
+<Answers>
+1. **The server never renders them.** The catalog HTML is identical for everyone; the runtime shell fetches `/bff/me` and `/bff/api/cart` after load and fills in `[data-acme-session]` and `[data-acme-cart]`. Personal data goes through the BFF, uncached, while the document stays cacheable — the cacheability floor from <Mod to="micro-frontends" /> applied deliberately.
+2. **The shell and product grid, immediately; a fallback in the recommendations slot after 400 ms.** The catalog flushes before it asks for the fragment, and the fragment request carries `AbortSignal.timeout(400)`, so one slow team costs one slot, never the page (<Mod to="streaming" />).
+3. **The account zone would render catalog URLs it does not own**, with the account zone's build, bundle and router — the two routers now disagree about who owns history (<Mod to="navigation" />). Keep plain `<a>` links between zones, and make the crossing feel instant with speculation rules and cross-document View Transitions as a progressive enhancement.
+</Answers>
+</Check>

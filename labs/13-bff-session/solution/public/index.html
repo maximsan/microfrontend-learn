@@ -1,0 +1,23 @@
+<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Lab 13 · Orders</title>
+<style>
+  body{font:15px/1.5 system-ui,sans-serif;max-width:44rem;margin:1.5rem auto;padding:0 1rem;color:#1b1f24}
+  button{font:inherit;padding:.4rem .8rem;margin:.2rem .2rem .2rem 0}
+  pre{background:#eef1f5;padding:.8rem;border-radius:4px;white-space:pre-wrap;word-break:break-all;font-size:13px}
+  .xss{border:2px dashed #a83f26;padding:.6rem .8rem;border-radius:6px;margin-top:1rem}
+</style>
+<h1>Orders</h1>
+<p id="who">Not signed in.</p>
+<p>
+  <button id="login">Sign in</button>
+  <button id="load">Load orders</button>
+  <button id="create">Create order</button>
+  <button id="logout">Sign out</button>
+</p>
+<pre id="out">…</pre>
+<div class="xss">
+  <strong>Pretend a third-party script on this page was compromised.</strong>
+  <button id="attack">Run the injected script</button>
+  <pre id="loot">(nothing yet)</pre>
+</div>
+<script type="module" src="/app.js"></script>

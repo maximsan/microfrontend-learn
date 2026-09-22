@@ -1,0 +1,9 @@
+body{font:16px/1.6 system-ui,sans-serif;max-width:46rem;margin:0 auto;padding:1rem;color:#1b1f24}
+nav a{margin-right:1rem}
+main{min-height:140vh}
+h1:focus{outline:3px solid #2c57c9;outline-offset:4px}
+.visually-hidden{position:absolute;width:1px;height:1px;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.skip{position:absolute;left:-9999px}.skip:focus{left:1rem;top:1rem;background:#fff;padding:.5rem}
+#checks{position:fixed;right:1rem;bottom:1rem;background:#fff;border:1px solid #cfd5de;border-radius:6px;padding:.6rem .8rem;font:13px/1.5 ui-monospace,monospace;box-shadow:0 6px 20px -10px #0004;max-width:22rem}
+#checks b{display:block;margin-bottom:.2rem}
+@media (max-width:600px){#checks{left:1rem;right:1rem}}

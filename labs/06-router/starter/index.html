@@ -1,0 +1,18 @@
+<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Acme · Home</title>
+<link rel="stylesheet" href="/style.css">
+<header>
+  <a class="skip" href="#view">Skip to content</a>
+  <nav aria-label="Main">
+    <a href="/">Home</a>
+    <a href="/orders">Orders</a>
+    <a href="/orders/1042">Order 1042</a>
+    <a href="/settings">Settings</a>
+  </nav>
+</header>
+<main id="view"></main>
+<!-- Screen readers hear whatever is written in here. -->
+<p id="announcer" class="visually-hidden" aria-live="polite"></p>
+<aside id="checks" aria-label="Self-check"></aside>
+<script type="module" src="/router.js"></script>
+<script type="module" src="/checks.js"></script>

@@ -129,7 +129,7 @@ function Brief({ meta }) {
       {meta.lab ? (
         <div>
           <dt>Lab</dt>
-          <dd><code>labs/{meta.lab}</code></dd>
+          <dd><code>{meta.lab}</code> in the repository</dd>
         </div>
       ) : null}
     </dl>

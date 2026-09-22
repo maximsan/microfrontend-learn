@@ -1,0 +1,11 @@
+<!doctype html><meta charset="utf-8"><title>Signing in…</title>
+<script type="module">
+  // STARTER: exchange the code in the browser and keep the tokens in localStorage.
+  const code = new URLSearchParams(location.search).get('code');
+  const body = new URLSearchParams({ grant_type: 'authorization_code', code, client_id: 'spa', redirect_uri: `${location.origin}/callback.html`, code_verifier: sessionStorage.getItem('pkce') });
+  const res = await fetch('http://localhost:5120/token', { method: 'POST', body });
+  const t = await res.json();
+  localStorage.setItem('access_token', t.access_token);
+  localStorage.setItem('refresh_token', t.refresh_token);
+  location.replace('/');
+</script>
