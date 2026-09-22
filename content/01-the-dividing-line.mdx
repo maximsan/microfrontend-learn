@@ -1,0 +1,90 @@
+---
+id: "m1"
+num: "01"
+group: "Part I · Foundations"
+kicker: "Module 01 · Foundations"
+title: "The dividing line"
+standfirst: "What actually separates a SPA from everything else — and why it has nothing to do with page count."
+---
+
+Ask ten engineers what makes an application a SPA and you get: one HTML file, client-side routing, no page reload. All symptoms. The cause is more specific.
+
+<Insight title="The core distinction">
+The dividing line is **what an interaction does to the JavaScript runtime.**
+
+**Server-rendered:** every interaction is a document replacement. Heap, DOM, variables, closures — all discarded, rebuilt from zero.
+
+**SPA:** the document loads once and the runtime **never dies**. Navigation is a function call: swap components, push a URL, keep everything else.
+</Insight>
+
+Bundle size, SEO difficulty, hydration, API design, cache invalidation, the need for a client-side router at all — every one of those follows from that single property. Two definitions make it precise:
+
+- **The runtime** — the global object, the JS heap, the module registry, and every registration on the event loop.
+- **What destroys it** — a full document navigation, a hard reload, a crash, or the OS evicting a backgrounded mobile tab.
+
+### Runtime lifetime and state lifetime are different dials
+
+The refinement most explanations skip. An MPA has a *short* runtime and a *long* state — the state lives in a server session, keyed by a cookie. The application is stateful; the browser is not. That decoupling is why MPAs worked for two decades and still do.
+
+Separate the two dials and these architectures stop looking like a progression from primitive to modern. They become different answers to one question: **where does the long-lived state live, and who is allowed to touch it?**
+
+| Architecture | Runtime lives for | Long-lived state sits in | What bites you |
+| --- | --- | --- | --- |
+| Static documents | — | URL, cookies | Nothing. This is the easy case. |
+| Classic MPA | One document | Server session | Client state dies on every click |
+| MPA + AJAX | One document | Server session + page-scoped JS | Widget state lost on navigate |
+| htmx / Turbo | **Long** — document persists, DOM swaps | Server; the DOM *is* the client state | Listener and interval leaks |
+| LiveView / Blazor Server | **Long, but server-side** | Server memory, per connection | RAM scales with concurrent users; RTT per keystroke |
+| SPA (CSR) | Whole session | Client memory | Leaks, version skew, tab eviction |
+| SSR + hydration | **Two**: per-request server, then long client | Client, after hydration | Module-level server state leaks across users |
+| Static generation | Build time, then client session | Client | Staleness |
+| Islands | **Per island**, independent | Per island | Islands cannot see each other |
+| Server Components | Per-request server + long client | Client components only | Newer, less settled tooling |
+| Local-first | **Exceeds the session** | The device | Multi-tab coordination, conflict resolution |
+
+### Three rows that deserve more than a cell
+
+#### htmx and Turbo are the sneaky case
+
+The document persists, so the runtime persists — but the DOM underneath is destroyed and replaced on every fragment swap. Your `setInterval` and `addEventListener` outlive their targets. Hence Stimulus's `connect()`/`disconnect()` and htmx's `htmx:load`. Teams read "no client state" as "no lifecycle." It is not.
+
+#### LiveView and Blazor Server are a third model entirely
+
+Not a point between SPA and MPA: long-lived state held *on the server*, one process or circuit per open WebSocket, browser as thin diff-applier. Excellent on low-latency networks, punishing at 200 ms, and server memory now scales with concurrent users rather than request rate.
+
+#### bfcache blurs the MPA boundary
+
+Browsers freeze the entire heap on back-navigation and thaw it on return, so an MPA's runtime *can* survive a navigation. Module 05 has the mechanics and the two things that silently disqualify your page.
+
+### So — is a SPA only possible in a browser?
+
+This is the right question, and the answer has two halves.
+
+**The half that is correct:** “SPA” is defined *negatively*, against the browser's native navigation model. The term only carries meaning on a platform whose default behaviour is document replacement. Nobody describes an iOS app as a single-page application — not because it would be impossible, but because it is already how every native GUI app works.
+
+**The half that needs correcting:** SPAs are not confined to a browser *tab*. They need a browser *engine* — Electron, Tauri, Capacitor, WKWebView, Android WebView. [VS Code](https://code.visualstudio.com/docs/editor/whyvscode) and [Slack](https://slack.engineering/building-hybrid-applications-with-electron/) run on Electron; [Spotify's desktop client uses CEF](https://engineering.atspotify.com/2021/04/building-the-future-of-our-desktop-apps). All three are SPAs in an embedded browser wearing native window chrome.
+
+<Insight title="The inversion">
+The SPA is not an innovation. It is the web **re-converging on the normal GUI model** — persistent runtime, in-memory state, event loop — that Smalltalk, Win32 and Cocoa had from the start.
+
+The **MPA** is the anomaly: an architecture that destroys and rebuilds the entire UI after every click. It exists only because the web was a hypertext system drafted into being an app platform.
+</Insight>
+
+<Recap>
+- The distinction is runtime lifetime, not page count. Document replacement destroys the JS heap; SPA navigation does not.
+- Runtime lifetime and state lifetime are independent. MPAs have long-lived state — it lives on the server.
+- Long-lived state on the *server*, per connection, is a distinct third model, not a midpoint.
+- SPA requires a browser engine, not a browser tab. Conceptually it is the normal GUI model; the MPA is the anomaly.
+</Recap>
+
+<Check>
+1. An htmx app has a long-lived runtime but is usually described as having “no client state.” Are those statements in conflict? What reconciles them?
+2. Your SPA works perfectly, then users report losing work after leaving the tab open overnight on mobile. Which property from this module explains it?
+3. Why is “LiveView is basically a SPA with the rendering on the server” a misleading description?
+
+<Answers>
+1. **No conflict — they describe different dials.** The runtime is long-lived because the document is never replaced. The *state* is server-owned, and what client state exists lives in the DOM rather than in JS variables. The practical consequence people miss: a long-lived runtime means lifecycle is your problem. Listeners and intervals registered against swapped-out DOM keep running, which is why Stimulus has `disconnect()`.
+2. **Runtime lifetime is shorter than the session.** “Whole session” is the optimistic case; mobile browsers discard backgrounded tabs under memory pressure and the JS heap goes with them. Anything that must survive needs explicit persistence and a rehydration path — the memory tier and the persisted tier are not the same thing.
+3. **It puts LiveView on the SPA–MPA line, and it is not on that line.** A SPA holds long-lived state in the browser. LiveView holds it in a server process, one per open socket, and ships DOM diffs. That changes what scales with what: your server memory now grows with *concurrent users* rather than request rate, and every interaction costs a round trip. Those are the properties that decide whether it fits, and the “SPA with server rendering” framing hides both.
+</Answers>
+</Check>

@@ -1,0 +1,95 @@
+---
+id: "m11"
+num: "11"
+group: "Part III · The wire"
+kicker: "Module 11 · The wire"
+title: "Monorepo and delivery"
+nav: "Monorepo & delivery"
+standfirst: "Does a shared repo defeat independent deployment? No — and here is what you need to run it."
+---
+
+<Insight title="Two things people conflate">
+**Repo layout and deploy independence are orthogonal.**
+
+One repository couples your *source history*, not your deployments. Only the first is affected by directory layout. Confusing the two drives most of this argument.
+</Insight>
+
+### The two positions
+
+[Cam Jackson's article](https://martinfowler.com/articles/micro-frontends.html) assumes separate repositories per micro-frontend, each with its own pipeline. [Nx argues the opposite](https://nx.dev/docs/kb/micro-frontend-architecture), and makes the stronger case:
+
+<Source>
+<Quote>A monorepo removes two of the biggest micro frontend pains: shared dependency drift and cross-app integration testing. Every application builds against the same library versions at the same commit, and CI exercises the composed application before any team deploys. Deployments stay independent even though the repository is shared.</Quote>
+
+And on the dominant failure mode: <q>Because deployments are not atomic, mismatched shared library versions are a leading failure mode of micro frontends. The safest strategy is to share only the libraries that must be singletons.</q>
+
+<Cite>— [Nx, Micro Frontend Architecture](https://nx.dev/docs/kb/micro-frontend-architecture)</Cite>
+</Source>
+
+[Vercel states the principle neutrally](https://vercel.com/docs/microfrontends), and most cleanly: <q>Microfrontends work the same whether you keep your applications in one repository (a monorepo) or spread them across several (a polyrepo)… Each application is its own Vercel project and deploys on its own, no matter where its code lives.</q>
+
+### Turborepo
+
+<Moved title="Domain">
+Current Turborepo documentation lives at [**turborepo.dev**](https://turborepo.dev/docs). Both `turbo.build` and `turborepo.com` redirect there. Vercel's own docs are one migration behind and still show the pre-2.0 `"pipeline"` key instead of `"tasks"` — do not copy their `turbo.json` snippets.
+</Moved>
+
+- **[Remote Caching](https://turborepo.dev/docs/core-concepts/remote-caching)** — <q>a cloud server that stores the results of your tasks… preventing duplicated work across your entire organization.</q> Without it, <q>the same task must be re-executed on each machine.</q>
+- **[`turbo prune`](https://turborepo.dev/docs/reference/prune)** — <q>Generate a partial monorepo for a target package</q>, emitting only the needed source, a pruned lockfile and the root `package.json`. With `--docker` it splits output for layer caching. This is how you get a small container image per micro-frontend out of a large repository.
+- **[Filtering](https://turborepo.dev/docs/crafting-your-repository/running-tasks)** — `...ui` selects dependents of `ui`, `ui...` selects `ui` and its dependencies. `--affected` is shorthand for `--filter=...[main...HEAD]` and requires a deep checkout, <q>or all packages will be considered changed.</q>
+
+<Trap title="The microfrontends proxy is dev-only">
+[Turborepo's microfrontends support](https://turborepo.dev/docs/guides/microfrontends) is narrower than the name suggests: <q>The Turborepo microfrontends proxy is meant for local usage only. How you implement and integrate your production microfrontends depends on your production infrastructure.</q>
+
+The same page draws the distinction crisply: <q>The proxy composes independently running applications by route. Module Federation composes JavaScript modules at runtime inside an application.</q>
+</Trap>
+
+### Nx — and a breaking change you need to know about
+
+<Moved title="The big Nx break">
+<p><q>As of Nx v23, the `host` and `remote` generators are replaced by `consumer` and `provider`.</q> Deprecated in v23 and **removed in v24**: `@nx/react:host|remote|federate-module`, `@nx/angular:host|remote|setup-mf`, and all `module-federation-dev-server` and `module-federation-ssr-dev-server` executors. <q>There is no automated codemod.</q></p>
+
+**Angular:** <q>Angular Module Federation in Nx is no longer supported. Use `@angular-architects/native-federation` for the supported Angular path going forward.</q> **SSR:** <q>SSR is not first-classed in the new generators… If you need SSR with federation, see the upstream Module Federation SSR guide and wire it yourself.</q>
+
+Any tutorial using `nx g @nx/react:host` or Nx SSR module federation is citing a dead API. This is the single most consequential piece of staleness in the current ecosystem.
+</Moved>
+
+For scale evidence, Nx publishes named customer stories — [Caseware at 700+ projects](https://nx.dev/blog/caseware-success-story) and [Broadcom at 177](https://nx.dev/customer-stories/how-broadcom-stays-efficient-and-nimble-with-monorepos). Treat the compute-savings figures in them as vendor-reported rather than audited. Turborepo has no equivalent published case study I could verify; the company names circulating for it come from an unmoderated community thread, so this guide does not repeat them.
+
+Nx's other machinery remains excellent: [`nx affected`](https://nx.dev/docs/features/ci-features/affected), [computation caching](https://nx.dev/docs/features/cache-task-results) that restores <q>both the terminal output and the files</q>, and [enforce-module-boundaries](https://nx.dev/docs/features/enforce-module-boundaries) — how you stop teams importing each other's internals. That last one is the governance layer micro-frontends need and rarely have.
+
+### Package managers and release
+
+- **[pnpm workspaces](https://pnpm.io/workspaces)** — the `workspace:` protocol: <q>When this protocol is used, pnpm will refuse to resolve to anything other than a local workspace package.</q> Note [Yarn's publish semantics differ](https://yarnpkg.com/features/workspaces): `workspace:*` publishes as an exact pin.
+- **Phantom dependencies** — [pnpm's rationale](https://pnpm.io/motivation): <q>When installing dependencies with npm or Yarn Classic, all packages are hoisted to the root of the modules directory. As a result, source code has access to dependencies that are not added as dependencies to the project.</q> In a micro-frontend repository this is genuinely dangerous: an app builds locally against a hoisted transitive dependency and fails only in isolated production builds.
+- **[Changesets](https://github.com/changesets/changesets)** — <q>an intent to release a set of packages at particular semver bump types.</q> For applications rather than npm packages, see their [versioning-apps guide](https://github.com/changesets/changesets/blob/main/docs/versioning-apps.md).
+- **[Bazel rules_js](https://github.com/aspect-build/rules_js)** — warranted at very large scale or in polyglot repositories. Note <q>rules_js is an alternative to `build_bazel_rules_nodejs`… which is now unmaintained.</q>
+
+### Knowing what is actually running
+
+Rarely planned and always needed. Once deployments are independent, **nobody knows what combination of versions a given user saw** — and that single fact makes production debugging qualitatively harder than in a monolith, where the answer was one commit SHA.
+
+Four things to put in from the start, all cheap before launch and painful after:
+
+- **Publish every build ID.** Each micro-frontend writes its name and build identifier somewhere machine-readable — a `<meta>` tag, a global registry object, a response header. The first question on any incident is “which versions were live together,” and without this it is unanswerable.
+- **Propagate one trace ID.** The shell mints it and every fragment render and every API call carries it. Otherwise a slow page is six unrelated traces and no way to see that fragment C blocked the render.
+- **Attribute errors to an owner.** Tag every reported error with the owning micro-frontend and its build ID, and upload source maps per team. Untagged errors land on whoever owns the shell, who cannot fix them — the most reliable way to burn out a platform team.
+- **Attribute performance too.** One team's bundle regression shows up as the whole page's LCP getting worse. Without per-micro-frontend attribution in your RUM, the shell gets blamed for a change it did not make.
+
+<Trap title="The version-combination explosion">
+Five micro-frontends on independent release cadences produce a combinatorial space of live version sets, and your integration tests exercise exactly one point in it: the newest of everything.
+
+Two mitigations. Test the composed application in CI at the current *production* versions, not at HEAD of everything — that is the combination your users have. And keep a deliberately short compatibility window, an explicit rule such as “any micro-frontend must work against shell contracts from the last 30 days,” so the space stays bounded rather than growing forever.
+</Trap>
+
+### Deployment
+
+[Vercel's monorepo docs](https://vercel.com/docs/monorepos) describe the mechanism most platforms converge on: one project per application directory, and <q>Vercel automatically skips builds for projects in a monorepo that are unchanged by the commit.</q> The requirement that makes it work is worth quoting because it is what teams get wrong: <q>Dependencies between packages in the monorepo must be explicitly stated in each package's `package.json`</q> — otherwise every commit deploys everything.
+
+<Recap>
+- Repository layout and deployment independence are orthogonal. A monorepo buys atomic cross-library refactors and pre-deploy integration testing at no cost to deploy independence.
+- Turborepo's microfrontends proxy is local-development only. Docs are at turborepo.dev.
+- Nx v23 replaced its entire micro-frontend generator surface and dropped Angular MF and SSR-MF. Most tutorials online are now wrong.
+- pnpm prevents phantom dependencies, which matter more here than in a single app.
+- Per-app affected builds require explicitly declared inter-package dependencies.
+</Recap>

@@ -1,0 +1,79 @@
+---
+id: "m9"
+num: "09"
+group: "Part III · The wire"
+kicker: "Module 09 · The wire"
+title: "APIs and transports"
+nav: "APIs & transports"
+standfirst: "What the browser can actually speak, and the two transport problems that only appear with several teams."
+---
+
+### The two micro-frontend-specific problems
+
+<Trap title="The connection budget">
+From [MDN on EventSource](https://developer.mozilla.org/en-US/docs/Web/API/EventSource): <q>When not used over HTTP/2, SSE suffers from a limitation to the maximum number of open connections, which can be specially painful when opening various tabs as the limit is per browser and set to a very low number (6). The issue has been marked as 'Won't fix' in Chrome and Firefox.</q>
+
+Six micro-frontends each opening their own `EventSource` on HTTP/1.1 and the user has **zero connections left for anything else — in every tab.**
+
+**Rule:** the shell owns one connection and fans messages out. Micro-frontends do not each open their own.
+</Trap>
+
+<Trap title="You cannot authenticate a WebSocket with a header">
+The browser constructor is [`new WebSocket(url)` / `new WebSocket(url, protocols)`](https://developer.mozilla.org/en-US/docs/Web/API/WebSocket/WebSocket). There is no headers parameter. You cannot send `Authorization`.
+
+That leaves cookies (which flow automatically), a subprotocol hack, or a token in the query string — which lands in access logs. And cookies flowing automatically is itself the problem: per [OWASP](https://cheatsheetseries.owasp.org/cheatsheets/WebSocket_Security_Cheat_Sheet.html), <q>Browsers include cookies in WebSocket handshake requests, making WebSocket applications vulnerable to Cross-Site WebSocket Hijacking (CSWSH).</q>
+
+The mitigation is explicit: <q>Validate the Origin header on every handshake. Always use an explicit allowlist of trusted origins.</q> See also [CWE-1385](https://cwe.mitre.org/data/definitions/1385.html).
+</Trap>
+
+### The options
+
+| Transport | Direction | Specification | Browser reality |
+| --- | --- | --- | --- |
+| **HTTP / REST** | Request/response | — | The default. Cache- and CDN-friendly |
+| **GraphQL** | Request/response | [spec](https://spec.graphql.org/October2021/), [over HTTP (draft)](https://graphql.github.io/graphql-over-http/draft/) | POST required, GET optional; `application/graphql-response+json` |
+| **SSE** | Server → client | [WHATWG HTML](https://html.spec.whatwg.org/multipage/server-sent-events.html#the-eventsource-interface) | UTF-8 text only; auto-reconnect with `Last-Event-ID`; 6-connection cap on HTTP/1.1 |
+| **WebSocket** | Full duplex | [RFC 6455](https://www.rfc-editor.org/rfc/rfc6455), [RFC 8441](https://www.rfc-editor.org/rfc/rfc8441) over HTTP/2 | No custom headers; no auto-reconnect; CSWSH risk |
+| **WebTransport** | Full duplex + datagrams | [W3C](https://w3c.github.io/webtransport/), [IETF draft](https://datatracker.ietf.org/doc/html/draft-ietf-webtrans-http3/) | [Baseline 2026](https://developer.mozilla.org/en-US/docs/Web/API/WebTransport_API) since March 2026 |
+| **gRPC** | RPC, streaming | [grpc.io](https://grpc.io/docs/) | <No>Impossible natively in a browser</No> |
+| **Connect** | RPC, streaming | [connectrpc.com](https://connectrpc.com/docs/protocol/) | Works — deliberately avoids HTTP trailers |
+| **WebRTC** | Peer-to-peer | [W3C](https://www.w3.org/TR/webrtc/) | Signalling is out of scope — your problem |
+| **MQTT** | Pub/sub | [OASIS MQTT 5.0](https://docs.oasis-open.org/mqtt/mqtt/v5.0/mqtt-v5.0.html) | Needs MQTT-over-WebSocket in a browser |
+
+### Why gRPC cannot work in a browser
+
+<Source>
+<Quote>It is currently impossible to implement the HTTP/2 gRPC spec in the browser, as there is simply no browser API with enough fine-grained control over the requests. For example: there is no way to force the use of HTTP/2, and even if there was, raw HTTP/2 frames are inaccessible in browsers.</Quote>
+
+<Cite>— [grpc.io, “The state of gRPC in the browser”](https://grpc.io/blog/state-of-grpc-web/)</Cite>
+</Source>
+
+gRPC signals its final status in HTTP/2 trailers, which `fetch` cannot read. [gRPC-Web](https://github.com/grpc/grpc-web) works around it with a mandatory translating proxy, usually Envoy. [Connect](https://connectrpc.com/docs/protocol/) is the cleaner modern answer: <q>Bidirectional streaming requires HTTP/2, but the other RPC types also support HTTP/1.1. The protocol doesn't use HTTP trailers at all, so it works with any networking infrastructure.</q>
+
+### WebRTC's boundary
+
+<Source>
+<Quote>Passing SDP objects to remote peers is called signaling and is not covered by the WebRTC specification… You can use anything you like, from WebSocket to fetch() to carrier pigeons.</Quote>
+
+<Cite>— [MDN, Signaling and video calling](https://developer.mozilla.org/en-US/docs/Web/API/WebRTC_API/Signaling_and_video_calling)</Cite>
+</Source>
+
+So WebRTC is never your only transport — you always need a second one to bootstrap it. [`RTCDataChannel`](https://developer.mozilla.org/en-US/docs/Web/API/RTCDataChannel) is the non-media use: peer-to-peer arbitrary data.
+
+### GraphQL federation and subscriptions
+
+[Apollo Federation's](https://www.apollographql.com/docs/graphos/schema-design/federated-schemas/federation) vocabulary: <q>the single, federated graph is called a supergraph</q>; <q>the constituent APIs are called subgraphs</q>; <q>Clients make requests to the federated GraphQL API's single entry point called the router.</q> The property that makes it fit micro-frontend org structures: <q>Different subgraphs in the same supergraph can use different server implementations and even different programming languages.</q>
+
+On subscriptions, the [over-HTTP spec explicitly punts](https://graphql.github.io/graphql-over-http/draft/): <q>GraphQL Subscriptions are beyond the scope of this specification at this time.</q> The live transports are [`graphql-ws`](https://github.com/enisdenjo/graphql-ws) and [`graphql-sse`](https://github.com/enisdenjo/graphql-sse).
+
+<Moved>
+[`subscriptions-transport-ws` was archived in April 2023.](https://github.com/apollographql/subscriptions-transport-ws) If you are still on it you are on a dead protocol — and because `graphql-ws` implements a genuinely different wire protocol, client and server must migrate together.
+</Moved>
+
+<Recap>
+- Six-connection cap on HTTP/1.1: the shell owns one stream and fans out. The top transport rule for micro-frontends.
+- Browser WebSockets cannot carry an `Authorization` header, and the cookies they do carry create CSWSH. Validate `Origin` against an allowlist.
+- gRPC is impossible in a browser because raw HTTP/2 frames and trailers are inaccessible. Use Connect, or gRPC-Web with a proxy.
+- WebRTC always needs a second transport for signalling.
+- SSE for server-push-only; WebSocket for genuine bidirectional; WebTransport is newly Baseline.
+</Recap>

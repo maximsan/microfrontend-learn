@@ -1,0 +1,71 @@
+---
+id: "m13"
+num: "13"
+group: "Part III · The wire"
+kicker: "Module 13 · In practice"
+title: "Migration paths"
+standfirst: "Nobody is greenfield. Four routes people actually take, ordered so the reversible steps come first."
+---
+
+Module 12 answers “what should this be?” This module answers the question you probably have instead: *I have X, I need Y, in what order?* Each path is graded with the reversibility markers from Module 12, so you can see where you stop being able to change your mind.
+
+### Path A — SPA that now needs SEO or first-paint speed
+
+The most common migration, and the one most often attempted backwards.
+
+<Wire>
+<Step t="Step 1 · measure">Find out which routes actually need it. Usually it is the marketing pages, the catalogue and a handful of detail pages — **not** the authenticated application. Migrating the wrong 80% is the standard waste here.</Step>
+<Step t="Step 2 · split the surface" rev="cheap">Carve those routes out as a separate deployment behind a path prefix. Now you can change their rendering without touching the app. This is Module 06's routing-level split used as a migration tool rather than an architecture.</Step>
+<Step t="Step 3 · render them on the server" rev="costly">Static generation if the content changes on a deploy cadence; PPR or ISR if it does not. Keep interactivity as islands. Do **not** reach for SSR-plus-full-hydration reflexively — if the interactive surface is a search box and an add-to-cart button, hydrating the whole page re-imports the cost you are trying to remove.</Step>
+<Step t="Step 4 · leave the app alone">The authenticated application stays a SPA. That was always the right answer for it.</Step>
+</Wire>
+
+<Trap title="The SSR-everything reflex">
+The instinct is to turn on SSR across the whole application. That gives every route hydration cost and a server render, including the dashboard nobody indexes, and it is how teams end up slower than when they started. **SEO is a property of specific routes. Fix those routes.**
+</Trap>
+
+### Path B — monolith splitting across new teams
+
+The path with the most one-way doors, and the one worth going slowest on.
+
+<Wire>
+<Step t="Step 1 · enforce boundaries in place" rev="cheap">Before splitting anything, draw the module boundaries inside the existing repo and make them *enforced* — [Nx's lint rule](https://nx.dev/docs/features/enforce-module-boundaries) or equivalent. If teams cannot stop importing each other's internals while in one codebase, distributing the deploys will not fix it; it will make the violations invisible.</Step>
+<Step t="Step 2 · run it for a quarter">This step is the whole migration. If the boundaries hold, you have found the real seams. If they keep being violated in the same three places, those are not separate domains and you just avoided a very expensive mistake.</Step>
+<Step t="Step 3 · split the URL surface" rev="costly">Promote the stable boundaries to routing-level zones behind a proxy. Independent deploys, one full page load when crossing. Stop here unless a screen genuinely needs two teams on it.</Step>
+<Step t="Step 4 · only now, runtime composition" rev="oneway">Fragments or federation, for the specific screens that need it. Everything before this point is reversible. This is not.</Step>
+</Wire>
+
+### Path C — tokens in `localStorage` to a BFF
+
+Prompted by [RFC 10017](https://www.rfc-editor.org/info/rfc10017/), and the migration whose ordering matters most, because a half-done version is *less* secure than either end state.
+
+<Wire>
+<Step t="Step 1 · one origin first" rev="cheap">Proxy all API traffic through the app's own origin. No behaviour change, no auth change — but without it, cookie auth cannot work and you will be tempted to fix that with a `Domain` cookie, which Module 10 explains is the wrong exit.</Step>
+<Step t="Step 2 · stand the BFF up beside the current flow" rev="costly">It becomes the confidential OAuth client and issues a `__Host-` session cookie. Both mechanisms work at once. Tokens are still in the browser; nothing has improved yet.</Step>
+<Step t="Step 3 · move callers to the cookie session">Route by route. The BFF attaches the access token server-side. Instrument which callers still send a bearer token, because that count is your actual progress metric.</Step>
+<Step t="Step 4 · cut the browser off" rev="oneway">Stop issuing tokens to the client, purge storage, and revoke anything outstanding. **Only now is the vulnerability closed.** Steps 2 and 3 are preparation, not mitigation.</Step>
+</Wire>
+
+<Trap title="Never ship steps 2 and 3 with refresh split across both">
+If the browser still runs its own refresh loop while the BFF also refreshes, you have two clients rotating the same refresh token. Rotation invalidates the other's copy, and users get logged out at random under load — the exact race Module 10 warns about, now with two independent causes. **Move refresh ownership to the BFF in a single step, before step 3 begins.**
+</Trap>
+
+### Path D — server-rendered app that needs one genuinely interactive screen
+
+The path where the correct answer is usually “do much less than you were planning.”
+
+<Wire>
+<Step t="Step 1 · try hypermedia" rev="cheap">htmx or Turbo on the existing stack. A surprising share of “we need a SPA for this” screens are a fragment swap and an optimistic update. Contexte went the other direction and removed 67% of their code (Module 02).</Step>
+<Step t="Step 2 · if that genuinely fails, one island" rev="cheap">Mount a framework component into the server-rendered page for that screen only. Its own hydration root, its own bundle. The rest of the application never learns about it.</Step>
+<Step t="Step 3 · if the island grows into an app" rev="costly">Promote it to its own zone with its own deployment. You are now in Path A's world, deliberately, for one route.</Step>
+</Wire>
+
+The discipline here is refusing to let step 2 spread. One island is an enhancement; fifteen islands with shared state is a SPA that nobody decided to build and nobody is maintaining as one.
+
+<Recap>
+- Migrate routes, not applications. SEO and interactivity are route-level properties.
+- Enforce module boundaries *before* splitting deployments — it is the cheap test for whether your seams are real.
+- In every path, the reversible steps come first and the one-way step comes last. If your plan inverts that, re-order it.
+- A half-migrated auth system is worse than either end state. Move refresh ownership in one step.
+- The most valuable outcome of a migration plan is sometimes discovering you should stop at step 2.
+</Recap>
