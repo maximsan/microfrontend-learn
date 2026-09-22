@@ -78,7 +78,26 @@
     });
   }
 
+  /* ---- copy button on every code block ---- */
+  function addCopyButtons(){
+    document.querySelectorAll(".codewrap").forEach(function(wrap){
+      var pre=wrap.querySelector("pre"); if(!pre) return;
+      var btn=document.createElement("button");
+      btn.type="button"; btn.className="copy"; btn.textContent="Copy";
+      btn.setAttribute("aria-label","Copy code to clipboard");
+      btn.addEventListener("click",function(){
+        var text=pre.innerText;
+        var done=function(ok){ btn.textContent=ok?"Copied":"Press ⌘C"; setTimeout(function(){btn.textContent="Copy";},1600); };
+        if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(text).then(function(){done(true);},function(){done(false);}); }
+        else { var r=document.createRange(); r.selectNodeContents(pre); var sel=getSelection(); sel.removeAllRanges(); sel.addRange(r); done(false); }
+      });
+      var bar=wrap.querySelector(".fname");
+      if(bar){ bar.appendChild(btn); } else { btn.classList.add("float"); wrap.appendChild(btn); }
+    });
+  }
+
   try { setStats(); } catch(e) {}
+  try { addCopyButtons(); } catch(e) {}
   try { linkAcronyms(); } catch(e) {}
 
   var root=document.documentElement;
@@ -115,11 +134,19 @@
   var side=document.getElementById("side");
   var scrim=document.getElementById("scrim");
   var menu=document.getElementById("menu");
+  var mainEl=document.querySelector("main");
   function setDrawer(open){
     if(!side||!scrim||!menu)return;
+    var wasOpen=side.classList.contains("open");
     side.classList.toggle("open",open);
     scrim.classList.toggle("on",open);
     menu.setAttribute("aria-expanded",open?"true":"false");
+    root.classList.toggle("drawer-open",open);      // no background scrolling under the drawer
+    if(mainEl){ if(open){mainEl.setAttribute("inert","");} else {mainEl.removeAttribute("inert");} }
+    if(open&&!wasOpen){
+      var cur=side.querySelector("#toc a.on")||side.querySelector("#toc a");
+      if(cur){cur.focus({preventScroll:true});cur.scrollIntoView({block:"center"});}
+    } else if(!open&&wasOpen){ menu.focus({preventScroll:true}); }
   }
   if(menu){menu.addEventListener("click",function(){setDrawer(!side.classList.contains("open"));});}
   if(scrim){scrim.addEventListener("click",function(){setDrawer(false);});}

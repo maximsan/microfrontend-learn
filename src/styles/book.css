@@ -100,7 +100,7 @@ a:hover{text-decoration-thickness:2px}
   background:var(--paper);border-bottom:1px solid var(--rule);
   padding:10px 16px;align-items:center;gap:12px;font-family:var(--f-ui);
 }
-#bar strong{font-size:14px;font-weight:600}
+#bar strong{font-size:14px;font-weight:600;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:center}
 .iconbtn{
   font-family:var(--f-ui);font-size:12px;font-weight:600;
   background:var(--surface);color:var(--ink-2);
@@ -401,8 +401,65 @@ a.xref:hover{color:var(--client);border-bottom-color:var(--client)}
   .wrap,.wide{padding-inline:20px}
   .module{padding-block:48px}
 }
+/* ============ TOUCH & NARROW ============ */
+@media(max-width:600px){
+  /* Tables: 2 columns fit; 3+ columns become one card per row, labelled from the header. */
+  table.cols-2{min-width:0}
+  .tscroll:has(table.stack){overflow:visible;border:0;background:none}
+  table.stack{min-width:0}
+  table.stack thead{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+  table.stack,table.stack tbody,table.stack tr,table.stack td,table.stack tbody th{display:block;width:100%}
+  table.stack tr{border:1px solid var(--rule);border-radius:3px;background:var(--surface);margin:0 0 10px;padding:4px 0}
+  table.stack td,table.stack tbody th{border:0;padding:5px 14px;white-space:normal}
+  table.stack tbody th{background:none;font-family:var(--f-ui);font-size:13.5px;letter-spacing:0;text-transform:none;color:var(--ink)}
+  table.stack [data-label]::before{content:attr(data-label);display:block;font-family:var(--f-mono);font-size:9px;letter-spacing:.11em;text-transform:uppercase;color:var(--faint);font-weight:500;margin-bottom:1px}
+  table.stack tr > :first-child{font-weight:600;padding-top:10px;font-size:14px}
+  table.stack tr > :first-child::before{display:none}
+}
+/* Long flows (more than three boxes) stack at every width — they cannot fit the measure side by side. */
+.flow.flow-long{flex-direction:column}
+.flow.flow-long .arrow{flex-direction:row;gap:8px;min-width:0;padding:7px 0 7px 14px;justify-content:flex-start}
+.flow.flow-long .arrow i{transform:rotate(90deg)}
+.flow.flow-long .arrow em{margin-top:0;text-align:left}
+.flow.flow-long .box{flex:none}
+
+/* Code blocks: copy button (added by the client script) */
+.codewrap{position:relative}
+.copy{font-family:var(--f-mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;background:var(--surface);color:var(--muted);border:1px solid var(--rule-strong);border-radius:3px;padding:4px 8px;cursor:pointer;margin-left:8px;min-height:28px}
+.codewrap .fname em{margin-left:auto}
+.codewrap .fname > span + .copy{margin-left:auto}
+.copy:hover{color:var(--client);border-color:var(--client)}
+.codewrap .fname{align-items:center}
+.codewrap .copy.float{position:absolute;top:8px;right:8px}
+.codewrap pre{-webkit-overflow-scrolling:touch;tab-size:2}
+
+@media(max-width:600px){
+  .codewrap pre{font-size:12px;padding:12px}
+  .codewrap .fname{flex-wrap:wrap}
+}
+/* ============ TOUCH & NARROW ============ */
+@media(max-width:900px){
+  #bar{gap:8px;padding:8px max(12px, env(safe-area-inset-left)) 8px max(12px, env(safe-area-inset-right))}
+  .iconbtn{min-height:40px;padding:8px 12px;font-size:12.5px}
+  #toc a{padding:10px 10px;font-size:14px}
+  #toc .grp{padding-top:18px}
+}
+@media(max-width:480px){
+  .wrap,.wide{padding-inline:16px}
+  #top .lede{font-size:17.5px}
+  .call{padding:14px 16px;font-size:15.5px}
+  .call.verified{padding:2px 0 2px 16px}
+  .recap,.check{padding:16px 18px}
+  .dtree .kids{padding-left:12px}
+  .spectrum .spec-row .lbl{font-size:12px}
+  h3{font-size:20.5px;margin-top:38px}
+  .module{padding-block:40px}
+}
+
 @media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important;scroll-behavior:auto!important}}
-html{scroll-behavior:smooth}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%;text-size-adjust:100%}
+html.drawer-open{overflow:hidden}
+main p,main li,main dd,main td,main th{overflow-wrap:break-word}
 section[id]{scroll-margin-top:70px}
 
 /* ============ PRINT ============ */
