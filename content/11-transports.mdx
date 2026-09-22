@@ -107,3 +107,15 @@ On subscriptions, the [over-HTTP spec explicitly punts](https://graphql.github.i
 - WebRTC always needs a second transport for signalling.
 - SSE for server-push-only; WebSocket for genuine bidirectional; WebTransport is newly Baseline.
 </Recap>
+
+<Check>
+1. Six micro-frontends each open their own `EventSource` over HTTP/1.1. What does the user experience?
+2. How do you authenticate a browser WebSocket, and which attack must you then defend against?
+3. The backend team offers gRPC for the web client. What is your answer?
+
+<Answers>
+1. **Nothing else loads — in any tab.** SSE over HTTP/1.1 is capped at six connections per browser per domain, and Chrome and Firefox have marked it “Won't fix”. The shell should own one connection and fan messages out; with several tabs open, elect one leader tab with the Web Locks API and relay over `BroadcastChannel`.
+2. **With cookies, since the constructor cannot send an `Authorization` header** — the alternatives are a subprotocol hack or a query-string token that lands in logs. Because the browser attaches cookies to the handshake automatically, you are exposed to Cross-Site WebSocket Hijacking: validate the `Origin` header on every handshake against an explicit allowlist.
+3. **Native gRPC is impossible in a browser**: no browser API can force HTTP/2 or read raw frames and trailers, and gRPC reports status in trailers. Use the Connect protocol, which avoids trailers and works over HTTP/1.1 for everything except bidirectional streaming, or gRPC-Web behind a translating proxy such as Envoy.
+</Answers>
+</Check>

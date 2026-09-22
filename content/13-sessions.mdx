@@ -115,3 +115,15 @@ Expanding the one-line rule from earlier, because this is where composed pages l
 - Authorization is enforced at the resource server. The browser gets coarse capability flags for rendering, never the role graph, and never enforcement.
 - During SSR: propagate identity, never cache user data at module scope, and decide in advance what a mid-stream auth failure renders.
 </Recap>
+
+<Check>
+1. You adopted a BFF with `SameSite=Strict` cookies. Is CSRF solved?
+2. The only session timeout is 15 minutes of inactivity. What does that fail to stop?
+3. A user clicks “Log out”. List everything that has to happen.
+
+<Answers>
+1. **No.** OWASP: SameSite is defence in depth, not a replacement. It is scoped to the registrable domain, so every sibling subdomain in a micro-frontend estate is same-site; `Lax` does not stop state-changing `GET`s. Add a synchronizer or signed double-submit token sent in a custom header, and verify `Origin` (falling back to `Referer`) on every state-changing endpoint.
+2. **An active attacker.** An idle timeout expires abandoned sessions, but anyone using a stolen session keeps it alive with traffic. Add an absolute timeout measured from session creation — OWASP suggests 4–8 hours for a working day — which eventually evicts a hijacked session regardless of activity.
+3. **Server side:** clear the cookie, destroy the server-side session record, and revoke the refresh token at the authorisation server — otherwise the BFF can mint a new access token. **Client side:** the shell broadcasts `session:ended` so every mounted micro-frontend clears its data and closes sockets, and other tabs learn of it through `BroadcastChannel` or the `storage` event.
+</Answers>
+</Check>

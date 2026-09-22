@@ -97,3 +97,15 @@ Two mitigations. Test the composed application in CI at the current *production*
 - pnpm prevents phantom dependencies, which matter more here than in a single app.
 - Per-app affected builds require explicitly declared inter-package dependencies.
 </Recap>
+
+<Check>
+1. Does putting every micro-frontend in one repository couple their deployments?
+2. A tutorial tells you to run `nx g @nx/react:host`. What do you do?
+3. Some users see a slow page and nobody can reproduce it. What should already have been in place?
+
+<Answers>
+1. **No — repository layout and deploy independence are orthogonal.** One repository couples source history, not releases. Per-app affected builds keep deployments independent, provided inter-package dependencies are declared explicitly in each `package.json`; otherwise every commit deploys everything.
+2. **Treat it as a dead API.** Nx v23 replaced `host`/`remote` with `consumer`/`provider`, deprecated the old generators and executors, and removes them in v24 with no automated codemod. Angular Module Federation is no longer supported in Nx (use Native Federation), and SSR federation must be wired by hand.
+3. **The four observability basics:** every micro-frontend publishes its build ID, the shell mints one trace ID that every fragment render and API call carries, errors and RUM performance are attributed to the owning micro-frontend and build, and CI tests the composed app at current *production* versions rather than HEAD of everything.
+</Answers>
+</Check>

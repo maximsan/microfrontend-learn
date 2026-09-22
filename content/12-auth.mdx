@@ -141,3 +141,15 @@ What survives: <q>CHIPS and FedCM… We'll continue to support those APIs. We'll
 - The shell owns refresh. One origin for API traffic. Deduplicate `/me`.
 - Third-party cookies survive in Chrome; CHIPS and FedCM are the surviving Privacy Sandbox pieces.
 </Recap>
+
+<Check>
+1. For each of RFC 10017's three architectures, where does the access token live?
+2. Setting the session cookie on `Domain=example.com` would let every sub-app use it. Why does the RFC say not to, and what makes it unnecessary?
+3. “Our tokens are in memory, not `localStorage`, so XSS cannot steal them.” Evaluate the claim.
+
+<Answers>
+1. **BFF:** never in the browser — the BFF holds access and refresh tokens and the browser holds only a session cookie. **Token-mediating backend:** the access token is in the browser, the refresh token stays server-side. **Browser-based OAuth client:** every token is in the browser. The RFC strongly recommends the first for business, sensitive and personal-data applications.
+2. **A `Domain` cookie is readable by every subdomain**, so one compromised subdomain compromises the session everywhere; `__Host-` cookies cannot carry `Domain` at all. Proxy all API traffic through the BFF's own origin and a host-only cookie already reaches everything — needing a `Domain` cookie is a sign that sub-apps call different backends directly.
+3. **It is weaker than it sounds.** RFC 10017 concludes that none of the browser storage options can fully prevent exfiltration once an attacker executes code in the application. In a micro-frontend estate every team's code and dependencies share one origin and one heap, so the blast radius is larger than in a monolith — the strongest argument for keeping tokens out of the browser entirely.
+</Answers>
+</Check>
