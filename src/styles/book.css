@@ -276,7 +276,9 @@ span.pg{border:0;background:none}
 .call.insight .tag{color:var(--insight)}
 .call.trap{border-left-color:var(--trap);background:var(--trap-soft)}
 .call.trap .tag{color:var(--trap)}
-.call.verified{border-left-color:var(--verified);background:var(--verified-soft)}
+/* Quotes are the most frequent callout; render them as a quiet pull-quote
+   rather than a filled box so the analysis boxes keep their weight. */
+.call.verified{border-left:2px solid var(--verified);background:transparent;padding:4px 0 4px 20px;border-radius:0}
 .call.verified .tag{color:var(--verified)}
 .call.correction{border-left-color:var(--server);background:var(--server-soft)}
 .call.correction .tag{color:var(--server)}
