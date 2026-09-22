@@ -134,11 +134,19 @@
   var side=document.getElementById("side");
   var scrim=document.getElementById("scrim");
   var menu=document.getElementById("menu");
+  var mainEl=document.querySelector("main");
   function setDrawer(open){
     if(!side||!scrim||!menu)return;
+    var wasOpen=side.classList.contains("open");
     side.classList.toggle("open",open);
     scrim.classList.toggle("on",open);
     menu.setAttribute("aria-expanded",open?"true":"false");
+    root.classList.toggle("drawer-open",open);      // no background scrolling under the drawer
+    if(mainEl){ if(open){mainEl.setAttribute("inert","");} else {mainEl.removeAttribute("inert");} }
+    if(open&&!wasOpen){
+      var cur=side.querySelector("#toc a.on")||side.querySelector("#toc a");
+      if(cur){cur.focus({preventScroll:true});cur.scrollIntoView({block:"center"});}
+    } else if(!open&&wasOpen){ menu.focus({preventScroll:true}); }
   }
   if(menu){menu.addEventListener("click",function(){setDrawer(!side.classList.contains("open"));});}
   if(scrim){scrim.addEventListener("click",function(){setDrawer(false);});}
