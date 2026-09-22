@@ -401,6 +401,21 @@ a.xref:hover{color:var(--client);border-bottom-color:var(--client)}
   .wrap,.wide{padding-inline:20px}
   .module{padding-block:48px}
 }
+/* ============ TOUCH & NARROW ============ */
+@media(max-width:600px){
+  /* Tables: 2 columns fit; 3+ columns become one card per row, labelled from the header. */
+  table.cols-2{min-width:0}
+  .tscroll:has(table.stack){overflow:visible;border:0;background:none}
+  table.stack{min-width:0}
+  table.stack thead{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+  table.stack,table.stack tbody,table.stack tr,table.stack td,table.stack tbody th{display:block;width:100%}
+  table.stack tr{border:1px solid var(--rule);border-radius:3px;background:var(--surface);margin:0 0 10px;padding:4px 0}
+  table.stack td,table.stack tbody th{border:0;padding:5px 14px;white-space:normal}
+  table.stack tbody th{background:none;font-family:var(--f-ui);font-size:13.5px;letter-spacing:0;text-transform:none;color:var(--ink)}
+  table.stack [data-label]::before{content:attr(data-label);display:block;font-family:var(--f-mono);font-size:9px;letter-spacing:.11em;text-transform:uppercase;color:var(--faint);font-weight:500;margin-bottom:1px}
+  table.stack tr > :first-child{font-weight:600;padding-top:10px;font-size:14px}
+  table.stack tr > :first-child::before{display:none}
+}
 @media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important;scroll-behavior:auto!important}}
 html{scroll-behavior:smooth}
 section[id]{scroll-margin-top:70px}
