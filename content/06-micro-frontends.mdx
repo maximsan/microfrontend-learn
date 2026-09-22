@@ -153,7 +153,15 @@ And the behaviour you must design around: <q>Navigating between pages in the sam
 <Cite>— [Next.js, Multi-Zones](https://nextjs.org/docs/app/guides/multi-zones)</Cite>
 </Source>
 
-This is an MPA of SPAs, and it is dramatically more robust than the alternatives: no shared bundler configuration, no runtime version negotiation, independent failure domains. The cost is one full page load when crossing a zone boundary — and with speculation rules and View Transitions that boundary is now nearly invisible.
+This is an MPA of SPAs, and it is dramatically more robust than the alternatives: no shared bundler configuration, no runtime version negotiation, independent failure domains. The cost is one full page load when crossing a zone boundary. Speculation rules can prerender the next zone so the load is fast everywhere they are supported; cross-document View Transitions smooth the swap in Chromium and Safari but not yet in Firefox (Module 05). Design for the hard navigation and treat the smoothness as an enhancement.
+
+<Insight title="What “the shell” means once you have zones">
+A zone crossing is a document replacement, so by Module 01's definition **nothing in memory survives it** — no shell runtime, no open socket, no in-memory store. With zones, "the shell" is not a running program; it is a **shared layout package** (header, nav, tokens, the session client) that every zone renders, plus a contract for what must survive a crossing.
+
+That contract has exactly three carriers: the **URL**, **cookies** (the BFF session, Module 10) and **browser storage**. Anything else — a media player, an unsent draft — either lives inside one zone or is the signal that the boundary is in the wrong place (Appendix D).
+
+Two rules from later modules change shape accordingly. *One owner for history* becomes one router **per document**: each zone's router owns the address bar while it is loaded, and cross-zone links are plain `<a>` tags. *One realtime connection* becomes one **per tab**, re-established on every zone load — or, if reconnect cost matters, one per browser held by a `SharedWorker` or a `BroadcastChannel` leader tab (Module 09).
+</Insight>
 
 #### 3. Federated SSR — most seamless, most operationally expensive
 

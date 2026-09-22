@@ -95,8 +95,8 @@ Run this *per route*, not per application — that is the whole point of the mod
 #### Fixed regardless of which leaf you reached
 
 - **Auth** — BFF, host-only `__Host-` cookies, no tokens in the browser ([RFC 10017](https://www.rfc-editor.org/info/rfc10017/)).
-- **Realtime** — one shell-owned connection, fanned out. Never one per micro-frontend.
-- **History** — exactly one owner, built on the Navigation API.
+- **Realtime** — one connection per tab, owned by the shell layer and fanned out to micro-frontends. Never one per micro-frontend. Under zones it is re-opened on each zone load (Module 06).
+- **History** — exactly one owner per document, built on the Navigation API. Under zones that is each zone's own router; cross-zone links are plain `<a>` tags.
 - **Repository** — a monorepo does not couple deployments, and it kills dependency drift.
 
 ### A defensible 2026 default
@@ -107,10 +107,10 @@ Run this *per route*, not per application — that is the whole point of the mod
 | **Escalation** | Podium fragment streaming | Only when several teams must appear on one screen *and* SEO matters |
 | **Repository** | Monorepo, pnpm workspaces, Turborepo or Nx | Kills dependency drift; per-app affected deploys keep releases independent |
 | **Bundler** | Rspack or Vite | Not Next.js (federation deprecated), not Parcel (no MF), not Turbopack (no webpack plugins) |
-| **Routing** | Shell owns history, built on the Navigation API | Baseline since Jan 2026 — no monkey-patching for new work |
+| **Routing** | One router per document, built on the Navigation API; plain links between zones | Baseline since Jan 2026 — no monkey-patching for new work |
 | **Auth** | BFF per RFC 10017 | Host-only `__Host-` cookies, `Secure`, `HttpOnly`, `SameSite=Strict`, no tokens in the browser |
 | **API** | BFF per team, or GraphQL federation | Front-end and back-end boundaries align; no shared-API committee bottleneck |
-| **Realtime** | One shell-owned SSE or WebSocket | The six-connection cap is per browser, per domain, across all tabs |
+| **Realtime** | One SSE or WebSocket per tab, from the shared shell package | The six-connection cap is per browser, per domain, across all tabs |
 
 ### Four questions that should stop you
 
