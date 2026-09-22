@@ -1,0 +1,112 @@
+---
+id: "rendering-modes"
+part: "Part I · Foundations"
+title: "Rendering modes"
+section: "Foundations"
+standfirst: "The five things people mean by “SSR”, what partial prerendering changes, and why Server Components are a new position rather than a new mode."
+prereqs: ["dividing-line", "spectrum"]
+objectives:
+  - "Distinguish the five SSR modes by when HTML is produced and whether a CDN can cache it"
+  - "Disambiguate “selective SSR” in a design discussion"
+  - "Explain what Server Components change about runtime lifetime, and why they do not federate"
+---
+
+<Mod to="spectrum" /> placed architectures on one axis. Inside the server-rendering half of it there is a second decision, made per route rather than per application: *when* the HTML is produced. Getting the vocabulary straight here saves arguments later, because the same three letters cover five mechanisms with different caching, freshness and failure behaviour.
+
+### “SSR” is five different things
+
+The question that distinguishes them is **when the HTML is produced**, and the consequence that matters is **whether a CDN can cache it**.
+
+| Mode | HTML produced | CDN-cacheable | Freshness |
+| --- | --- | --- | --- |
+| **Static generation** | At build | <Ok>Fully</Ok> | <No>Stale until you rebuild</No> |
+| **Request-time SSR** | Per request | <No>No</No> | <Ok>Always fresh</Ok> |
+| **On-demand / ISR** | First request or webhook, then cached and revalidated in the background | <Ok>Yes</Ok> | Stale-while-revalidate |
+| **Streaming SSR** | Per request, flushed progressively | <No>Not as one unit</No> | <Ok>Fresh, much better TTFB</Ok> |
+| **Partial prerendering** | Static shell at build + dynamic holes streamed per request | <Warn>Shell yes, holes no</Warn> | <Ok>Fresh where it matters</Ok> |
+
+The last one is the newest and is no longer experimental.
+
+<Source>
+<Quote>This rendering approach is called **Partial Prerendering (PPR)**, the default behavior with Cache Components.</Quote>
+
+And the mechanism, which is exactly the streaming sequence from <Mod to="streaming" /> applied at build boundaries: <q>Every produced static shell can be served directly from a CDN, without going through to the upstream server.</q> Components marked `'use cache'` join the shell; anything wrapped in `<Suspense>` streams at request time.
+
+<Cite>— [Next.js, Caching with Cache Components](https://nextjs.org/docs/app/getting-started/caching), docs v16.3.5. Cache Components shipped in 16.0.0 and is enabled with `cacheComponents: true`.</Cite>
+</Source>
+
+<Trap title="“Selective SSR” means three different things">
+It is not a standard term, and people use it for at least three unrelated mechanisms. Establish which one is meant before agreeing to anything:
+
+1. **Per-route rendering choice** — some routes server-rendered, others static or client-only. The most common meaning, entirely standard, and every meta-framework has it: Next.js route segment config, Nuxt `routeRules`, SvelteKit's `export const ssr = false`. Nothing exotic.
+2. **Partial prerendering** — selective *within one page*: a static shell plus dynamic holes, in one response. This is what PPR above is.
+3. **Selective hydration** — React's term, and not an SSR mode at all. It is about which parts get JavaScript and in what order (<Mod to="streaming" />). Routinely conflated with the other two because the word is the same.
+
+All three are current and widely used. They solve different problems, and a conversation where one person means (1) and the other means (3) will appear to agree and then produce the wrong architecture.
+</Trap>
+
+<Trap title="Crawlers take a different code path">
+Under PPR, bots do not get the cached shell. From the same docs: <q>because they need a complete document, Next.js skips the shell and renders the entire page dynamically at request time.</q>
+
+So your SEO traffic exercises a different rendering path from your users, and <q>work that completed during prerendering now runs at request time for a bot.</q> A page that loads fine for a person can fail for a crawler if the shell depended on build-time data.
+</Trap>
+
+### Server Components: a third runtime category
+
+<Mod to="spectrum" /> lists them as a row on the spectrum, which undersells them. They change the shape of the axis itself, and they do it by attacking the property <Mod to="dividing-line" /> is built on.
+
+#### Neither one document nor one session
+
+<Mod to="dividing-line" /> gave two answers to “how long does the runtime live”: one document, or the whole session. A server component is neither. It runs once on the server, renders to a **serialized payload rather than JavaScript**, and *never exists on the client at all*. No bundle entry, no hydration, no memory footprint. Its lifetime is a single render.
+
+So `'use client'` is not a rendering hint. It is the literal marker for **where the client runtime begins** — the network boundary expressed as a component boundary. Everything above it costs zero client JavaScript; everything below it is a SPA.
+
+#### The property that is genuinely new
+
+Navigation under RSC does not replace the document and does not re-render the client tree from scratch. The router fetches a new payload for the changed part and **merges it into the existing client tree**.
+
+<Table>
+<thead><tr><th></th><th>Server renders each navigation</th><th>Client state survives navigation</th></tr></thead>
+<tbody>
+<tr><th>Classic MPA</th><td className="ok">Yes</td><td className="no">No — heap destroyed</td></tr>
+<tr><th>SPA</th><td className="no">No — client renders</td><td className="ok">Yes</td></tr>
+<tr><th>Hypermedia</th><td className="ok">Yes</td><td className="warn">DOM only</td></tr>
+<tr><th>Server Components</th><td className="ok">Yes</td><td className="ok">Yes</td></tr>
+</tbody>
+</Table>
+
+That bottom row is the point. Server rendering on every navigation, *without* losing in-memory client state — an open modal, a media player, a half-filled form all survive. No previous position on the spectrum offers both, and it is why RSC is not simply “SSR with extra steps.”
+
+#### What it costs
+
+- **The spectrum stops being a per-application choice.** It becomes a per-component dial, which is more power and considerably more ways to be inconsistent across a codebase.
+- **The boundary is invisible in the source.** A `'use client'` three components up silently pulls everything below it into the bundle. Bundle regressions arrive as a one-line diff in an unrelated file.
+- **Data fetching moves into rendering**, which removes an API layer and removes the place many teams had put their caching and authorization.
+
+#### And why it does not yet compose across teams
+
+RSC and micro-frontends are not currently compatible in the way people assume. An RSC payload is a serialized React tree tied to a specific React version and a specific build — a tighter coupling than sharing a JavaScript module, not a looser one. The Module Federation maintainers' own tracking issue for RSC in Next.js lists why: React splits into four distinct singletons (`react`, `react/rsc`, `react-dom/server`, `react-dom/server/rsc`) that would all need sharing, and <q>Next.js isn't built for this architecture</q>. It was closed as not planned ([module-federation/core #1400](https://github.com/module-federation/core/issues/1400)).
+
+The pattern that does work today is the one in <Mod to="micro-frontends" />, under *Specifically in Next.js*: a server component fetching another team's rendered output over HTTP. That crosses the boundary as data or HTML rather than as a React tree, which is exactly why it survives the version skew.
+
+<Recap>
+- “SSR” is five modes, distinguished by **when the HTML is produced** and **whether a CDN can cache it**: static generation, request-time SSR, ISR, streaming SSR and partial prerendering.
+- “Selective SSR” is not a standard term. Establish whether someone means per-route choice, PPR or selective hydration.
+- Under PPR, crawlers skip the cached shell and take a fully dynamic path. Test that path.
+- Server components are a third runtime category: rendered once per request, shipped as a payload, never present on the client.
+- `'use client'` marks where the client runtime starts — the network boundary as a component boundary.
+- They are the only position that server-renders every navigation *and* preserves client state.
+- They do not federate. The payload is more tightly version-coupled than a JS module, not less.
+</Recap>
+
+<Check>
+1. A product page is identical for every visitor except the stock level and the cart count; prices change a few times a day. Which mode fits, and why?
+2. A colleague proposes “selective SSR.” What do you ask before agreeing?
+3. Why do React Server Component payloads not federate across teams, and what crosses the boundary instead?
+
+<Answers>
+1. **Partial prerendering** — or ISR with streamed holes if you are not on a PPR-capable framework. The static shell (description, images, price if a few hours' staleness is acceptable) is served from the CDN; the stock level and cart count are dynamic holes streamed per request. Request-time SSR for the whole page would give up the CDN for two small regions.
+2. **Which of the three meanings they intend:** a per-route rendering choice, partial prerendering within one page, or React's selective hydration. The first two are SSR modes; the third is about which parts get JavaScript and in what order. A conversation where each side means a different one will appear to agree and produce the wrong design.
+3. **The payload is a serialized React tree tied to one React version and one build** — tighter coupling than a shared JavaScript module. The Module Federation maintainers' tracking issue lists four React singletons that would all need sharing, and was closed as not planned. What works today is a server component fetching another team's *rendered output* over HTTP: data or HTML crosses the boundary, not a React tree.
+</Answers>
+</Check>

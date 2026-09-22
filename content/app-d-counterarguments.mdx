@@ -1,8 +1,6 @@
 ---
 id: "counter"
-num: "D"
-group: "Back matter"
-kicker: "Appendix D"
+part: "Back matter"
 title: "When this guide is wrong"
 standfirst: "The strongest cases against this guide's main positions, made as their defenders would make them."
 appendix: true
@@ -32,7 +30,7 @@ Every recommendation here has a defensible opposite. If your situation matches o
 
 **The case against:** build time is a real engineering cost and at some scale it dominates everything else. A twenty-minute CI run changes how often people refactor, which changes the code. Splitting for build performance alone — without any deploy independence — is a legitimate use that this guide and Nx both dismiss slightly too quickly.
 
-**The counter:** remote caching and affected-task graphs (Module 11) usually solve build time at a fraction of the cost. Try those first, then re-measure.
+**The counter:** remote caching and affected-task graphs (<Mod to="delivery" />) usually solve build time at a fraction of the cost. Try those first, then re-measure.
 
 ### “Next.js federation is a dead end”
 

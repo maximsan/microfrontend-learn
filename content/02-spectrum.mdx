@@ -1,10 +1,14 @@
 ---
-id: "m2"
-num: "02"
-group: "Part I · Foundations"
-kicker: "Module 02 · Foundations"
+id: "spectrum"
+part: "Part I · Foundations"
 title: "The spectrum of variants"
+section: "Foundations"
 standfirst: "Eleven architectures on one axis, with sourced examples of who runs each in production."
+prereqs: ["dividing-line"]
+objectives:
+  - "Place eleven architectures on the server-to-client axis"
+  - "Name a production system, with a primary source, for each position"
+  - "Explain why PWA and micro-frontends are orthogonal to rendering"
 ---
 
 With the dividing line established, the landscape orders itself. The axis runs from <ServerSide>server owns everything</ServerSide> to <ClientSide>client owns everything</ClientSide>, and the useful question for any architecture is: at what point does the HTML come into existence, and who holds the truth afterwards?
@@ -65,7 +69,7 @@ Two of these are worth more than the rest. **Contexte** and **Netflix** are the 
 
 **Progressive Web Apps** are orthogonal. A service worker, a manifest, offline capability and installability can be bolted onto an MPA as easily as onto a SPA. PWA describes distribution and offline behaviour, not rendering.
 
-**Micro-frontends** are also orthogonal, and more consequentially so. They are an organisational and deployment concern. You can build an MPA composed of independently-deployed SPAs — Module 06 argues that is usually the right shape. Confusing “we need micro-frontends” with “we need a SPA” produces some of the worst architectures in the field.
+**Micro-frontends** are also orthogonal, and more consequentially so. They are an organisational and deployment concern. You can build an MPA composed of independently-deployed SPAs — <Mod to="micro-frontends" /> argues that is usually the right shape. Confusing “we need micro-frontends” with “we need a SPA” produces some of the worst architectures in the field.
 
 <Insight title="The one discriminator">
 **How long is a session, and how dense are the interactions inside it?**
@@ -79,3 +83,15 @@ Read-and-leave, low density → server-rendered HTML. Live-in-it-all-day, high d
 - Micro-frontends are orthogonal and organisational. An MPA of independently-deployed SPAs is coherent and often correct.
 - Session length × interaction density settles most cases.
 </Recap>
+
+<Check>
+1. A team says “we need micro-frontends, so we need a SPA.” What is wrong with the inference?
+2. Why are Contexte and Netflix worth more than the other rows in *In the wild*?
+3. An internal admin tool is open all day and every screen is filters, inline edits and drag-and-drop. Where does it sit on the axis, and which two numbers justify that?
+
+<Answers>
+1. **It conflates two orthogonal axes.** Micro-frontends are an organisational and deployment decision; SPA is a rendering decision. An MPA made of independently deployed SPAs — routing-level zones — is coherent and often the right shape (<Mod to="micro-frontends" />). Treating one as implying the other produces some of the worst architectures in the field.
+2. **They moved backwards along the axis and published numbers.** Contexte cut its code base by 67% moving from React to Django + htmx; Netflix made a landing page 50% faster by removing client-side React. Every other row shows *what* someone runs; these two show what happened when a team changed position — the closest thing to evidence rather than reasoning.
+3. **Toward the client — a SPA, or hypermedia if the team is server-side and state is server-owned.** The justification is the chapter's one discriminator: *session length* and *interaction density*. Both are high, so the bundle cost amortises and per-interaction round trips would dominate the experience.
+</Answers>
+</Check>

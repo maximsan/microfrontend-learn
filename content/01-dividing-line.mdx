@@ -1,10 +1,13 @@
 ---
-id: "m1"
-num: "01"
-group: "Part I · Foundations"
-kicker: "Module 01 · Foundations"
+id: "dividing-line"
+part: "Part I · Foundations"
 title: "The dividing line"
+section: "Foundations"
 standfirst: "What actually separates a SPA from everything else — and why it has nothing to do with page count."
+objectives:
+  - "Define SPA and MPA by runtime lifetime rather than page count"
+  - "Separate runtime lifetime from state lifetime for any architecture"
+  - "Explain why LiveView-style servers are a third model, not a midpoint"
 ---
 
 Ask ten engineers what makes an application a SPA and you get: one HTML file, client-side routing, no page reload. All symptoms. The cause is more specific.
@@ -54,7 +57,7 @@ Not a point between SPA and MPA: long-lived state held *on the server*, one proc
 
 #### bfcache blurs the MPA boundary
 
-Browsers freeze the entire heap on back-navigation and thaw it on return, so an MPA's runtime *can* survive a navigation. Module 05 has the mechanics and the two things that silently disqualify your page.
+Browsers freeze the entire heap on back-navigation and thaw it on return, so an MPA's runtime *can* survive a navigation. <Mod to="navigation" /> has the mechanics and the two things that silently disqualify your page.
 
 ### So — is a SPA only possible in a browser?
 

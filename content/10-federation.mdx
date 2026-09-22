@@ -1,11 +1,15 @@
 ---
-id: "m8"
-num: "08"
-group: "Part II · The machinery"
-kicker: "Module 08 · The machinery"
+id: "federation"
+part: "Part II · The machinery"
 title: "Bundlers and Module Federation"
 nav: "Bundlers & federation"
+section: "The machinery"
 standfirst: "Sharing semantics, the React singleton problem, working setup code, and which tools are dead ends."
+prereqs: ["micro-frontends", "sharing"]
+objectives:
+  - "Configure shared dependencies with correct singleton and strictVersion semantics"
+  - "Avoid the react-dom/client duplicate-React trap"
+  - "Choose between Module Federation, import maps, single-spa and Web Components"
 ---
 
 ### The `shared` configuration, precisely
@@ -34,7 +38,7 @@ And the nuance most summaries drop: <q>In general, React supports using multiple
 <Cite>— [react.dev, Invalid hook call warning](https://react.dev/warnings/invalid-hook-call-warning)</Cite>
 </Source>
 
-So two fully independent micro-frontends, each with their own React, are fine — provided nothing crosses the boundary. It is sharing components, context or hooks across the boundary that forces the singleton, and therefore forces the version coupling micro-frontends were supposed to eliminate. That is the tension from Module 06 in its most concrete form.
+So two fully independent micro-frontends, each with their own React, are fine — provided nothing crosses the boundary. It is sharing components, context or hooks across the boundary that forces the singleton, and therefore forces the version coupling micro-frontends were supposed to eliminate. That is the tension from <Mod to="micro-frontends" /> in its most concrete form.
 
 <Trap title="The subpath that silently duplicates React">
 From [Module Federation's documentation](https://module-federation.io/configure/shared.html): <q>Writing 'react-dom' (no trailing slash) only intercepts import 'react-dom'. Any code that does import \{ createRoot \} from 'react-dom/client' will load a second copy of React DOM, which breaks React singleton requirements and causes hydration errors.</q>
@@ -164,13 +168,15 @@ export default function App() {
 }
 ```
 
-What happens when that page loads:
+What happens when that page loads, step by step (the dots mark which side does the work — the remote's server only serves files):
 
-1. Shell boots and populates its **share scope** with the versions of `react` and `react-dom` it carries.
-2. On first render of `<CartWidget />`, the runtime fetches `remoteEntry.js` from `cart.example.com`.
-3. The remote registers *its* versions into the same share scope and negotiates: because both declare `singleton`, one copy of React wins — the higher semver, with a console warning to the loser.
-4. The runtime fetches only the chunks for `./CartWidget` that are not already satisfied.
-5. The component renders inside the shell's React tree, sharing its context and its reconciler.
+<Wire>
+<Step t="1 · shell boots">Populates its **share scope** with the versions of `react` and `react-dom` it carries.</Step>
+<Step t="2 · first render of the remote" server>The runtime fetches `remoteEntry.js` from `cart.example.com` — a network call on the render path.</Step>
+<Step t="3 · negotiation">The remote registers *its* versions into the same share scope. Both declare `singleton`, so one copy of React wins — the higher semver — with a console warning to the loser.</Step>
+<Step t="4 · chunks" server>The runtime fetches only the chunks for `./CartWidget` that the share scope does not already satisfy.</Step>
+<Step t="5 · render">The component renders inside the shell's React tree, sharing its context and its reconciler.</Step>
+</Wire>
 
 <Trap title="Step 2 is a network call you do not control">
 If `cart.example.com` is slow or down, that dynamic `import()` rejects and — without the error boundary above — takes down the shell's whole subtree. Every remote needs a boundary and a fallback. The team that owns the shell will be paged for the team that owns the remote.
@@ -310,7 +316,7 @@ This is the approach [micro-frontends.org](https://micro-frontends.org/) advocat
 </tbody>
 </Table>
 
-The pattern in that table is the same trade-off from Module 06, now visible as configuration: **Module Federation wins on bundle size and developer ergonomics precisely because it couples the dependency graph. Web Components win on isolation precisely because they ship React twice.**
+The pattern in that table is the same trade-off from <Mod to="micro-frontends" />, now visible as configuration: **Module Federation wins on bundle size and developer ergonomics precisely because it couples the dependency graph. Web Components win on isolation precisely because they ship React twice.**
 
 <Recap>
 - `singleton` exists because some libraries hold global internal state. `strictVersion` defaults to `true` more often than blogs claim.
@@ -319,3 +325,15 @@ The pattern in that table is the same trade-off from Module 06, now visible as c
 - Next.js federation is deprecated and Turbopack cannot run webpack plugins. Rspack or Vite for MF; Modern.js for federated SSR.
 - Parcel, esbuild and Turbopack have no Module Federation. Import maps are the standards-based alternative.
 </Recap>
+
+<Check>
+1. `react` and `react-dom` are shared as singletons, yet the app still reports “Invalid hook call”. What is the most likely cause?
+2. A blog post says `strictVersion` defaults to `false`. Why does it matter that this is wrong?
+3. A Next.js 16 App Router team wants Module Federation. What do you tell them?
+
+<Answers>
+1. **The `react-dom/client` subpath is not shared.** The key `'react-dom'` only intercepts `import 'react-dom'`; code importing `createRoot` from `react-dom/client` loads a second copy. Add the trailing-slash key `'react-dom/': { singleton: true }` on both host and remote.
+2. **It decides whether a version mismatch fails loudly or degrades silently.** The webpack documentation says it defaults to `true` when a local fallback exists and the module is not a singleton. Relying on the blog's default, you would expect a silent fallback and get a runtime error — or vice versa.
+3. **It is a dead end for new work.** The official integration page says the App Router is not supported and Next.js support is ending, and Turbopack — the Next.js 16 default — cannot load webpack plugins at all. Use Multi-Zones for independent deployment within Next.js, federate with Rspack or Vite outside it, or use Modern.js for federated SSR.
+</Answers>
+</Check>

@@ -248,6 +248,26 @@ a code{color:inherit}
 .wire .step .d b{color:var(--ink)}
 .wire code{font-size:11.5px}
 
+/* ============ MODULE BRIEF ============ */
+.brief{margin:26px 0 0;padding:14px 18px;border:1px solid var(--rule);border-radius:3px;background:var(--surface);font-family:var(--f-ui);font-size:13.5px;line-height:1.5;display:grid;gap:8px}
+.brief > div{display:grid;grid-template-columns:132px minmax(0,1fr);gap:12px;align-items:baseline}
+.brief dt{font-family:var(--f-mono);font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--faint)}
+.brief dd{margin:0;color:var(--ink-2)}
+.brief ul{margin:0;padding-left:1.1em}
+.brief li{margin-bottom:3px}
+.brief li:last-child{margin-bottom:0}
+@media(max-width:560px){.brief > div{grid-template-columns:1fr;gap:2px}}
+
+/* ============ PAGER ============ */
+.pager{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:48px;font-family:var(--f-ui)}
+.pg{display:flex;flex-direction:column;gap:3px;padding:12px 14px;border:1px solid var(--rule);border-radius:3px;text-decoration:none;color:var(--ink-2);background:var(--surface);min-height:44px}
+a.pg:hover{border-color:var(--client);color:var(--client)}
+.pg.next{text-align:right}
+.pg-k{font-family:var(--f-mono);font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--faint)}
+.pg-t{font-size:13.5px;font-weight:600;line-height:1.35}
+span.pg{border:0;background:none}
+@media(max-width:560px){.pager{grid-template-columns:1fr}.pg.next{text-align:left}span.pg{display:none}}
+
 /* ============ CALLOUTS ============ */
 .call{margin:26px 0;padding:18px 20px;border-radius:3px;border-left:3px solid var(--rule-strong);background:var(--surface);font-size:16px;line-height:1.62}
 .call > :last-child{margin-bottom:0}
@@ -256,7 +276,9 @@ a code{color:inherit}
 .call.insight .tag{color:var(--insight)}
 .call.trap{border-left-color:var(--trap);background:var(--trap-soft)}
 .call.trap .tag{color:var(--trap)}
-.call.verified{border-left-color:var(--verified);background:var(--verified-soft)}
+/* Quotes are the most frequent callout; render them as a quiet pull-quote
+   rather than a filled box so the analysis boxes keep their weight. */
+.call.verified{border-left:2px solid var(--verified);background:transparent;padding:4px 0 4px 20px;border-radius:0}
 .call.verified .tag{color:var(--verified)}
 .call.correction{border-left-color:var(--server);background:var(--server-soft)}
 .call.correction .tag{color:var(--server)}
@@ -350,6 +372,10 @@ a.acro-ref{color:inherit;text-decoration:none;border-bottom:1px dotted var(--rul
 a.acro-ref:hover{border-bottom-color:var(--client);color:var(--client)}
 a.acro-ref sup{font-family:var(--f-mono);font-size:9px;color:var(--faint);margin-left:1px;line-height:0}
 a.acro-ref:hover sup{color:var(--client)}
+
+/* cross-references between chapters (<Mod>) */
+a.xref{color:inherit;text-decoration:none;border-bottom:1px dotted var(--rule-strong)}
+a.xref:hover{color:var(--client);border-bottom-color:var(--client)}
 
 /* ============ REFERENCES ============ */
 .refgrp{margin:0 0 30px}

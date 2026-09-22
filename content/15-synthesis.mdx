@@ -1,10 +1,14 @@
 ---
-id: "m12"
-num: "12"
-group: "Part III · The wire"
-kicker: "Module 12 · Synthesis"
+id: "synthesis"
+part: "Part IV · Putting it to work"
 title: "Putting it together"
+section: "Synthesis"
 standfirst: "Which decisions are one-way doors, three decision trees, and a defensible default stack."
+prereqs: ["choosing", "micro-frontends", "auth"]
+objectives:
+  - "Spend analysis on one-way doors, not on cheap decisions"
+  - "Walk the three decision trees for your own product"
+  - "Defend or depart from the default stack with stated conditions"
 ---
 
 ### First: not all of these decisions cost the same to undo
@@ -13,13 +17,13 @@ The guide has so far treated every choice as equally weighty. They are not, and 
 
 | Decision | Cost to reverse | Why |
 | --- | --- | --- |
-| **Micro-frontends, yes or no** | <Rev kind="oneway" /> | Reversing means re-merging independently deployed codebases and dissolving the team boundaries that justified them. Spotify needed a full rewrite (Module 06). |
+| **Micro-frontends, yes or no** | <Rev kind="oneway" /> | Reversing means re-merging independently deployed codebases and dissolving the team boundaries that justified them. Spotify needed a full rewrite (<Mod to="micro-frontends" />). |
 | **Auth architecture** | <Rev kind="oneway" /> | Moving tokens out of the browser touches every API call, every client, and invalidates every live session. Retrofitting a BFF onto a token-holding SPA is a migration, not a refactor. |
 | **Local-first / sync engine** | <Rev kind="oneway" /> | Conflict resolution and offline semantics leak into the data model and into the product's behaviour. Users notice when you remove it. |
 | **SPA vs server-rendered** | <Rev kind="costly" /> | Reversible, and Netflix and Contexte both did it — but it is a rewrite of the view layer, not a config change. |
 | **Composition point** | <Rev kind="costly" /> | Zones → fragments → federation each imply different deploy topology and ops. Changing it is a quarter, not a sprint. |
 | **Public API shape** | <Rev kind="costly" /> | Versioning buys you an exit, but you carry both shapes until every client migrates. |
-| **Monorepo vs polyrepo** | <Rev kind="cheap" /> | History rewriting is annoying and well-trodden. Deployment independence is unaffected either way (Module 11). |
+| **Monorepo vs polyrepo** | <Rev kind="cheap" /> | History rewriting is annoying and well-trodden. Deployment independence is unaffected either way (<Mod to="delivery" />). |
 | **Bundler** | <Rev kind="cheap" /> | Config and CI. webpack → Rspack is close to a drop-in. Teams agonise over this one and should not. |
 | **Router library** | <Rev kind="cheap" /> | Contained to the view layer, mechanical to swap. |
 | **Realtime transport** | <Rev kind="cheap" /> | SSE ↔ WebSocket is an adapter, provided you kept it behind one. |
@@ -36,11 +40,11 @@ Read the sequence below in that light: **steps 2 and 4 are one-way doors and ste
 
 ### The same sequence as a schema
 
-One gate at the top decides which of the two trees you are in. Outcome colour marks where it lands on the spectrum from Module 02 — <ServerSide>server-owned</ServerSide> through <ClientSide>client-owned</ClientSide>.
+One gate at the top decides which of the two trees you are in. Outcome colour marks where it lands on the spectrum from <Mod to="spectrum" /> — <ServerSide>server-owned</ServerSide> through <ClientSide>client-owned</ClientSide>.
 
 <Tree q="Do several teams need to deploy to one URL surface independently?">
   <Leaf chip="no" side="mid">One application → <Light>use tree A</Light></Leaf>
-  <Leaf chip="yes" side="mid" why="And re-read Module 06 first. If teams can ship together, the answer is No.">Micro-frontends → <Light>use tree B</Light></Leaf>
+  <Leaf chip="yes" side="mid" why={<>And re-read <Mod to="micro-frontends" /> first. If teams can ship together, the answer is No.</>}>Micro-frontends → <Light>use tree B</Light></Leaf>
 </Tree>
 
 #### Tree A — one application: which rendering model?
@@ -65,13 +69,13 @@ One gate at the top decides which of the two trees you are in. Outcome colour ma
   <Leaf chip="no" side="mid" why="Each team owns URL paths. Independent failure domains, no shared bundler config.">Routing-level zones behind a proxy <Chip kind="star" inline>Default</Chip></Leaf>
   <Branch chip="yes" q="Does that screen need SEO or fast first paint?">
     <Leaf chip="yes" side="srv" why="Podium. One hydration root per fragment, per-fragment timeouts and fallbacks.">Server fragment streaming</Leaf>
-    <Leaf chip="no" side="cli" why="Not Next.js, not Parcel, not Turbopack — see Module 08.">Module Federation on Rspack or Vite</Leaf>
+    <Leaf chip="no" side="cli" why={<>Not Next.js, not Parcel, not Turbopack — see <Mod to="federation" />.</>}>Module Federation on Rspack or Vite</Leaf>
   </Branch>
 </Tree>
 
 #### Tree C — which SSR mode, per route
 
-Run this *per route*, not per application — that is the whole point of the modes (defined in Module 06). A marketing page and a dashboard in the same codebase should land on different leaves.
+Run this *per route*, not per application — that is the whole point of the modes (defined in <Mod to="rendering-modes" />). A marketing page and a dashboard in the same codebase should land on different leaves.
 
 <Tree q="Is the HTML identical for every user on this route?">
   <Branch chip="yes" q="Does it change only when you deploy?">
@@ -90,12 +94,12 @@ Run this *per route*, not per application — that is the whole point of the mod
   </Branch>
 </Tree>
 
-**Streaming is orthogonal to the rest of the tree.** It is not a competing mode — it is a modifier you layer onto any request-time rendering when a data source is slow. And if several teams compose this route, check the cacheability floor in Module 06 before committing to a leaf: one team's per-user fragment can invalidate the caching the other leaves depend on.
+**Streaming is orthogonal to the rest of the tree.** It is not a competing mode — it is a modifier you layer onto any request-time rendering when a data source is slow. And if several teams compose this route, check the cacheability floor in <Mod to="micro-frontends" /> before committing to a leaf: one team's per-user fragment can invalidate the caching the other leaves depend on.
 
 #### Fixed regardless of which leaf you reached
 
 - **Auth** — BFF, host-only `__Host-` cookies, no tokens in the browser ([RFC 10017](https://www.rfc-editor.org/info/rfc10017/)).
-- **Realtime** — one connection per tab, owned by the shell layer and fanned out to micro-frontends. Never one per micro-frontend. Under zones it is re-opened on each zone load (Module 06).
+- **Realtime** — one connection per tab, owned by the shell layer and fanned out to micro-frontends. Never one per micro-frontend. Under zones it is re-opened on each zone load (<Mod to="micro-frontends" />).
 - **History** — exactly one owner per document, built on the Navigation API. Under zones that is each zone's own router; cross-zone links are plain `<a>` tags.
 - **Repository** — a monorepo does not couple deployments, and it kills dependency drift.
 
@@ -124,3 +128,23 @@ Every architecture in this guide answers the same thing: *where does the long-li
 
 Rendering, routing, transports, auth and delivery are all downstream of that. Decide it; do not inherit it from a starter template.
 </Insight>
+
+<Recap>
+- Decisions differ in cost to undo. Micro-frontends, auth architecture and local-first are one-way doors; bundler, router and transport are cheap. Budget analysis accordingly.
+- Sequence: measure, decide on independent deployment, pick the composition point, design auth, then choose tools.
+- Tree A picks a rendering model for one application, Tree B a composition point for many teams, Tree C an SSR mode per route.
+- Some things are fixed on every leaf: a BFF, one realtime connection per tab, one history owner per document.
+- Every architecture here answers one question: where does the long-lived state live, and who may touch it?
+</Recap>
+
+<Check>
+1. A team spent two weeks choosing a bundler and one afternoon on auth. What is inverted?
+2. Walk Tree B for this case: several teams must render onto the same checkout screen, and SEO is irrelevant because checkout is behind login.
+3. Your team wants to depart from the routing-level-zones default. What must you be able to point at?
+
+<Answers>
+1. **The analysis budget.** The bundler is a cheap door — config and CI, and webpack to Rspack is close to a drop-in. Auth architecture is a one-way door: moving tokens out of the browser later touches every API call and every client and invalidates every live session. Spend the thinking where the door only opens one way.
+2. **Same screen → yes; SEO or first paint critical → no → Module Federation on Rspack or Vite.** Not on Next.js (federation deprecated, App Router unsupported), not Parcel (no federation), not Turbopack (no webpack plugins). If SEO had mattered, the leaf would have been server fragment streaming with one hydration root per fragment.
+3. **The conditions in <Mod to="counter" />.** Zones fight you when a boundary falls *inside* one continuous workflow. Ask what must survive a boundary crossing: if the honest answer is a media player, an open draft and a cart, runtime composition is justified. If you cannot name what must survive, you are departing from the default by preference, not for a reason.
+</Answers>
+</Check>

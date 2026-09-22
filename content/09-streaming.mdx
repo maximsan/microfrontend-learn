@@ -1,11 +1,15 @@
 ---
-id: "m7"
-num: "07"
-group: "Part II · The machinery"
-kicker: "Module 07 · The machinery"
+id: "streaming"
+part: "Part II · The machinery"
 title: "Fragment streaming and hydration"
 nav: "Fragment streaming"
-standfirst: "How streaming works on the wire, why fragments hydrate themselves, and what Server Components change."
+section: "The machinery"
+standfirst: "How streaming works on the wire, why fragments hydrate themselves, and what fails when they don't."
+prereqs: ["rendering-modes", "micro-frontends"]
+objectives:
+  - "Describe what an out-of-order streamed response contains on the wire"
+  - "Confine a hydration failure to one fragment"
+  - "Diagnose the common causes of hydration mismatches"
 ---
 
 ### The mechanism, from the primary source
@@ -112,54 +116,24 @@ Tailor's README still states the requirements better than anything written since
 
 [Podium](https://podium-lib.io/docs/introduction/hello-podium/) is the maintained equivalent, and its vocabulary is worth learning: <q>In Podium there are two types of servers: Podlets that serve page fragments / Layouts that compose podlets and serve the finished page.</q> The contract is explicit — <q>The contract between a podlet and a layout is defined in a JSON manifest</q> — and so is context propagation: <q>The layout is also responsible for providing a Podium context on requests made to each podlet. This context is a set of HTTP headers with information the podlet can use to generate dynamic content.</q>
 
-That last mechanism is how you propagate identity and locale into fragments during server rendering — the SSR half of Module 10's auth discussion.
-
-### Server Components, and why they belong in this guide
-
-Module 02 lists them as a row on the spectrum, which undersells them. They change the shape of the axis itself, and they do it by attacking the property Module 01 is built on.
-
-#### A third runtime category
-
-Module 01 gave two answers to “how long does the runtime live”: one document, or the whole session. A server component is neither. It runs once on the server, renders to a **serialized payload rather than JavaScript**, and *never exists on the client at all*. No bundle entry, no hydration, no memory footprint. Its lifetime is a single render.
-
-So `'use client'` is not a rendering hint. It is the literal marker for **where the client runtime begins** — the network boundary expressed as a component boundary. Everything above it costs zero client JavaScript; everything below it is a SPA.
-
-#### The property that is genuinely new
-
-Navigation under RSC does not replace the document and does not re-render the client tree from scratch. The router fetches a new payload for the changed part and **merges it into the existing client tree**.
-
-<Table>
-<thead><tr><th></th><th>Server renders each navigation</th><th>Client state survives navigation</th></tr></thead>
-<tbody>
-<tr><th>Classic MPA</th><td className="ok">Yes</td><td className="no">No — heap destroyed</td></tr>
-<tr><th>SPA</th><td className="no">No — client renders</td><td className="ok">Yes</td></tr>
-<tr><th>Hypermedia</th><td className="ok">Yes</td><td className="warn">DOM only</td></tr>
-<tr><th>Server Components</th><td className="ok">Yes</td><td className="ok">Yes</td></tr>
-</tbody>
-</Table>
-
-That bottom row is the point. Server rendering on every navigation, *without* losing in-memory client state — an open modal, a media player, a half-filled form all survive. No previous position on the spectrum offers both, and it is why RSC is not simply “SSR with extra steps.”
-
-#### What it costs
-
-- **The spectrum stops being a per-application choice.** It becomes a per-component dial, which is more power and considerably more ways to be inconsistent across a codebase.
-- **The boundary is invisible in the source.** A `'use client'` three components up silently pulls everything below it into the bundle. Bundle regressions arrive as a one-line diff in an unrelated file.
-- **Data fetching moves into rendering**, which removes an API layer and removes the place many teams had put their caching and authorization.
-
-#### And why it does not yet compose across teams
-
-RSC and micro-frontends are not currently compatible in the way people assume. An RSC payload is a serialized React tree tied to a specific React version and a specific build — a tighter coupling than sharing a JavaScript module, not a looser one. Module Federation's maintainers describe RSC support as validated in demos and *not* shippable (Module 08).
-
-The pattern that does work today is the one in Module 06: a server component fetching another team's rendered output over HTTP. That crosses the boundary as data or HTML rather than as a React tree, which is exactly why it survives the version skew.
+That last mechanism is how you propagate identity and locale into fragments during server rendering — the SSR half of the identity discussion in <Mod to="sessions" />.
 
 <Recap>
-- Server components are a third runtime category: rendered once per request, shipped as a payload, never present on the client.
-- `'use client'` marks where the client runtime starts — the network boundary as a component boundary.
-- They are the only position that server-renders every navigation *and* preserves client state.
-- They do not federate. The payload is more tightly version-coupled than a JS module, not less.
 - Out-of-order streaming works by appending hidden HTML plus a tiny inline script that relocates it. React documents this; Marko did it first.
 - Hydrate per fragment, not per page, and set `identifierPrefix` — one root couples every team's failure domain.
 - Islands are the same technique at component granularity; Jason Miller's post distinguishes them from micro-frontends precisely.
 - Tailor is archived. Podium, OpenComponents, Piral and qiankun are alive.
 - Per-fragment timeouts, fallbacks and error boundaries are not optional — one slow team must not block the page.
 </Recap>
+
+<Check>
+1. The sidebar's data resolves before the post's. What does the browser receive, and in what order?
+2. One team's fragment throws a hydration error and the entire page goes blank, including fragments that rendered correctly. What was the architecture, and what is the fix?
+3. Dates look right in development but cause hydration mismatches for users in Tokyo. Why?
+
+<Answers>
+1. **Order of completion, not order of markup.** The shell with placeholders arrives first and paints. When the sidebar resolves, a hidden block with its HTML and a tiny inline script are appended to the *same open response*; the script moves the block into its slot. The post follows the same way. The relocation is plain DOM work, so it runs before React has loaded.
+2. **A single hydration root for the whole page**, which couples every team's failure domain. Hydrate each fragment from its own root and give each a distinct `identifierPrefix`, so `useId` does not produce duplicate ids and one fragment's mismatch destroys only that fragment.
+3. **Timezone.** The server formats the date in UTC; the browser formats it in the user's zone, so the two trees differ — invisible to a developer sitting in UTC. In a composed page, resolve locale and timezone once in the shell and propagate them to every fragment (Podium's context headers are the mechanism), or format in an effect on the client.
+</Answers>
+</Check>

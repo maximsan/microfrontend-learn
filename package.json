@@ -19,7 +19,6 @@
     "remark-mdx-frontmatter": "^5.2.0"
   },
   "devDependencies": {
-    "cheerio": "^1.2.0",
     "tsx": "^4.23.15"
   }
 }
