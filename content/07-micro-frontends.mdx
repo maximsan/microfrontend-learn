@@ -80,41 +80,9 @@ Read that first sentence against the rule at the top of this module. The archite
 <Cite>— [Spotify Engineering, "Building the future of our desktop apps"](https://engineering.atspotify.com/2021/04/building-the-future-of-our-desktop-apps)</Cite>
 </Moved>
 
-### “SSR” is five different things
+### Which rendering modes survive composition
 
-Before the composition patterns, the modes need separating — because they behave very differently once more than one team is involved. The question that distinguishes them is **when the HTML is produced**, and the consequence that matters is **whether a CDN can cache it**.
-
-| Mode | HTML produced | CDN-cacheable | Freshness |
-| --- | --- | --- | --- |
-| **Static generation** | At build | <Ok>Fully</Ok> | <No>Stale until you rebuild</No> |
-| **Request-time SSR** | Per request | <No>No</No> | <Ok>Always fresh</Ok> |
-| **On-demand / ISR** | First request or webhook, then cached and revalidated in the background | <Ok>Yes</Ok> | Stale-while-revalidate |
-| **Streaming SSR** | Per request, flushed progressively | <No>Not as one unit</No> | <Ok>Fresh, much better TTFB</Ok> |
-| **Partial prerendering** | Static shell at build + dynamic holes streamed per request | <Warn>Shell yes, holes no</Warn> | <Ok>Fresh where it matters</Ok> |
-
-The last one is the newest and is no longer experimental.
-
-<Source>
-<Quote>This rendering approach is called **Partial Prerendering (PPR)**, the default behavior with Cache Components.</Quote>
-
-And the mechanism, which is exactly the streaming sequence from <Mod to="streaming" /> applied at build boundaries: <q>Every produced static shell can be served directly from a CDN, without going through to the upstream server.</q> Components marked `'use cache'` join the shell; anything wrapped in `<Suspense>` streams at request time.
-
-<Cite>— [Next.js, Caching with Cache Components](https://nextjs.org/docs/app/getting-started/caching), docs v16.3.5. Cache Components shipped in 16.0.0 and is enabled with `cacheComponents: true`.</Cite>
-</Source>
-
-<Trap title="“Selective SSR” means three different things">
-It is not a standard term, and people use it for at least three unrelated mechanisms. Establish which one is meant before agreeing to anything:
-
-1. **Per-route rendering choice** — some routes server-rendered, others static or client-only. The most common meaning, entirely standard, and every meta-framework has it: Next.js route segment config, Nuxt `routeRules`, SvelteKit's `export const ssr = false`. Nothing exotic.
-2. **Partial prerendering** — selective *within one page*: a static shell plus dynamic holes, in one response. This is what PPR above is.
-3. **Selective hydration** — React's term, and not an SSR mode at all. It is about which parts get JavaScript and in what order (<Mod to="streaming" />). Routinely conflated with the other two because the word is the same.
-
-All three are current and widely used. They solve different problems, and a conversation where one person means (1) and the other means (3) will appear to agree and then produce the wrong architecture.
-</Trap>
-
-#### Which modes survive composition
-
-This is the part that is absent from most micro-frontend writing, and it is where the real constraint lives:
+<Mod to="rendering-modes" /> separates the five things people mean by “SSR”. They behave very differently once more than one team contributes to a page, and this is the part that is absent from most micro-frontend writing — it is where the real constraint lives:
 
 <Insight title="The cacheability floor">
 **A composed page is only as cacheable as its least cacheable fragment.**
@@ -128,11 +96,7 @@ One team's per-user fragment makes the whole assembled document uncacheable at t
 | **Server fragment composition** | Survives, but you must do the work. Every fragment needs its own TTL and the layout must honour it — this is precisely what ESI was invented for, and what Podium's manifest and context headers carry. Streaming is the natural fit. The trap: fragments then have *different ages* on one page, which is fine for nav and footer and dangerous for price next to stock level. |
 | **Federated SSR** | <No>Mostly collapses. One render, one response, one cache policy. ISR and PPR both assume a single build knows which parts are dynamic, and a remote that decides at runtime breaks that assumption. In practice you fall back to request-time SSR for the whole page, losing the CDN entirely.</No> |
 
-<Trap title="Crawlers take a different code path">
-Under PPR, bots do not get the cached shell. From the same docs: <q>because they need a complete document, Next.js skips the shell and renders the entire page dynamically at request time.</q>
-
-So your SEO traffic exercises a different rendering path from your users, and <q>work that completed during prerendering now runs at request time for a bot.</q> A page that loads fine for a person can fail for a crawler if the shell depended on build-time data. In a composed page, that failure mode is multiplied by the number of teams contributing to the shell.
-</Trap>
+Composition also multiplies the PPR crawler trap from <Mod to="rendering-modes" />: if the static shell depends on build-time data from several teams, a crawler's full dynamic render has several more ways to fail than a person's cached one.
 
 ### SSR with micro-frontends: three patterns
 
