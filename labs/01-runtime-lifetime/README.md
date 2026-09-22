@@ -33,7 +33,7 @@ Same id, the age keeps growing, and the clicks survive. Navigation here is `hist
 
 1. In the MPA, go from page A to page B, then press the browser's **Back** button.
 2. The page says *restored from bfcache*: the old runtime id and clicks are back. The browser froze the whole heap and thawed it.
-3. Now follow **…with an unload handler** and press Back. It says *fresh load*. One `unload` listener made the page ineligible.
+3. Now follow **…with an unload handler** (page B, this time registering an `unload` listener), click *Go to page A*, then press Back. Page B says *fresh load*: one `unload` listener made it ineligible.
 
 In Chrome, *DevTools → Application → Back/forward cache → Test* shows the reason in plain words.
 
