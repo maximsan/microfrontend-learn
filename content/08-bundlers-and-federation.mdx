@@ -101,8 +101,8 @@ module.exports = {
         './CartWidget': './src/CartWidget',
       },
       shared: {
-        react:        { singleton: true, requiredVersion: '^18.3.0' },
-        'react-dom':  { singleton: true, requiredVersion: '^18.3.0' },
+        react:        { singleton: true, requiredVersion: '^19.0.0' },
+        'react-dom':  { singleton: true, requiredVersion: '^19.0.0' },
         'react-dom/': { singleton: true },  // trailing slash: catches react-dom/client
       },
     }),
@@ -124,8 +124,8 @@ module.exports = {
       },
       shared: {
         // must match the remote, or you get two Reacts
-        react:        { singleton: true, requiredVersion: '^18.3.0' },
-        'react-dom':  { singleton: true, requiredVersion: '^18.3.0' },
+        react:        { singleton: true, requiredVersion: '^19.0.0' },
+        'react-dom':  { singleton: true, requiredVersion: '^19.0.0' },
         'react-dom/': { singleton: true },
       },
     }),
@@ -187,12 +187,12 @@ All three solve the same problem — load another team's code at runtime — and
 No bundler runtime at all. The mapping is a standard [HTML feature](https://html.spec.whatwg.org/multipage/webappapis.html#import-map); "singleton" just means the map has one entry.
 
 ```html file="shell/index.html" label="Import maps"
+<!-- one entry per dependency = one copy, enforced by the browser -->
 <script type="importmap">
 {
   "imports": {
-    // one entry per dependency = one copy, enforced by the browser
-    "react":       "https://cdn.example.com/react@18.3.1/index.js",
-    "react-dom/":  "https://cdn.example.com/react-dom@18.3.1/",
+    "react":       "https://cdn.example.com/react@19.2.0/index.js",
+    "react-dom/":  "https://cdn.example.com/react-dom@19.2.0/",
     "@acme/cart":  "https://cart.example.com/main.js"
   }
 }
@@ -205,6 +205,10 @@ No bundler runtime at all. The mapping is a standard [HTML feature](https://html
 ```
 
 You deploy a new cart by rewriting one line of JSON — which is exactly what single-spa's `import-map-deployer` automates. The cost: no automatic version negotiation, no build-time type sharing, and you manage the CDN yourself.
+
+<Trap title="An import map is strict JSON">
+No comments, no trailing commas. MDN: <q>The import map must be a valid JSON object</q> ([MDN, `<script type="importmap">`](https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/script/type/importmap)). A map that fails to parse does not partly work — none of its specifiers resolve, and every `import('@acme/…')` on the page fails. Put explanations in an HTML comment beside the `<script>`, as above, never inside it.
+</Trap>
 
 #### 2. single-spa — an orchestrator resolves
 
@@ -247,13 +251,19 @@ No shared runtime, real CSS isolation via Shadow DOM, and the integration surfac
 class CartWidget extends HTMLElement {
   static observedAttributes = ['user-id'];
 
-  connectedCallback() {
-    // Shadow DOM: the host's CSS cannot reach in, and yours cannot leak out
+  constructor() {
+    super();
+    // Shadow DOM: the host's CSS cannot reach in, and yours cannot leak out.
+    // Attach it here, once — connectedCallback runs again every time the element moves.
     this.attachShadow({ mode: 'open' });
-    this.render();
   }
-  attributeChangedCallback() { this.render(); }
+  connectedCallback()        { this.render(); }
+  attributeChangedCallback() { this.render(); }  // may run before connectedCallback
   disconnectedCallback()     { /* same teardown duty as single-spa's unmount */ }
+
+  render() {
+    this.shadowRoot.innerHTML = `<button part="badge">Cart · user ${this.getAttribute('user-id')}</button>`;
+  }
 
   addItem(item) {
     // events up — the host listens, it does not reach in
@@ -275,6 +285,12 @@ customElements.define('acme-cart', CartWidget);
     .addEventListener('cart:item-added', e => shell.refreshBadge(e.detail));
 </script>
 ```
+
+<Trap title="Two lifecycle orders that break naive custom elements">
+**Attributes arrive before connection.** When the browser upgrades an element that is already in the page — the normal case when the definition script loads after the HTML — it queues `attributeChangedCallback` for every existing attribute *before* `connectedCallback` ([WHATWG HTML, upgrade an element, steps 4–5](https://html.spec.whatwg.org/multipage/custom-elements.html#concept-upgrade-an-element)). A `render()` that assumes the shadow root was created in `connectedCallback` crashes on first paint.
+
+**Connection happens more than once.** Moving the element fires `disconnectedCallback` then `connectedCallback` again, and a second `attachShadow()` on an element that is already a shadow host throws `NotSupportedError` ([MDN, attachShadow()](https://developer.mozilla.org/en-US/docs/Web/API/Element/attachShadow#calling_this_method_on_an_element_that_is_already_a_shadow_host)). Attach the shadow root in the constructor; keep `connectedCallback` idempotent.
+</Trap>
 
 This is the approach [micro-frontends.org](https://micro-frontends.org/) advocates, and the reason is visible in the code: there is no version to negotiate, because nothing is shared.
 

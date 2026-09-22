@@ -18,6 +18,32 @@ Six micro-frontends each opening their own `EventSource` on HTTP/1.1 and the use
 **Rule:** the shell owns one connection and fans messages out. Micro-frontends do not each open their own.
 </Trap>
 
+#### One connection per browser, not per tab
+
+The cap is per browser, so ten open tabs of a well-behaved shell still hold ten connections. The fix is leader election: one tab owns the stream and relays it to the rest. The [Web Locks API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Locks_API) — Baseline since March 2022 — is built for this: <q>each tab could try to acquire a "my_net_db_sync" lock, but only one tab will succeed (the leader election pattern.)</q> When the leader tab closes, its lock is released and the next queued tab takes over.
+
+```js file="shell/realtime.js" label="One stream per browser"
+const bus = new BroadcastChannel('acme:realtime');
+const deliver = (msg) =>
+  window.dispatchEvent(new CustomEvent(`rt:${msg.type}`, { detail: msg }));
+
+// Followers: receive what the leader relays.
+bus.onmessage = (e) => deliver(e.data);
+
+// Every tab queues for the lock; exactly one holds it at a time.
+navigator.locks.request('acme:realtime-leader', () => {
+  const es = new EventSource('/api/events');
+  es.onmessage = (e) => {
+    const msg = JSON.parse(e.data);
+    deliver(msg);          // BroadcastChannel does not echo to its sender
+    bus.postMessage(msg);
+  };
+  return new Promise(() => {}); // hold the lock for this tab's lifetime
+});
+```
+
+Micro-frontends listen for `rt:*` events and never touch the connection. Under routing-level zones this module is part of the shared shell package, so the same code runs in every zone.
+
 <Trap title="You cannot authenticate a WebSocket with a header">
 The browser constructor is [`new WebSocket(url)` / `new WebSocket(url, protocols)`](https://developer.mozilla.org/en-US/docs/Web/API/WebSocket/WebSocket). There is no headers parameter. You cannot send `Authorization`.
 

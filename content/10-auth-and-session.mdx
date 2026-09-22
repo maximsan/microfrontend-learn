@@ -178,7 +178,7 @@ Everything above is authentication. Authorization is a separate decision that mi
 | **BFF** | Coarse route gating, so an unauthorised user does not reach a shell they cannot use. | Duplicates policy in two places; they drift. |
 | **Browser** | Hiding controls the user cannot use. **Presentation only.** | Tempting to treat as enforcement. It is not — every check is editable by the person it applies to. |
 
-The practical question is what claims the shell publishes. Shipping a full permission set to the browser makes every micro-frontend's UI easy and leaks your authorization model to anyone who opens devtools. Shipping nothing means each micro-frontend fetches its own permissions and you get the `/me` fan-out from Module 09. The usable middle: the shell exposes a small, coarse set of *capability flags* — `canManageBilling`, not the role graph — purely to decide what to render, with the resource server enforcing the real thing on every call.
+The practical question is what claims the shell publishes. Shipping a full permission set to the browser makes every micro-frontend's UI easy and leaks your authorization model to anyone who opens devtools. Shipping nothing means each micro-frontend fetches its own permissions and you get the `/me` fan-out described under *Supporting specs* below. The usable middle: the shell exposes a small, coarse set of *capability flags* — `canManageBilling`, not the role graph — purely to decide what to render, with the resource server enforcing the real thing on every call.
 
 ### Auth during server rendering
 
