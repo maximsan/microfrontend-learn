@@ -76,17 +76,16 @@ async function build() {
   const dup = chapters.map((c) => c.meta.id).find((id, i, a) => a.indexOf(id) !== i);
   if (dup) throw new Error(`Duplicate chapter id "${dup}"`);
   setChapters(chapters.map((c) => c.meta));
-  for (const c of chapters) c.body = render(c.mod);
+  for (const c of chapters) {
+    c.body = render(c.mod);
+    c.meta.minutes = Math.max(1, Math.round(countWords(renderToStaticMarkup(c.body)) / 200));
+  }
 
   const hero = render(await compile(rel('content', '_hero.mdx')));
 
   // Stats shown in the hero. The client script recomputes them the same way.
   const bodyHtml = renderToStaticMarkup(h(runtime.Fragment, null, ...chapters.map((c) => c.body)));
-  const words = bodyHtml
-    .replace(/<pre[\s\S]*?<\/pre>/g, ' ')
-    .replace(/<[^>]+>/g, ' ')
-    .trim()
-    .split(/\s+/).length;
+  const words = countWords(bodyHtml);
   const mins = Math.max(5, Math.round(words / 200 / 5) * 5);
   const stats = {
     modules: chapters.filter((c) => !c.meta.appendix).length,
@@ -143,6 +142,10 @@ function runWatch() {
   watch(rel('book.config.mjs'), schedule);
   console.log('Watching content/ and src/ …');
   run();
+}
+
+function countWords(html) {
+  return html.replace(/<pre[\s\S]*?<\/pre>/g, ' ').replace(/<[^>]+>/g, ' ').trim().split(/\s+/).length;
 }
 
 function escapeHtml(s) {

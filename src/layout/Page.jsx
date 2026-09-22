@@ -1,6 +1,7 @@
 // The page shell: sidebar contents, mobile bar, hero and one <section> per chapter.
 import book from '../../book.config.mjs';
 import { VerifiedDate } from '../components/inline.jsx';
+import { chapter, label } from '../components/xref.jsx';
 
 /**
  * @param {{ hero: JSX.Element, chapters: { meta: object, body: JSX.Element }[], stats: object }} props
@@ -53,8 +54,10 @@ export default function Page({ hero, chapters, stats }) {
             </div>
           </section>
 
-          {chapters.map(({ meta, body }) => (
-            <Chapter key={meta.id} meta={meta}>{body}</Chapter>
+          {chapters.map(({ meta, body }, i) => (
+            <Chapter key={meta.id} meta={meta} prev={chapters[i - 1]?.meta} next={chapters[i + 1]?.meta}>
+              {body}
+            </Chapter>
           ))}
         </main>
       </div>
@@ -78,12 +81,13 @@ const Group = ({ label, items }) => (
   </>
 );
 
-function Chapter({ meta, children }) {
+function Chapter({ meta, prev, next, children }) {
   const head = (
     <div className="modhead" style={meta.wide ? { maxWidth: 'var(--measure)', marginLeft: 'auto', marginRight: 'auto' } : undefined}>
       <span className="modnum">{meta.kicker}</span>
       <h2>{meta.title}</h2>
       <p className="standfirst">{meta.standfirst}</p>
+      {meta.appendix ? null : <Brief meta={meta} />}
     </div>
   );
   return (
@@ -91,8 +95,62 @@ function Chapter({ meta, children }) {
       <div className={meta.wide ? 'wide' : 'wrap'}>
         {head}
         {children}
+        <Pager prev={prev} next={next} wide={meta.wide} />
       </div>
     </section>
+  );
+}
+
+/** Time, prerequisites, objectives and lab for one module, from its frontmatter. */
+function Brief({ meta }) {
+  const prereqs = (meta.prereqs ?? []).map(chapter);
+  return (
+    <dl className="brief">
+      <div>
+        <dt>Time</dt>
+        <dd>{meta.minutes} min read{meta.lab ? ' + lab' : ''}</dd>
+      </div>
+      {prereqs.length ? (
+        <div>
+          <dt>Before this</dt>
+          <dd>
+            {prereqs.map((c, i) => (
+              <span key={c.id}>{i ? ' · ' : ''}<a className="xref" href={`#${c.id}`}>{label(c)} {c.nav ?? c.title}</a></span>
+            ))}
+          </dd>
+        </div>
+      ) : null}
+      {meta.objectives?.length ? (
+        <div className="brief-obj">
+          <dt>You will be able to</dt>
+          <dd><ul>{meta.objectives.map((o) => <li key={o}>{o}</li>)}</ul></dd>
+        </div>
+      ) : null}
+      {meta.lab ? (
+        <div>
+          <dt>Lab</dt>
+          <dd><code>labs/{meta.lab}</code></dd>
+        </div>
+      ) : null}
+    </dl>
+  );
+}
+
+/** Previous / next links at the end of every chapter. */
+function Pager({ prev, next, wide }) {
+  if (!prev && !next) return null;
+  const item = (c, dir) =>
+    c ? (
+      <a className={`pg ${dir}`} href={`#${c.id}`}>
+        <span className="pg-k">{dir === 'prev' ? '← Previous' : 'Next →'}</span>
+        <span className="pg-t">{label(c)} · {c.nav ?? c.title}</span>
+      </a>
+    ) : <span className="pg" aria-hidden="true"></span>;
+  return (
+    <nav className="pager" aria-label="Chapter navigation" style={wide ? { maxWidth: 'var(--measure)', marginInline: 'auto' } : undefined}>
+      {item(prev, 'prev')}
+      {item(next, 'next')}
+    </nav>
   );
 }
 
