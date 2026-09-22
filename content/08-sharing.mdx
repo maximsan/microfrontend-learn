@@ -50,7 +50,7 @@ If two micro-frontends share a lot of *mutable* state, they are not two micro-fr
 3. **Events.** `CustomEvent` on `window`; `BroadcastChannel` for cross-tab and cross-iframe. Version the contracts (`cart:item-added@v1`).
 4. **One small shell-owned singleton.** Not a global Redux store — a deliberately tiny, versioned contract for what is genuinely cross-cutting: auth/session, theme, locale, feature flags, notifications. That list is close to complete.
 5. **Props down, events up**, if your micro-frontends are custom elements. It is just the DOM contract, and it is the cleanest boundary available.
-6. **Web storage** for tokens and preferences only. A poor reactive store: no same-tab event, strings only, quota limits.
+6. **Web storage** for non-sensitive preferences only — never tokens, which belong server-side behind the BFF (<Mod to="auth" />). A poor reactive store: no same-tab event, strings only, quota limits.
 
 <Trap title="Events are not state">
 A micro-frontend that mounts *after* an event fired never sees it, and will render with stale or empty data. This produces bugs that only appear under specific navigation orders and are miserable to reproduce.
