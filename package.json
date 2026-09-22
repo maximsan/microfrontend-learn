@@ -1,0 +1,25 @@
+{
+  "name": "rendering-spectrum",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "The Rendering Spectrum — a field guide to web architecture, authored in MDX and rendered with React to a single static HTML page.",
+  "scripts": {
+    "build": "tsx scripts/build.mjs",
+    "watch": "tsx scripts/build.mjs --watch",
+    "check": "tsx scripts/check.mjs"
+  },
+  "dependencies": {
+    "@mdx-js/mdx": "^3.1.1",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
+    "rehype-mdx-code-props": "^3.0.1",
+    "remark-frontmatter": "^5.0.0",
+    "remark-gfm": "^4.0.1",
+    "remark-mdx-frontmatter": "^5.2.0"
+  },
+  "devDependencies": {
+    "cheerio": "^1.2.0",
+    "tsx": "^4.23.15"
+  }
+}
