@@ -128,3 +128,15 @@ Every architecture in this guide answers the same thing: *where does the long-li
 
 Rendering, routing, transports, auth and delivery are all downstream of that. Decide it; do not inherit it from a starter template.
 </Insight>
+
+<Check>
+1. A team spent two weeks choosing a bundler and one afternoon on auth. What is inverted?
+2. Walk Tree B for this case: several teams must render onto the same checkout screen, and SEO is irrelevant because checkout is behind login.
+3. Your team wants to depart from the routing-level-zones default. What must you be able to point at?
+
+<Answers>
+1. **The analysis budget.** The bundler is a cheap door — config and CI, and webpack to Rspack is close to a drop-in. Auth architecture is a one-way door: moving tokens out of the browser later touches every API call and every client and invalidates every live session. Spend the thinking where the door only opens one way.
+2. **Same screen → yes; SEO or first paint critical → no → Module Federation on Rspack or Vite.** Not on Next.js (federation deprecated, App Router unsupported), not Parcel (no federation), not Turbopack (no webpack plugins). If SEO had mattered, the leaf would have been server fragment streaming with one hydration root per fragment.
+3. **The conditions in <Mod to="counter" />.** Zones fight you when a boundary falls *inside* one continuous workflow. Ask what must survive a boundary crossing: if the honest answer is a media player, an open draft and a cart, runtime composition is justified. If you cannot name what must survive, you are departing from the default by preference, not for a reason.
+</Answers>
+</Check>

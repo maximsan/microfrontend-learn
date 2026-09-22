@@ -73,3 +73,15 @@ The discipline here is refusing to let step 2 spread. One island is an enhanceme
 - A half-migrated auth system is worse than either end state. Move refresh ownership in one step.
 - The most valuable outcome of a migration plan is sometimes discovering you should stop at step 2.
 </Recap>
+
+<Check>
+1. A SPA needs SEO. Why not simply enable SSR across the whole application?
+2. During Path C, the BFF is live and half the callers use the cookie session. Is the token-theft risk reduced yet?
+3. In Path B, step 2 is “run it for a quarter”. What are you actually measuring?
+
+<Answers>
+1. **SEO is a property of specific routes.** Turning SSR on everywhere gives every route a server render and hydration cost — including the authenticated dashboard nobody indexes — which is how teams end up slower than they started. Measure which routes need it, carve them out behind a path prefix, render those on the server with islands for interactivity, and leave the app a SPA.
+2. **No.** Tokens are still issued to the browser until step 4, so steps 2 and 3 are preparation, not mitigation. Worse, if the browser and the BFF both refresh, two clients rotate the same refresh token and users are logged out at random under load. Move refresh ownership to the BFF in one step before step 3 begins.
+3. **Whether the enforced module boundaries hold.** If teams stop importing each other's internals, you have found real seams and can promote them to zones. If the same three places keep being violated, those are not separate domains — and you have avoided splitting deployments along the wrong line, which is far more expensive to undo.
+</Answers>
+</Check>
