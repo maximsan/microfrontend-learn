@@ -1,4 +1,5 @@
 // Diagram blocks: spectrum, timeline, request flows, wire sequences, decision trees.
+import { Children } from 'react';
 import { Chip, Rev } from './inline.jsx';
 
 /* ---------- Spectrum ---------- */
@@ -41,7 +42,11 @@ export const Era = ({ yr, dir, title, children }) => (
 /* ---------- Request flow ---------- */
 
 /** A left-to-right chain of <Box> and <Arrow>. */
-export const Flow = ({ children }) => <div className="flow">{children}</div>;
+export const Flow = ({ children }) => {
+  // More than three boxes do not fit side by side in the reading column: stack them.
+  const boxes = Children.toArray(children).filter((c) => c.type === Box).length;
+  return <div className={boxes > 3 ? 'flow flow-long' : 'flow'}>{children}</div>;
+};
 
 /** kind = "good" | "hot" | undefined */
 export const Box = ({ kind, title, children }) => (

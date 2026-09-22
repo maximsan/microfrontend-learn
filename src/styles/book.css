@@ -416,6 +416,13 @@ a.xref:hover{color:var(--client);border-bottom-color:var(--client)}
   table.stack tr > :first-child{font-weight:600;padding-top:10px;font-size:14px}
   table.stack tr > :first-child::before{display:none}
 }
+/* Long flows (more than three boxes) stack at every width — they cannot fit the measure side by side. */
+.flow.flow-long{flex-direction:column}
+.flow.flow-long .arrow{flex-direction:row;gap:8px;min-width:0;padding:7px 0 7px 14px;justify-content:flex-start}
+.flow.flow-long .arrow i{transform:rotate(90deg)}
+.flow.flow-long .arrow em{margin-top:0;text-align:left}
+.flow.flow-long .box{flex:none}
+
 @media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important;scroll-behavior:auto!important}}
 html{scroll-behavior:smooth}
 section[id]{scroll-margin-top:70px}
