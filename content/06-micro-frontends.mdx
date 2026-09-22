@@ -1,9 +1,8 @@
 ---
-id: "m6"
-num: "06"
-group: "Part II · The machinery"
-kicker: "Module 06 · The machinery"
+id: "micro-frontends"
+part: "Part II · The machinery"
 title: "Micro-frontends"
+section: "The machinery"
 standfirst: "When to split a frontend, where to compose it, and everything that gets harder once you do."
 ---
 
@@ -25,7 +24,7 @@ This guide otherwise speaks as if there is one answer. There is not — the same
 
 | Teams on the surface | What is usually right |
 | --- | --- |
-| **1–3** | A modular monolith. Enforced module boundaries (Module 11) give you most of the discipline with none of the runtime cost. Micro-frontends here are almost always a mistake. |
+| **1–3** | A modular monolith. Enforced module boundaries (<Mod to="delivery" />) give you most of the discipline with none of the runtime cost. Micro-frontends here are almost always a mistake. |
 | **4–8** | Routing-level zones. Real deploy independence, boring failure modes, no platform team required. |
 | **9–20** | Zones plus fragment composition where teams genuinely share a screen. You now need someone to own the shell contract full-time. |
 | **20+** | A platform team is not optional — version negotiation, the shell, the deploy pipeline and the governance become somebody's actual job. This is the scale the published case studies later in this module are drawn from. |
@@ -98,7 +97,7 @@ The last one is the newest and is no longer experimental.
 <Source>
 <Quote>This rendering approach is called **Partial Prerendering (PPR)**, the default behavior with Cache Components.</Quote>
 
-And the mechanism, which is exactly the streaming sequence from Module 07 applied at build boundaries: <q>Every produced static shell can be served directly from a CDN, without going through to the upstream server.</q> Components marked `'use cache'` join the shell; anything wrapped in `<Suspense>` streams at request time.
+And the mechanism, which is exactly the streaming sequence from <Mod to="streaming" /> applied at build boundaries: <q>Every produced static shell can be served directly from a CDN, without going through to the upstream server.</q> Components marked `'use cache'` join the shell; anything wrapped in `<Suspense>` streams at request time.
 
 <Cite>— [Next.js, Caching with Cache Components](https://nextjs.org/docs/app/getting-started/caching), docs v16.3.5. Cache Components shipped in 16.0.0 and is enabled with `cacheComponents: true`.</Cite>
 </Source>
@@ -108,7 +107,7 @@ It is not a standard term, and people use it for at least three unrelated mechan
 
 1. **Per-route rendering choice** — some routes server-rendered, others static or client-only. The most common meaning, entirely standard, and every meta-framework has it: Next.js route segment config, Nuxt `routeRules`, SvelteKit's `export const ssr = false`. Nothing exotic.
 2. **Partial prerendering** — selective *within one page*: a static shell plus dynamic holes, in one response. This is what PPR above is.
-3. **Selective hydration** — React's term, and not an SSR mode at all. It is about which parts get JavaScript and in what order (Module 07). Routinely conflated with the other two because the word is the same.
+3. **Selective hydration** — React's term, and not an SSR mode at all. It is about which parts get JavaScript and in what order (<Mod to="streaming" />). Routinely conflated with the other two because the word is the same.
 
 All three are current and widely used. They solve different problems, and a conversation where one person means (1) and the other means (3) will appear to agree and then produce the wrong architecture.
 </Trap>
@@ -139,7 +138,7 @@ So your SEO traffic exercises a different rendering path from your users, and <q
 
 #### 1. Fragment services — when SEO and first paint matter
 
-Each micro-frontend exposes an HTTP endpoint returning an HTML fragment plus its asset manifest. A layout service fetches them in parallel and streams them into one document as they arrive. Module 07 covers the mechanics.
+Each micro-frontend exposes an HTTP endpoint returning an HTML fragment plus its asset manifest. A layout service fetches them in parallel and streams them into one document as they arrive. <Mod to="streaming" /> covers the mechanics.
 
 #### 2. Routing-level split — the pragmatic default
 
@@ -153,14 +152,14 @@ And the behaviour you must design around: <q>Navigating between pages in the sam
 <Cite>— [Next.js, Multi-Zones](https://nextjs.org/docs/app/guides/multi-zones)</Cite>
 </Source>
 
-This is an MPA of SPAs, and it is dramatically more robust than the alternatives: no shared bundler configuration, no runtime version negotiation, independent failure domains. The cost is one full page load when crossing a zone boundary. Speculation rules can prerender the next zone so the load is fast everywhere they are supported; cross-document View Transitions smooth the swap in Chromium and Safari but not yet in Firefox (Module 05). Design for the hard navigation and treat the smoothness as an enhancement.
+This is an MPA of SPAs, and it is dramatically more robust than the alternatives: no shared bundler configuration, no runtime version negotiation, independent failure domains. The cost is one full page load when crossing a zone boundary. Speculation rules can prerender the next zone so the load is fast everywhere they are supported; cross-document View Transitions smooth the swap in Chromium and Safari but not yet in Firefox (<Mod to="navigation" />). Design for the hard navigation and treat the smoothness as an enhancement.
 
 <Insight title="What “the shell” means once you have zones">
-A zone crossing is a document replacement, so by Module 01's definition **nothing in memory survives it** — no shell runtime, no open socket, no in-memory store. With zones, "the shell" is not a running program; it is a **shared layout package** (header, nav, tokens, the session client) that every zone renders, plus a contract for what must survive a crossing.
+A zone crossing is a document replacement, so by <Mod to="dividing-line" />'s definition **nothing in memory survives it** — no shell runtime, no open socket, no in-memory store. With zones, "the shell" is not a running program; it is a **shared layout package** (header, nav, tokens, the session client) that every zone renders, plus a contract for what must survive a crossing.
 
-That contract has exactly three carriers: the **URL**, **cookies** (the BFF session, Module 10) and **browser storage**. Anything else — a media player, an unsent draft — either lives inside one zone or is the signal that the boundary is in the wrong place (Appendix D).
+That contract has exactly three carriers: the **URL**, **cookies** (the BFF session, <Mod to="auth" />) and **browser storage**. Anything else — a media player, an unsent draft — either lives inside one zone or is the signal that the boundary is in the wrong place (<Mod to="counter" />).
 
-Two rules from later modules change shape accordingly. *One owner for history* becomes one router **per document**: each zone's router owns the address bar while it is loaded, and cross-zone links are plain `<a>` tags. *One realtime connection* becomes one **per tab**, re-established on every zone load — or, if reconnect cost matters, one per browser held by a `SharedWorker` or a `BroadcastChannel` leader tab (Module 09).
+Two rules from later modules change shape accordingly. *One owner for history* becomes one router **per document**: each zone's router owns the address bar while it is loaded, and cross-zone links are plain `<a>` tags. *One realtime connection* becomes one **per tab**, re-established on every zone load — or, if reconnect cost matters, one per browser held by a `SharedWorker` or a `BroadcastChannel` leader tab (<Mod to="transports" />).
 </Insight>
 
 #### 3. Federated SSR — most seamless, most operationally expensive
@@ -187,7 +186,7 @@ Worth its own treatment, because Next.js is where most teams ask this question a
 <Trap title="Build-time composition sold as micro-frontends">
 Extracting shared components into a workspace package feels like splitting the frontend. It is not. Every consumer still has to rebuild and redeploy to pick up a change, so you have added a versioning step and gained nothing on release independence.
 
-The test is one question: **can one team ship a user-visible change without any other team's pipeline running?** If no, it is a modular monolith — which is often the right answer (Module 11), but should be called by its name so nobody budgets for the wrong thing.
+The test is one question: **can one team ship a user-visible change without any other team's pipeline running?** If no, it is a modular monolith — which is often the right answer (<Mod to="delivery" />), but should be called by its name so nobody budgets for the wrong thing.
 </Trap>
 
 ### CSS and the design system
@@ -239,7 +238,7 @@ A micro-frontend that mounts *after* an event fired never sees it, and will rend
 Always pair a broadcast with a “read the current value” accessor. The event says *something changed*; the accessor answers *what is it now*.
 </Trap>
 
-**Anti-patterns worth naming:** a shared global Redux store (you rebuilt the monolith, then distributed its deploys); importing another micro-frontend's internals; and passing React context across a federated boundary where React is not a singleton — see Module 08.
+**Anti-patterns worth naming:** a shared global Redux store (you rebuilt the monolith, then distributed its deploys); importing another micro-frontend's internals; and passing React context across a federated boundary where React is not a singleton — see <Mod to="federation" />.
 
 <Recap>
 - Micro-frontends solve independent deployment for many teams. Nothing else. If that is not your problem, stop.

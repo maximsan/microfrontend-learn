@@ -30,6 +30,7 @@ async function build() {
   const rehypeMdxCodeProps = (await import('rehype-mdx-code-props')).default;
   const rehypeCellStatus = (await import('../src/mdx/rehype-cell-status.mjs')).default;
   const { mdxComponents } = await import('../src/components/index.js');
+  const { setChapters } = await import('../src/components/xref.jsx');
   const Page = (await import('../src/layout/Page.jsx')).default;
   const book = (await import('../book.config.mjs')).default;
 
@@ -57,16 +58,25 @@ async function build() {
     .filter((f) => f.endsWith('.mdx') && !f.startsWith('_'))
     .sort();
   const chapters = [];
+  let moduleNo = 0;
+  let appendixNo = 0;
   for (const f of files) {
     const mod = await compile(rel('content', f));
-    const meta = mod.frontmatter ?? {};
-    for (const k of ['id', 'num', 'group', 'kicker', 'title', 'standfirst']) {
+    const meta = { ...(mod.frontmatter ?? {}) };
+    for (const k of ['id', 'part', 'title', 'standfirst']) {
       if (!meta[k]) throw new Error(`content/${f}: frontmatter is missing "${k}"`);
     }
-    chapters.push({ file: f, meta, body: render(mod) });
+    // Numbers come from file order: modules 00, 01, …; appendices A, B, …
+    meta.num = meta.appendix ? String.fromCharCode(65 + appendixNo++) : String(moduleNo++).padStart(2, '0');
+    meta.kicker = meta.appendix
+      ? `Appendix ${meta.num}`
+      : `Module ${meta.num}${meta.section ? ` · ${meta.section}` : ''}`;
+    chapters.push({ file: f, meta, mod });
   }
   const dup = chapters.map((c) => c.meta.id).find((id, i, a) => a.indexOf(id) !== i);
   if (dup) throw new Error(`Duplicate chapter id "${dup}"`);
+  setChapters(chapters.map((c) => c.meta));
+  for (const c of chapters) c.body = render(c.mod);
 
   const hero = render(await compile(rel('content', '_hero.mdx')));
 

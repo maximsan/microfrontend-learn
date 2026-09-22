@@ -1,10 +1,9 @@
 ---
-id: "m7"
-num: "07"
-group: "Part II · The machinery"
-kicker: "Module 07 · The machinery"
+id: "streaming"
+part: "Part II · The machinery"
 title: "Fragment streaming and hydration"
 nav: "Fragment streaming"
+section: "The machinery"
 standfirst: "How streaming works on the wire, why fragments hydrate themselves, and what Server Components change."
 ---
 
@@ -112,15 +111,15 @@ Tailor's README still states the requirements better than anything written since
 
 [Podium](https://podium-lib.io/docs/introduction/hello-podium/) is the maintained equivalent, and its vocabulary is worth learning: <q>In Podium there are two types of servers: Podlets that serve page fragments / Layouts that compose podlets and serve the finished page.</q> The contract is explicit — <q>The contract between a podlet and a layout is defined in a JSON manifest</q> — and so is context propagation: <q>The layout is also responsible for providing a Podium context on requests made to each podlet. This context is a set of HTTP headers with information the podlet can use to generate dynamic content.</q>
 
-That last mechanism is how you propagate identity and locale into fragments during server rendering — the SSR half of Module 10's auth discussion.
+That last mechanism is how you propagate identity and locale into fragments during server rendering — the SSR half of <Mod to="auth" />'s auth discussion.
 
 ### Server Components, and why they belong in this guide
 
-Module 02 lists them as a row on the spectrum, which undersells them. They change the shape of the axis itself, and they do it by attacking the property Module 01 is built on.
+<Mod to="spectrum" /> lists them as a row on the spectrum, which undersells them. They change the shape of the axis itself, and they do it by attacking the property <Mod to="dividing-line" /> is built on.
 
 #### A third runtime category
 
-Module 01 gave two answers to “how long does the runtime live”: one document, or the whole session. A server component is neither. It runs once on the server, renders to a **serialized payload rather than JavaScript**, and *never exists on the client at all*. No bundle entry, no hydration, no memory footprint. Its lifetime is a single render.
+<Mod to="dividing-line" /> gave two answers to “how long does the runtime live”: one document, or the whole session. A server component is neither. It runs once on the server, renders to a **serialized payload rather than JavaScript**, and *never exists on the client at all*. No bundle entry, no hydration, no memory footprint. Its lifetime is a single render.
 
 So `'use client'` is not a rendering hint. It is the literal marker for **where the client runtime begins** — the network boundary expressed as a component boundary. Everything above it costs zero client JavaScript; everything below it is a SPA.
 
@@ -148,9 +147,9 @@ That bottom row is the point. Server rendering on every navigation, *without* lo
 
 #### And why it does not yet compose across teams
 
-RSC and micro-frontends are not currently compatible in the way people assume. An RSC payload is a serialized React tree tied to a specific React version and a specific build — a tighter coupling than sharing a JavaScript module, not a looser one. Module Federation's maintainers describe RSC support as validated in demos and *not* shippable (Module 08).
+RSC and micro-frontends are not currently compatible in the way people assume. An RSC payload is a serialized React tree tied to a specific React version and a specific build — a tighter coupling than sharing a JavaScript module, not a looser one. Module Federation's maintainers describe RSC support as validated in demos and *not* shippable (<Mod to="federation" />).
 
-The pattern that does work today is the one in Module 06: a server component fetching another team's rendered output over HTTP. That crosses the boundary as data or HTML rather than as a React tree, which is exactly why it survives the version skew.
+The pattern that does work today is the one in <Mod to="micro-frontends" />: a server component fetching another team's rendered output over HTTP. That crosses the boundary as data or HTML rather than as a React tree, which is exactly why it survives the version skew.
 
 <Recap>
 - Server components are a third runtime category: rendered once per request, shipped as a payload, never present on the client.

@@ -6,7 +6,7 @@ import { VerifiedDate } from '../components/inline.jsx';
  * @param {{ hero: JSX.Element, chapters: { meta: object, body: JSX.Element }[], stats: object }} props
  */
 export default function Page({ hero, chapters, stats }) {
-  const groups = groupBy(chapters, (c) => c.meta.group);
+  const groups = groupBy(chapters, (c) => c.meta.part);
   const first = chapters[0]?.meta.id;
   return (
     <>

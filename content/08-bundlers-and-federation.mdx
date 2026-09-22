@@ -1,10 +1,9 @@
 ---
-id: "m8"
-num: "08"
-group: "Part II · The machinery"
-kicker: "Module 08 · The machinery"
+id: "federation"
+part: "Part II · The machinery"
 title: "Bundlers and Module Federation"
 nav: "Bundlers & federation"
+section: "The machinery"
 standfirst: "Sharing semantics, the React singleton problem, working setup code, and which tools are dead ends."
 ---
 
@@ -34,7 +33,7 @@ And the nuance most summaries drop: <q>In general, React supports using multiple
 <Cite>— [react.dev, Invalid hook call warning](https://react.dev/warnings/invalid-hook-call-warning)</Cite>
 </Source>
 
-So two fully independent micro-frontends, each with their own React, are fine — provided nothing crosses the boundary. It is sharing components, context or hooks across the boundary that forces the singleton, and therefore forces the version coupling micro-frontends were supposed to eliminate. That is the tension from Module 06 in its most concrete form.
+So two fully independent micro-frontends, each with their own React, are fine — provided nothing crosses the boundary. It is sharing components, context or hooks across the boundary that forces the singleton, and therefore forces the version coupling micro-frontends were supposed to eliminate. That is the tension from <Mod to="micro-frontends" /> in its most concrete form.
 
 <Trap title="The subpath that silently duplicates React">
 From [Module Federation's documentation](https://module-federation.io/configure/shared.html): <q>Writing 'react-dom' (no trailing slash) only intercepts import 'react-dom'. Any code that does import \{ createRoot \} from 'react-dom/client' will load a second copy of React DOM, which breaks React singleton requirements and causes hydration errors.</q>
@@ -310,7 +309,7 @@ This is the approach [micro-frontends.org](https://micro-frontends.org/) advocat
 </tbody>
 </Table>
 
-The pattern in that table is the same trade-off from Module 06, now visible as configuration: **Module Federation wins on bundle size and developer ergonomics precisely because it couples the dependency graph. Web Components win on isolation precisely because they ship React twice.**
+The pattern in that table is the same trade-off from <Mod to="micro-frontends" />, now visible as configuration: **Module Federation wins on bundle size and developer ergonomics precisely because it couples the dependency graph. Web Components win on isolation precisely because they ship React twice.**
 
 <Recap>
 - `singleton` exists because some libraries hold global internal state. `strictVersion` defaults to `true` more often than blogs claim.

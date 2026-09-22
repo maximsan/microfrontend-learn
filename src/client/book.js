@@ -8,7 +8,7 @@
 
   function setStats(){
     var main = document.querySelector("main");
-    var mods = document.querySelectorAll('section.module[id^="m"]').length;
+    var mods = document.querySelectorAll('section.module:not([data-kind="appendix"])').length;
     var apps = document.querySelectorAll('section.module[data-kind="appendix"]').length;
     var put = function(key, val){
       document.querySelectorAll('[data-count="' + key + '"]').forEach(function(el){ el.textContent = val; });
@@ -44,7 +44,7 @@
     var SKIP = /^(A|CODE|PRE|DT|DD|H1|H2|H3|H4|SCRIPT|STYLE|CITE|SUMMARY|BUTTON)$/;
     var MARK = String.fromCharCode(8599);   // north-east arrow, kept out of the source
 
-    document.querySelectorAll('section.module[id^="m"]').forEach(function(section){
+    document.querySelectorAll('section.module:not([data-kind="appendix"])').forEach(function(section){
       var used = {}, nodes = [], n;
       var walker = document.createTreeWalker(section, NodeFilter.SHOW_TEXT, {
         acceptNode: function(node){

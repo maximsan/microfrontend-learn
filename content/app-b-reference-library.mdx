@@ -1,8 +1,6 @@
 ---
 id: "library"
-num: "B"
-group: "Back matter"
-kicker: "Appendix B"
+part: "Back matter"
 title: "Reference library"
 standfirst: "Every source cited here, grouped by topic, labelled where a project's health is part of the information."
 appendix: true
@@ -10,7 +8,7 @@ wide: true
 ---
 
 <RefGroup title="Specifications & RFCs">
-- [RFC 10017 — OAuth 2.0 for Browser-Based Applications](https://www.rfc-editor.org/info/rfc10017/)<Badge kind="spec">BCP 212</Badge><Src>Published 21 Aug 2026. The single most important document in Module 10.</Src>
+- [RFC 10017 — OAuth 2.0 for Browser-Based Applications](https://www.rfc-editor.org/info/rfc10017/)<Badge kind="spec">BCP 212</Badge><Src>Published 21 Aug 2026. The single most important document in <Mod to="auth" />.</Src>
 - [RFC 9700 — Best Current Practice for OAuth 2.0 Security](https://www.rfc-editor.org/info/rfc9700)<Badge kind="spec">BCP 240</Badge>
 - [RFC 6749 — The OAuth 2.0 Authorization Framework](https://www.rfc-editor.org/info/rfc6749)
 - [RFC 6750 — Bearer Token Usage](https://www.rfc-editor.org/info/rfc6750)
@@ -25,7 +23,7 @@ wide: true
 - [W3C WebRTC](https://www.w3.org/TR/webrtc/) · [W3C WebTransport](https://w3c.github.io/webtransport/)
 </RefGroup>
 
-<RefGroup title="Navigation platform (Module 05)">
+<RefGroup title={<>Navigation platform (<Mod to="navigation" />)</>}>
 - [MDN — Navigation API](https://developer.mozilla.org/en-US/docs/Web/API/Navigation_API)<Badge kind="live">Baseline 2026</Badge>
 - [MDN — History.pushState()](https://developer.mozilla.org/en-US/docs/Web/API/History/pushState)
 - [MDN — History.scrollRestoration](https://developer.mozilla.org/en-US/docs/Web/API/History/scrollRestoration)
@@ -37,7 +35,7 @@ wide: true
 - [micro-frontends.tech — Routing and Navigation](https://micro-frontends.tech/architecture/routing-and-navigation/)<Src>Secondary source; useful catalogue of router-conflict symptoms.</Src>
 </RefGroup>
 
-<RefGroup title="Micro-frontend composition (Modules 06–07)">
+<RefGroup title={<>Micro-frontend composition (Modules <Mod to="micro-frontends" num />–<Mod to="streaming" num />)</>}>
 - [Cam Jackson — Micro Frontends (martinfowler.com)](https://martinfowler.com/articles/micro-frontends.html)<Src>The canonical taxonomy. Written 2019; the taxonomy holds, the tool names have moved on.</Src>
 - [Michael Geers — micro-frontends.org](https://micro-frontends.org/)<Src>The opposing position: isolate team code, don't share a runtime.</Src>
 - [React 18 WG #37 — New Suspense SSR Architecture](https://github.com/reactwg/react-18/discussions/37)<Src>The primary source on out-of-order streaming. Read this one in full.</Src>
@@ -51,7 +49,7 @@ wide: true
 - [Zalando Tailor](https://github.com/zalando/tailor)<Badge kind="dead">Archived 2022</Badge><Src>Still worth reading for the design goals in its README.</Src>
 </RefGroup>
 
-<RefGroup title="Bundlers & federation (Module 08)">
+<RefGroup title={<>Bundlers & federation (<Mod to="federation" />)</>}>
 - [webpack — ModuleFederationPlugin](https://webpack.js.org/plugins/module-federation-plugin/)
 - [Module Federation 2.0](https://module-federation.io/) · [Stable release, Feb 2026](https://module-federation.io/blog/v2-stable-version.html)
 - [MF — shared configuration](https://module-federation.io/configure/shared.html)<Src>Includes the `react-dom/client` subpath trap.</Src>
@@ -67,7 +65,7 @@ wide: true
 - [WICG import-maps](https://github.com/WICG/import-maps)<Badge kind="dead">Archived Feb 2025</Badge><Src>Cite the HTML Standard instead.</Src>
 </RefGroup>
 
-<RefGroup title="Transports (Module 09)">
+<RefGroup title={<>Transports (<Mod to="transports" />)</>}>
 - [MDN — EventSource](https://developer.mozilla.org/en-US/docs/Web/API/EventSource)<Src>Source for the six-connection limit.</Src>
 - [MDN — WebSocket constructor](https://developer.mozilla.org/en-US/docs/Web/API/WebSocket/WebSocket)
 - [OWASP — WebSocket Security Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/WebSocket_Security_Cheat_Sheet.html) · [CWE-1385](https://cwe.mitre.org/data/definitions/1385.html)
@@ -82,7 +80,7 @@ wide: true
 - [subscriptions-transport-ws](https://github.com/apollographql/subscriptions-transport-ws)<Badge kind="dead">Archived Apr 2023</Badge>
 </RefGroup>
 
-<RefGroup title="Auth & cookies (Module 10)">
+<RefGroup title={<>Auth & cookies (<Mod to="auth" />)</>}>
 - [MDN — Set-Cookie](https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Set-Cookie)<Src>HttpOnly, Secure, SameSite, `__Host-` prefixes, Domain semantics.</Src>
 - [MDN — CORS: credentials with wildcard origin](https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/CORS/Errors/CORSNotSupportingCredentials)
 - [MDN — CHIPS / partitioned cookies](https://developer.mozilla.org/en-US/docs/Web/Privacy/Guides/Third-party_cookies/Partitioned_cookies)
@@ -91,7 +89,7 @@ wide: true
 - [draft-ietf-httpbis-rfc6265bis](https://datatracker.ietf.org/doc/draft-ietf-httpbis-rfc6265bis/)<Src>Cookie spec revision; check for an assigned RFC number.</Src>
 </RefGroup>
 
-<RefGroup title="Monorepo & delivery (Module 11)">
+<RefGroup title={<>Monorepo & delivery (<Mod to="delivery" />)</>}>
 - [Turborepo](https://turborepo.dev/docs)<Src>Current domain — turbo.build and turborepo.com both redirect here.</Src>
 - [Remote Caching](https://turborepo.dev/docs/core-concepts/remote-caching) · [turbo prune](https://turborepo.dev/docs/reference/prune) · [Microfrontends (dev-only proxy)](https://turborepo.dev/docs/guides/microfrontends)
 - [Nx — Micro Frontend Architecture](https://nx.dev/docs/kb/micro-frontend-architecture)<Src>The best single argument for monorepo + independent deploys.</Src>

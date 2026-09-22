@@ -1,10 +1,9 @@
 ---
-id: "m10"
-num: "10"
-group: "Part III · The wire"
-kicker: "Module 10 · The wire"
+id: "auth"
+part: "Part III · The wire"
 title: "Auth and session"
 nav: "Auth & session"
+section: "The wire"
 standfirst: "Tokens, cookies, CSRF, sessions and logout — the one-way door, against the IETF's August 2026 BCP."
 ---
 
@@ -127,7 +126,7 @@ OWASP's summary recommendation, in order:
 5. **Verify `Origin`, falling back to `Referer`,** on every state-changing endpoint. These are [forbidden headers](https://developer.mozilla.org/en-US/docs/Glossary/Forbidden_header_name) that only the browser can set. OWASP recommends **blocking** when neither is present.
 
 <Insight title="Where this lives in a micro-frontend">
-The BFF already owns the session, so it must also own CSRF. One token, minted by the BFF, exposed to micro-frontends through the shell's `getCsrfToken()` — the same tiny shell-owned contract from Module 06, extended by one method.
+The BFF already owns the session, so it must also own CSRF. One token, minted by the BFF, exposed to micro-frontends through the shell's `getCsrfToken()` — the same tiny shell-owned contract from <Mod to="micro-frontends" />, extended by one method.
 
 Per-micro-frontend CSRF tokens are the failure mode here. They multiply the surface, they break the moment one team's token is rotated by another team's request, and they tempt somebody into widening the cookie's `Domain` to share them — which reintroduces the exact subdomain weakness above.
 </Insight>
@@ -165,7 +164,7 @@ Clearing the cookie is the cosmetic half. A logout that only deletes the client 
 
 Two propagation problems that only appear once the frontend is split:
 
-- **Across micro-frontends in one tab.** The shell logs out; every mounted micro-frontend still holds rendered user data and possibly an open socket. The shell needs to broadcast a `session:ended` event and each micro-frontend must clear and unmount on it — the same event contract from Module 06, and the one case where ignoring the event is a security bug rather than a staleness bug.
+- **Across micro-frontends in one tab.** The shell logs out; every mounted micro-frontend still holds rendered user data and possibly an open socket. The shell needs to broadcast a `session:ended` event and each micro-frontend must clear and unmount on it — the same event contract from <Mod to="micro-frontends" />, and the one case where ignoring the event is a security bug rather than a staleness bug.
 - **Across tabs.** Other tabs keep rendering a logged-in UI against a dead session until their next request fails. `BroadcastChannel` or the `storage` event closes it. This is also the mechanism for the reverse case: a login in one tab should refresh the others rather than leaving them in a stale anonymous state.
 
 ### Where authorization lives
@@ -184,9 +183,9 @@ The practical question is what claims the shell publishes. Shipping a full permi
 
 Expanding the one-line rule from earlier, because this is where composed pages leak.
 
-- **Propagate, do not re-authenticate.** The inbound request's identity travels to every internal call and every fragment render — Podium's context headers (Module 07) exist for exactly this.
+- **Propagate, do not re-authenticate.** The inbound request's identity travels to every internal call and every fragment render — Podium's context headers (<Mod to="streaming" />) exist for exactly this.
 - **Never cache user data at module scope.** In a long-lived Node process, a module-level variable is shared across every concurrent request. This is the highest-severity bug in this entire guide: it serves one user's data to another, it passes every test that runs one request at a time, and it appears under load.
-- **An authenticated render is not CDN-cacheable**, which is the cacheability floor from Module 06 arriving as a security constraint rather than a performance one. Keep the personalised part behind its own boundary and stream it.
+- **An authenticated render is not CDN-cacheable**, which is the cacheability floor from <Mod to="micro-frontends" /> arriving as a security constraint rather than a performance one. Keep the personalised part behind its own boundary and stream it.
 - **Decide what a mid-stream auth failure renders.** Once the shell has flushed, you cannot send a redirect — the status line is long gone. The fragment must degrade to a signed-out state inside its own boundary, and the shell must be designed to survive that.
 
 ### Token storage — the RFC is blunt

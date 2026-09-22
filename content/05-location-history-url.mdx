@@ -1,9 +1,8 @@
 ---
-id: "m5"
-num: "05"
-group: "Part II · The machinery"
-kicker: "Module 05 · The machinery"
+id: "navigation"
+part: "Part II · The machinery"
 title: "Location, history, URL"
+section: "The machinery"
 standfirst: "History, its traps, the Navigation API that replaces it, and what breaks when several routers share one address bar."
 ---
 
@@ -24,7 +23,7 @@ standfirst: "History, its traps, the Navigation API that replaces it, and what b
 <Source>
 <Quote>Some browsers save state objects to the user's disk so they can be restored after the user restarts the browser, and impose a size limit on the serialized representation of a state object, and will throw an exception if you pass a state object whose serialized representation is larger than that size limit.</Quote>
 
-<Cite>— [MDN](https://developer.mozilla.org/en-US/docs/Web/API/History/pushState). MDN does not print the number; the widely-cited Firefox figure traces to [Bugzilla](https://bugzilla.mozilla.org/show_bug.cgi?id=1522706). See Appendix C.</Cite>
+<Cite>— [MDN](https://developer.mozilla.org/en-US/docs/Web/API/History/pushState). MDN does not print the number; the widely-cited Firefox figure traces to [Bugzilla](https://bugzilla.mozilla.org/show_bug.cgi?id=1522706). See <Mod to="caveats" />.</Cite>
 </Source>
 
 #### It is rate-limited
@@ -65,11 +64,11 @@ And, critically for this guide's thesis: <q>Because bfcache works with browser-m
 <Cite>— [web.dev, Back/forward cache](https://web.dev/articles/bfcache). `Cache-Control: no-store` on the document also disqualifies it.</Cite>
 </Source>
 
-Read that second quote next to Module 01: a well-built MPA gets instant back-navigation from the platform, for free. Your SPA has to build it.
+Read that second quote next to <Mod to="dividing-line" />: a well-built MPA gets instant back-navigation from the platform, for free. Your SPA has to build it.
 
 #### Speculation Rules
 
-The [Speculation Rules API](https://developer.mozilla.org/en-US/docs/Web/API/Speculation_Rules_API) declares prefetch and prerender intent as JSON, either in a `<script type="speculationrules">` block or via the [`Speculation-Rules`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Speculation-Rules) header. This is what lets a well-tuned MPA feel instant. Chromium-led; support elsewhere is unconfirmed here (Appendix C).
+The [Speculation Rules API](https://developer.mozilla.org/en-US/docs/Web/API/Speculation_Rules_API) declares prefetch and prerender intent as JSON, either in a `<script type="speculationrules">` block or via the [`Speculation-Rules`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Speculation-Rules) header. This is what lets a well-tuned MPA feel instant. Chromium-led; support elsewhere is unconfirmed here (<Mod to="caveats" />).
 
 #### Cross-document View Transitions
 
@@ -91,7 +90,7 @@ Both documents opt in with `@view-transition { navigation: auto; }` and the brow
 
 ### What the browser did for free, and your router does not
 
-Module 04 lists “reimplementing the browser” as the SPA's largest hidden cost. This is the concrete version, and it is the part most often shipped broken — because it is invisible unless you test without a mouse.
+<Mod to="choosing" /> lists “reimplementing the browser” as the SPA's largest hidden cost. This is the concrete version, and it is the part most often shipped broken — because it is invisible unless you test without a mouse.
 
 On a real navigation the browser does four things automatically. A client-side router does **none** of them:
 

@@ -1,8 +1,6 @@
 ---
 id: "caveats"
-num: "C"
-group: "Back matter"
-kicker: "Appendix C"
+part: "Back matter"
 title: "Caveats and corrections"
 nav: "Caveats & corrections"
 standfirst: "Two lists: claims here that rest on secondary sources — verify those yourself — and what earlier drafts got wrong."
@@ -21,22 +19,22 @@ Each of these is probably true and is repeated widely, but was not confirmed aga
 - **CHIPS browser version numbers.** The mechanism and Chrome's commitment are sourced; specific versions are not.
 - **`rfc6265bis` status.** It was in the RFC Editor queue as of late 2025 and may have an RFC number by the time you read this.
 - **Cam Jackson's article — exact wording.** The URL and taxonomy are confirmed; individual sentences were not quoted verbatim from a full read. Read the original before quoting it.
-- **SSE vs WebSocket comparison.** No single first-party page canonically compares them. The decision rule in Module 09 is assembled from the primary docs for each, not quoted from one source.
+- **SSE vs WebSocket comparison.** No single first-party page canonically compares them. The decision rule in <Mod to="transports" /> is assembled from the primary docs for each, not quoted from one source.
 
 ### What will expire, and roughly when
 
-Appendix B's links are stable. The claims below are not — each is a snapshot of a moving target. Re-check before relying on any of them.
+<Mod to="library" />'s links are stable. The claims below are not — each is a snapshot of a moving target. Re-check before relying on any of them.
 
 | Claim | Re-check | Why it moves |
 | --- | --- | --- |
-| Module Federation support per bundler (Module 08) | <Expiry>6 months</Expiry> | Rolldown, Turbopack and Vite are all changing position; the Next.js deprecation may complete |
+| Module Federation support per bundler (<Mod to="federation" />) | <Expiry>6 months</Expiry> | Rolldown, Turbopack and Vite are all changing position; the Next.js deprecation may complete |
 | Nx generator surface — `consumer`/`provider` | <Expiry>Each major</Expiry> | v23 removed the previous API with no codemod; v24 removes the deprecated one |
 | Cross-document View Transitions in Firefox | <Expiry>6 months</Expiry> | In progress; will change the MPA-feels-like-SPA claim when it lands |
 | PPR and Cache Components API surface | <Expiry>6 months</Expiry> | New enough that directive names and defaults are still settling |
 | Navigation API browser versions | <Expiry>12 months</Expiry> | Baseline is recent; the polyfill advice changes as the floor rises |
 | Third-party cookies and Privacy Sandbox | <Expiry>12 months</Expiry> | Reversed once already in 2025; treat any position here as provisional |
-| Which composition tools are maintained (Module 07) | <Expiry>12 months</Expiry> | Tailor was archived quietly; the others can be too |
-| The measurement thresholds in Module 04 | <Expiry>Judgement</Expiry> | Calibrated, not researched — they were never a fact to expire |
+| Which composition tools are maintained (<Mod to="streaming" />) | <Expiry>12 months</Expiry> | Tailor was archived quietly; the others can be too |
+| The measurement thresholds in <Mod to="choosing" /> | <Expiry>Judgement</Expiry> | Calibrated, not researched — they were never a fact to expire |
 
 Everything else in the guide — runtime lifetime, coupling, cacheability floors, reversibility, the RFCs — ages in years, not months.
 
@@ -53,7 +51,7 @@ These were stated confidently and were wrong. They are recorded because the dire
 <Insight title="Two layers age differently">
 Four of the five corrections share a shape: **the principle was sound, the specific recommendation had expired.**
 
-Runtime lifetime, coupling, where state lives — these age in years. Tool names, version numbers, browser support — months. Check the second layer yourself against Appendix B.
+Runtime lifetime, coupling, where state lives — these age in years. Tool names, version numbers, browser support — months. Check the second layer yourself against <Mod to="library" />.
 </Insight>
 
 <Colophon>Sources verified <VerifiedDate />. Where this guide and a linked primary source disagree, the source is correct.</Colophon>

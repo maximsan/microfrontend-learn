@@ -351,6 +351,10 @@ a.acro-ref:hover{border-bottom-color:var(--client);color:var(--client)}
 a.acro-ref sup{font-family:var(--f-mono);font-size:9px;color:var(--faint);margin-left:1px;line-height:0}
 a.acro-ref:hover sup{color:var(--client)}
 
+/* cross-references between chapters (<Mod>) */
+a.xref{color:inherit;text-decoration:none;border-bottom:1px dotted var(--rule-strong)}
+a.xref:hover{color:var(--client);border-bottom-color:var(--client)}
+
 /* ============ REFERENCES ============ */
 .refgrp{margin:0 0 30px}
 .refgrp h4{font-family:var(--f-mono);font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--faint);margin:0 0 10px;padding-bottom:7px;border-bottom:1px solid var(--rule);font-weight:500}

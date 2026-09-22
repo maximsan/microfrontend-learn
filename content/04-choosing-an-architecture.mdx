@@ -1,15 +1,14 @@
 ---
-id: "m4"
-num: "04"
-group: "Part I · Foundations"
-kicker: "Module 04 · Foundations"
+id: "choosing"
+part: "Part I · Foundations"
 title: "Choosing an architecture"
+section: "Foundations"
 standfirst: "Six drivers, how to measure the first one, and what each side honestly costs."
 ---
 
 ### The drivers, in priority order
 
-1. **Session length and interaction density.** Established in Module 02 as the discriminator. Measure it rather than guessing.
+1. **Session length and interaction density.** Established in <Mod to="spectrum" /> as the discriminator. Measure it rather than guessing.
 2. **Content or application.** Public, indexable, first-visit-matters content pulls toward server rendering. Authenticated tools pull toward the client.
 3. **Offline and latency requirements.** A hard offline requirement settles the question immediately.
 4. **Team shape.** One full-stack team with a server language is a strong signal for hypermedia. A separate frontend team plus multiple clients consuming one API amortises the SPA's cost.
@@ -37,7 +36,7 @@ Routing, history, scroll restoration, focus management, loading indicators, cach
 </Trap>
 
 - **A second source of truth.** Server database plus client cache, and keeping them consistent is now your problem. This is the entire reason TanStack Query, SWR and Apollo's cache exist — most "SPA complexity" is cache-invalidation complexity under another name.
-- **A larger XSS blast radius.** One injection lands in a long-lived session with credentials in memory. Module 10 covers why this compounds in micro-frontends.
+- **A larger XSS blast radius.** One injection lands in a long-lived session with credentials in memory. <Mod to="auth" /> covers why this compounds in micro-frontends.
 - **Version skew.** Users run last week's bundle against today's API. You need a build-identifier header and a "new version available" path — before you need them.
 - **Accessibility work MPAs get free.** Route changes are not announced to screen readers unless you announce them. Focus does not move unless you move it.
 - **Memory leaks become real.** Detached DOM nodes, orphaned subscriptions, retained closures. You will need to profile.
@@ -46,7 +45,7 @@ Routing, history, scroll restoration, focus management, loading indicators, cach
 
 - **Latency per interaction.** On a high-RTT connection this is the whole experience.
 - **A ceiling on interaction richness.** Drag-and-drop canvases, real-time collaborative editing and offline work are not reasonable to build this way.
-- **Client state discarded on navigation.** Scroll position, half-filled forms, media playback. bfcache and View Transitions have narrowed this considerably (Module 05), but not closed it.
+- **Client state discarded on navigation.** Scroll position, half-filled forms, media playback. bfcache and View Transitions have narrowed this considerably (<Mod to="navigation" />), but not closed it.
 - **More server work per interaction**, and harder to put behind a CDN.
 
 <Insight title="The real disagreement">
@@ -68,7 +67,7 @@ Both are legitimate. Neither makes complexity disappear.
 3. Name the three browser behaviours you would have to reimplement first, and which is most often done badly.
 
 <Answers>
-1. **Session length and content-vs-application — drivers 1 and 2.** A ninety-second median session means the user pays the bundle cost and leaves before amortising it, and high organic search traffic makes first paint and indexability the product. Propose static generation or server rendering with *islands* for the interactive parts — filters, gallery, add-to-cart. That is the Netflix result in Module 02: the landing page got 50% faster by removing client-side React, not by tuning it.
+1. **Session length and content-vs-application — drivers 1 and 2.** A ninety-second median session means the user pays the bundle cost and leaves before amortising it, and high organic search traffic makes first paint and indexability the product. Propose static generation or server rendering with *islands* for the interactive parts — filters, gallery, add-to-cart. That is the Netflix result in <Mod to="spectrum" />: the landing page got 50% faster by removing client-side React, not by tuning it.
 2. **Because the SPA's largest structural cost is already sunk.** A mobile app forces you to have an API, versioned and public, plus the server-side cache and auth story that goes with it. Driver 6 is really asking whether you are paying for that twice. If you already have it, the marginal cost of a web SPA is much lower — and conversely, building a SPA *in order to* have an API is paying for a second client you do not have.
 3. **Routing, history and scroll restoration first** — they are entangled and everything else depends on them. Then focus management, loading state, and error pages. The one most often done badly is **focus management on route change**: the browser moves focus to the new document automatically, a client router does not, so keyboard and screen-reader users are left focused on a link that no longer exists. It is invisible in QA unless someone tests without a mouse.
 </Answers>
