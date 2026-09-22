@@ -100,7 +100,7 @@ a:hover{text-decoration-thickness:2px}
   background:var(--paper);border-bottom:1px solid var(--rule);
   padding:10px 16px;align-items:center;gap:12px;font-family:var(--f-ui);
 }
-#bar strong{font-size:14px;font-weight:600}
+#bar strong{font-size:14px;font-weight:600;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:center}
 .iconbtn{
   font-family:var(--f-ui);font-size:12px;font-weight:600;
   background:var(--surface);color:var(--ink-2);
@@ -437,8 +437,29 @@ a.xref:hover{color:var(--client);border-bottom-color:var(--client)}
   .codewrap pre{font-size:12px;padding:12px}
   .codewrap .fname{flex-wrap:wrap}
 }
+/* ============ TOUCH & NARROW ============ */
+@media(max-width:900px){
+  #bar{gap:8px;padding:8px max(12px, env(safe-area-inset-left)) 8px max(12px, env(safe-area-inset-right))}
+  .iconbtn{min-height:40px;padding:8px 12px;font-size:12.5px}
+  #toc a{padding:10px 10px;font-size:14px}
+  #toc .grp{padding-top:18px}
+}
+@media(max-width:480px){
+  .wrap,.wide{padding-inline:16px}
+  #top .lede{font-size:17.5px}
+  .call{padding:14px 16px;font-size:15.5px}
+  .call.verified{padding:2px 0 2px 16px}
+  .recap,.check{padding:16px 18px}
+  .dtree .kids{padding-left:12px}
+  .spectrum .spec-row .lbl{font-size:12px}
+  h3{font-size:20.5px;margin-top:38px}
+  .module{padding-block:40px}
+}
+
 @media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important;scroll-behavior:auto!important}}
-html{scroll-behavior:smooth}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%;text-size-adjust:100%}
+html.drawer-open{overflow:hidden}
+main p,main li,main dd,main td,main th{overflow-wrap:break-word}
 section[id]{scroll-margin-top:70px}
 
 /* ============ PRINT ============ */
