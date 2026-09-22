@@ -126,7 +126,7 @@ OWASP's summary recommendation, in order:
 5. **Verify `Origin`, falling back to `Referer`,** on every state-changing endpoint. These are [forbidden headers](https://developer.mozilla.org/en-US/docs/Glossary/Forbidden_header_name) that only the browser can set. OWASP recommends **blocking** when neither is present.
 
 <Insight title="Where this lives in a micro-frontend">
-The BFF already owns the session, so it must also own CSRF. One token, minted by the BFF, exposed to micro-frontends through the shell's `getCsrfToken()` — the same tiny shell-owned contract from <Mod to="micro-frontends" />, extended by one method.
+The BFF already owns the session, so it must also own CSRF. One token, minted by the BFF, exposed to micro-frontends through the shell's `getCsrfToken()` — the same tiny shell-owned contract from <Mod to="sharing" />, extended by one method.
 
 Per-micro-frontend CSRF tokens are the failure mode here. They multiply the surface, they break the moment one team's token is rotated by another team's request, and they tempt somebody into widening the cookie's `Domain` to share them — which reintroduces the exact subdomain weakness above.
 </Insight>
@@ -164,7 +164,7 @@ Clearing the cookie is the cosmetic half. A logout that only deletes the client 
 
 Two propagation problems that only appear once the frontend is split:
 
-- **Across micro-frontends in one tab.** The shell logs out; every mounted micro-frontend still holds rendered user data and possibly an open socket. The shell needs to broadcast a `session:ended` event and each micro-frontend must clear and unmount on it — the same event contract from <Mod to="micro-frontends" />, and the one case where ignoring the event is a security bug rather than a staleness bug.
+- **Across micro-frontends in one tab.** The shell logs out; every mounted micro-frontend still holds rendered user data and possibly an open socket. The shell needs to broadcast a `session:ended` event and each micro-frontend must clear and unmount on it — the same event contract from <Mod to="sharing" />, and the one case where ignoring the event is a security bug rather than a staleness bug.
 - **Across tabs.** Other tabs keep rendering a logged-in UI against a dead session until their next request fails. `BroadcastChannel` or the `storage` event closes it. This is also the mechanism for the reverse case: a login in one tab should refresh the others rather than leaving them in a stale anonymous state.
 
 ### Where authorization lives

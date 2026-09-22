@@ -1,0 +1,68 @@
+---
+id: "sharing"
+part: "Part II · The machinery"
+title: "Sharing a surface: styles and state"
+nav: "Styles & shared state"
+section: "The machinery"
+standfirst: "Independently deployed teams still paint one screen. How to keep it looking like one product, and how little state they should share."
+---
+
+Splitting the deploys does not split the screen. Every micro-frontend writes into the same cascade and reads from the same user session, and both of those are global by default. This chapter covers the two places that global-ness bites first.
+
+### CSS and the design system
+
+The problem nobody plans for and everybody hits in month two: independently deployed teams producing one visual surface. It is harder than shared state, because CSS has no module system and no versioning — the cascade is a single global namespace that every team writes into at runtime.
+
+| Approach | Isolation | The catch |
+| --- | --- | --- |
+| Global stylesheet, shared | <No>None</No> | One team's `.button` restyles another's. Works only with strict naming discipline nobody sustains. |
+| CSS Modules / scoped styles | <Ok>Good</Ok> | Hashed class names, so collisions are gone. Global resets still collide. |
+| CSS-in-JS | <Ok>Good</Ok> | Runtime cost, and each micro-frontend ships its own copy of the library. |
+| Utility framework (Tailwind) | <Warn>Partial</Warn> | Each team compiles its own subset — duplicated but non-conflicting. **Different major versions collide on the preflight reset**, which is a real and confusing failure. |
+| Shadow DOM | <Ok>Total</Ok> | Nothing leaks in or out — including your design system. See below. |
+
+#### The versioning trap
+
+A shared design-system package looks like the obvious answer and quietly reintroduces the coupling the architecture was meant to remove. Pin it per team and they drift visually until a redesign requires eight coordinated releases. Force one version and you have build-time coupling — every design change means every team rebuilds and redeploys.
+
+<Insight title="Split tokens from components">
+**Ship design tokens at runtime; ship components at build time.**
+
+Tokens — colour, spacing, type scale, radius — go out as CSS custom properties served by the shell. Change a brand colour centrally and every micro-frontend picks it up on next load, with nobody redeploying.
+
+Components stay a versioned package each team upgrades on its own schedule. A team lagging two versions looks slightly dated; it does not look like a different product, because the tokens underneath are current.
+
+And the detail that makes this work with Shadow DOM: **custom properties inherit through shadow boundaries** where stylesheets do not. Tokens are the one thing that can cross the isolation you just paid for.
+</Insight>
+
+Two operational rules worth adopting early. **Prefix everything** — class names, custom element names, CSS custom properties, `localStorage` keys — with the owning team's name; this is one of the core practices on [micro-frontends.org](https://micro-frontends.org/) and costs nothing to start with and a great deal to retrofit. And **one team owns global CSS**: resets, `@font-face`, `:root` tokens, and nothing else is allowed at document scope.
+
+### Sharing state: a ranked ladder
+
+<Insight title="The governing principle">
+**The best shared state is no shared state.** (Not original here — a common formulation in the field.)
+
+If two micro-frontends share a lot of *mutable* state, they are not two micro-frontends. You drew the boundary along screen regions instead of business domains. Redraw it before picking a mechanism.
+</Insight>
+
+1. **The URL.** Wildly underrated and almost always sufficient. Selected entity, filters, active tab, pagination, sort order. Zero coupling, no library, survives reload, deep-linkable, and the browser maintains it for you. Exhaust this before anything else.
+2. **Server state, not client state.** Most “shared state” is cached server data in disguise. Two micro-frontends that both need the cart count should both ask the API, backed by a shared HTTP cache (ETag, `Cache-Control`) or one shared query-client instance. *Reframing shared state as shared cache is the single biggest lever available to you.*
+3. **Events.** `CustomEvent` on `window`; `BroadcastChannel` for cross-tab and cross-iframe. Version the contracts (`cart:item-added@v1`).
+4. **One small shell-owned singleton.** Not a global Redux store — a deliberately tiny, versioned contract for what is genuinely cross-cutting: auth/session, theme, locale, feature flags, notifications. That list is close to complete.
+5. **Props down, events up**, if your micro-frontends are custom elements. It is just the DOM contract, and it is the cleanest boundary available.
+6. **Web storage** for tokens and preferences only. A poor reactive store: no same-tab event, strings only, quota limits.
+
+<Trap title="Events are not state">
+A micro-frontend that mounts *after* an event fired never sees it, and will render with stale or empty data. This produces bugs that only appear under specific navigation orders and are miserable to reproduce.
+
+Always pair a broadcast with a “read the current value” accessor. The event says *something changed*; the accessor answers *what is it now*.
+</Trap>
+
+**Anti-patterns worth naming:** a shared global Redux store (you rebuilt the monolith, then distributed its deploys); importing another micro-frontend's internals; and passing React context across a federated boundary where React is not a singleton — see <Mod to="federation" />.
+
+<Recap>
+- CSS has no module system: the cascade is one global namespace every team writes into at runtime. Scope styles, prefix everything, and let one team own document-level CSS.
+- Ship design tokens at runtime as custom properties and components at build time as a versioned package. Tokens cross Shadow DOM; stylesheets do not.
+- The state ladder starts at the URL and at treating shared state as shared cache.
+- Events are not state: pair every broadcast with a “read the current value” accessor.
+</Recap>
