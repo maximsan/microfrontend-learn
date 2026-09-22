@@ -1,7 +1,7 @@
 // The page shell: sidebar contents, mobile bar, hero and one <section> per chapter.
 import book from '../../book.config.mjs';
 import { VerifiedDate } from '../components/inline.jsx';
-import { chapter, label } from '../components/xref.jsx';
+import { chapter, label, Mod } from '../components/xref.jsx';
 
 /**
  * @param {{ hero: JSX.Element, chapters: { meta: object, body: JSX.Element }[], stats: object }} props
@@ -34,7 +34,7 @@ export default function Page({ hero, chapters, stats }) {
             ))}
           </nav>
           <div className="sidefoot">
-            Sources verified <VerifiedDate />. Anything not independently confirmed is flagged in Appendix C.
+            Sources verified <VerifiedDate />. Anything not independently confirmed is flagged in <Mod to="caveats" />.
           </div>
         </aside>
 
