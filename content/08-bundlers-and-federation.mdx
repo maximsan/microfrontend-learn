@@ -187,12 +187,12 @@ All three solve the same problem — load another team's code at runtime — and
 No bundler runtime at all. The mapping is a standard [HTML feature](https://html.spec.whatwg.org/multipage/webappapis.html#import-map); "singleton" just means the map has one entry.
 
 ```html file="shell/index.html" label="Import maps"
+<!-- one entry per dependency = one copy, enforced by the browser -->
 <script type="importmap">
 {
   "imports": {
-    // one entry per dependency = one copy, enforced by the browser
-    "react":       "https://cdn.example.com/react@18.3.1/index.js",
-    "react-dom/":  "https://cdn.example.com/react-dom@18.3.1/",
+    "react":       "https://cdn.example.com/react@19.2.0/index.js",
+    "react-dom/":  "https://cdn.example.com/react-dom@19.2.0/",
     "@acme/cart":  "https://cart.example.com/main.js"
   }
 }
@@ -205,6 +205,10 @@ No bundler runtime at all. The mapping is a standard [HTML feature](https://html
 ```
 
 You deploy a new cart by rewriting one line of JSON — which is exactly what single-spa's `import-map-deployer` automates. The cost: no automatic version negotiation, no build-time type sharing, and you manage the CDN yourself.
+
+<Trap title="An import map is strict JSON">
+No comments, no trailing commas. MDN: <q>The import map must be a valid JSON object</q> ([MDN, `<script type="importmap">`](https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/script/type/importmap)). A map that fails to parse does not partly work — none of its specifiers resolve, and every `import('@acme/…')` on the page fails. Put explanations in an HTML comment beside the `<script>`, as above, never inside it.
+</Trap>
 
 #### 2. single-spa — an orchestrator resolves
 
