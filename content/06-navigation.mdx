@@ -141,3 +141,15 @@ The recommended resolution from that same source: <q>The shell owns the primary 
 - Cross-document View Transitions are not yet in Firefox. Treat as enhancement.
 - **One router owns history; everyone else receives the path.** This is the rule.
 </Recap>
+
+<Check>
+1. A map view writes its viewport into the URL on every pan. In production it starts throwing `SecurityError`. Why, and what is the fix?
+2. Why has every micro-frontend framework monkey-patched `history`, and what should new shells use instead?
+3. After a route change, a screen-reader user hears nothing and keyboard focus stays on the link they activated. What two things did the router fail to do?
+
+<Answers>
+1. **`pushState` is rate-limited** — MDN documents a `SecurityError` when it is called too frequently, and the thresholds are not specified anywhere normative. Write the URL on idle (debounced), use `replaceState` for intermediate positions, and push a history entry only for positions the user would want to go *back* to.
+2. **`pushState` fires no event**, so there was no hook for programmatic navigation and frameworks manufactured one by patching it. The Navigation API's `navigate` event fires for every kind of navigation from one central place, and `intercept()` adds focus and scroll handling — build new shells on that.
+3. **Move focus and announce the change.** Move focus to the new view's `<h1>` (with `tabindex="-1"`), and write the page name into a visually hidden `aria-live="polite"` region. Set `document.title` while you are there. The browser did all three on a real navigation; a client router does none of them unless you make it.
+</Answers>
+</Check>

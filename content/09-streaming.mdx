@@ -125,3 +125,15 @@ That last mechanism is how you propagate identity and locale into fragments duri
 - Tailor is archived. Podium, OpenComponents, Piral and qiankun are alive.
 - Per-fragment timeouts, fallbacks and error boundaries are not optional — one slow team must not block the page.
 </Recap>
+
+<Check>
+1. The sidebar's data resolves before the post's. What does the browser receive, and in what order?
+2. One team's fragment throws a hydration error and the entire page goes blank, including fragments that rendered correctly. What was the architecture, and what is the fix?
+3. Dates look right in development but cause hydration mismatches for users in Tokyo. Why?
+
+<Answers>
+1. **Order of completion, not order of markup.** The shell with placeholders arrives first and paints. When the sidebar resolves, a hidden block with its HTML and a tiny inline script are appended to the *same open response*; the script moves the block into its slot. The post follows the same way. The relocation is plain DOM work, so it runs before React has loaded.
+2. **A single hydration root for the whole page**, which couples every team's failure domain. Hydrate each fragment from its own root and give each a distinct `identifierPrefix`, so `useId` does not produce duplicate ids and one fragment's mismatch destroys only that fragment.
+3. **Timezone.** The server formats the date in UTC; the browser formats it in the user's zone, so the two trees differ — invisible to a developer sitting in UTC. In a composed page, resolve locale and timezone once in the shell and propagate them to every fragment (Podium's context headers are the mechanism), or format in an effect on the client.
+</Answers>
+</Check>

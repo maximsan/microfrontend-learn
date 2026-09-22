@@ -71,3 +71,15 @@ Always pair a broadcast with a “read the current value” accessor. The event 
 - The state ladder starts at the URL and at treating shared state as shared cache.
 - Events are not state: pair every broadcast with a “read the current value” accessor.
 </Recap>
+
+<Check>
+1. A brand colour must change across eight micro-frontends today, and nobody can redeploy. How was that made possible — or how do you make it possible next time?
+2. Two micro-frontends both need the cart count. Which rung of the state ladder do you reach for?
+3. A cart badge sometimes shows 0 after arriving from one particular page, and nobody can reproduce it reliably. What is the likely cause?
+
+<Answers>
+1. **Ship design tokens at runtime.** Colour, spacing and type scale go out as CSS custom properties served by the shell, so changing them centrally reaches every micro-frontend on next load. Custom properties inherit through shadow boundaries, so it works even for Shadow-DOM-isolated widgets. Components stay a versioned build-time package.
+2. **Server state, not client state.** Both ask the API, backed by a shared HTTP cache (ETag, `Cache-Control`) or one shared query-client instance. The cart count is cached server data in disguise; an event bus or a shared store would add coupling for a problem a cache already solves.
+3. **It mounted after the event fired.** Events are not state: a micro-frontend that mounts later never sees an earlier broadcast. Pair every broadcast with a “read the current value” accessor — the event says *something changed*, the accessor says *what it is now*.
+</Answers>
+</Check>

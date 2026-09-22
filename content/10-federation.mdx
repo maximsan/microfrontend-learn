@@ -323,3 +323,15 @@ The pattern in that table is the same trade-off from <Mod to="micro-frontends" /
 - Next.js federation is deprecated and Turbopack cannot run webpack plugins. Rspack or Vite for MF; Modern.js for federated SSR.
 - Parcel, esbuild and Turbopack have no Module Federation. Import maps are the standards-based alternative.
 </Recap>
+
+<Check>
+1. `react` and `react-dom` are shared as singletons, yet the app still reports “Invalid hook call”. What is the most likely cause?
+2. A blog post says `strictVersion` defaults to `false`. Why does it matter that this is wrong?
+3. A Next.js 16 App Router team wants Module Federation. What do you tell them?
+
+<Answers>
+1. **The `react-dom/client` subpath is not shared.** The key `'react-dom'` only intercepts `import 'react-dom'`; code importing `createRoot` from `react-dom/client` loads a second copy. Add the trailing-slash key `'react-dom/': { singleton: true }` on both host and remote.
+2. **It decides whether a version mismatch fails loudly or degrades silently.** The webpack documentation says it defaults to `true` when a local fallback exists and the module is not a singleton. Relying on the blog's default, you would expect a silent fallback and get a runtime error — or vice versa.
+3. **It is a dead end for new work.** The official integration page says the App Router is not supported and Next.js support is ending, and Turbopack — the Next.js 16 default — cannot load webpack plugins at all. Use Multi-Zones for independent deployment within Next.js, federate with Rspack or Vite outside it, or use Modern.js for federated SSR.
+</Answers>
+</Check>

@@ -165,3 +165,15 @@ The test is one question: **can one team ship a user-visible change without any 
 - Routing-level split is the pragmatic default; fragment streaming when SEO demands it; federated SSR last.
 - Styling and shared state are the two problems that follow you onto every screen; <Mod to="sharing" /> covers both.
 </Recap>
+
+<Check>
+1. Four teams share one release train and complain that builds are slow. Should they adopt micro-frontends?
+2. One team adds a per-user “recently viewed” fragment to a composed page that was fully CDN-cached. What happens, and what are the options?
+3. A team extracted its shared components into a workspace package and calls it micro-frontends. What single question tests the claim?
+
+<Answers>
+1. **No.** Micro-frontends solve independent deployment, and these teams already deploy together. Nx says it directly: if teams can deploy together and mainly want faster builds, runtime composition is the wrong tool. Remote caching and affected-task builds (<Mod to="delivery" />) address build time; enforced module boundaries give the discipline without the runtime cost.
+2. **The cacheability floor drops the whole page.** A composed page is only as cacheable as its least cacheable fragment, so the assembled document is now uncacheable at the CDN. Either the composition layer caches each fragment separately (ESI, Podium), or the personalised fragment moves behind its own boundary — streamed per request or fetched on the client — so the rest stays cacheable.
+3. **Can one team ship a user-visible change without any other team's pipeline running?** If every consumer must rebuild and redeploy to pick up the change, it is build-time composition — a modular monolith. That is often the right answer, but it should be budgeted as one.
+</Answers>
+</Check>
