@@ -4,6 +4,11 @@ part: "Part I · Foundations"
 title: "Rendering modes"
 section: "Foundations"
 standfirst: "The five things people mean by “SSR”, what partial prerendering changes, and why Server Components are a new position rather than a new mode."
+prereqs: ["dividing-line", "spectrum"]
+objectives:
+  - "Distinguish the five SSR modes by when HTML is produced and whether a CDN can cache it"
+  - "Disambiguate “selective SSR” in a design discussion"
+  - "Explain what Server Components change about runtime lifetime, and why they do not federate"
 ---
 
 <Mod to="spectrum" /> placed architectures on one axis. Inside the server-rendering half of it there is a second decision, made per route rather than per application: *when* the HTML is produced. Getting the vocabulary straight here saves arguments later, because the same three letters cover five mechanisms with different caching, freshness and failure behaviour.

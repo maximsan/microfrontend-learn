@@ -5,6 +5,11 @@ title: "Sessions, CSRF and authorization"
 nav: "Sessions & CSRF"
 section: "The wire"
 standfirst: "What a cookie session costs once you have one: CSRF, rotation, timeouts, logout that really logs out, and where permission checks belong."
+prereqs: ["auth"]
+objectives:
+  - "Add a CSRF defence that SameSite alone does not provide"
+  - "Run session rotation, idle and absolute timeouts, and a logout that really logs out"
+  - "Place authorization checks where they can actually be enforced"
 ---
 
 ### CSRF — the bill that comes with cookie sessions

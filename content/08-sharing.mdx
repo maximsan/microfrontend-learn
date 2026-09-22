@@ -5,6 +5,11 @@ title: "Sharing a surface: styles and state"
 nav: "Styles & shared state"
 section: "The machinery"
 standfirst: "Independently deployed teams still paint one screen. How to keep it looking like one product, and how little state they should share."
+prereqs: ["micro-frontends"]
+objectives:
+  - "Keep independently deployed UIs consistent with runtime design tokens"
+  - "Pick the lowest rung of the shared-state ladder that works"
+  - "Avoid the late-mount “events are not state” bug"
 ---
 
 Splitting the deploys does not split the screen. Every micro-frontend writes into the same cascade and reads from the same user session, and both of those are global by default. This chapter covers the two places that global-ness bites first.
