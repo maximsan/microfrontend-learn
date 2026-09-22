@@ -40,6 +40,17 @@ Reading a Zalando or Amex writeup at four teams is the most common way this arch
 
 The real taxonomy is not “which framework” but “at what point in the pipeline do the pieces become one page.” The canonical treatment is [Cam Jackson's article on martinfowler.com](https://martinfowler.com/articles/micro-frontends.html), covering server-side template composition, build-time integration, and run-time integration via iframes, JavaScript and Web Components.
 
+<Flow>
+<Box title="Build">npm packages imported by the shell. One deployable — not independent.</Box>
+<Arrow>deploy</Arrow>
+<Box title="Origin server">Podium layouts, a routing proxy or Multi-Zones, a server component fetching HTML.</Box>
+<Arrow>HTTP</Arrow>
+<Box title="Edge">ESI at the CDN, streaming Workers.</Box>
+<Arrow>HTML + JS</Arrow>
+<Box title="Browser">iframes, Web Components, Module Federation, single-spa.</Box>
+</Flow>
+<FlowCaption>The same four points, left to right, as the table below. The further right the pieces meet, the more seamless the page and the more the teams share at runtime.</FlowCaption>
+
 | Composition point | Mechanism | Independent deploy | SEO / first paint | Isolation | Cost |
 | --- | --- | --- | --- | --- | --- |
 | Build time | npm packages, shell imports them | <No>No</No> | <Ok>Good</Ok> | Weak | Low |

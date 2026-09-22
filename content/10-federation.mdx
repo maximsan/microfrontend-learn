@@ -168,13 +168,15 @@ export default function App() {
 }
 ```
 
-What happens when that page loads:
+What happens when that page loads, step by step (the dots mark which side does the work — the remote's server only serves files):
 
-1. Shell boots and populates its **share scope** with the versions of `react` and `react-dom` it carries.
-2. On first render of `<CartWidget />`, the runtime fetches `remoteEntry.js` from `cart.example.com`.
-3. The remote registers *its* versions into the same share scope and negotiates: because both declare `singleton`, one copy of React wins — the higher semver, with a console warning to the loser.
-4. The runtime fetches only the chunks for `./CartWidget` that are not already satisfied.
-5. The component renders inside the shell's React tree, sharing its context and its reconciler.
+<Wire>
+<Step t="1 · shell boots">Populates its **share scope** with the versions of `react` and `react-dom` it carries.</Step>
+<Step t="2 · first render of the remote" server>The runtime fetches `remoteEntry.js` from `cart.example.com` — a network call on the render path.</Step>
+<Step t="3 · negotiation">The remote registers *its* versions into the same share scope. Both declare `singleton`, so one copy of React wins — the higher semver — with a console warning to the loser.</Step>
+<Step t="4 · chunks" server>The runtime fetches only the chunks for `./CartWidget` that the share scope does not already satisfy.</Step>
+<Step t="5 · render">The component renders inside the shell's React tree, sharing its context and its reconciler.</Step>
+</Wire>
 
 <Trap title="Step 2 is a network call you do not control">
 If `cart.example.com` is slow or down, that dynamic `import()` rejects and — without the error boundary above — takes down the shell's whole subtree. Every remote needs a boundary and a fallback. The team that owns the shell will be paged for the team that owns the remote.
