@@ -423,6 +423,20 @@ a.xref:hover{color:var(--client);border-bottom-color:var(--client)}
 .flow.flow-long .arrow em{margin-top:0;text-align:left}
 .flow.flow-long .box{flex:none}
 
+/* Code blocks: copy button (added by the client script) */
+.codewrap{position:relative}
+.copy{font-family:var(--f-mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;background:var(--surface);color:var(--muted);border:1px solid var(--rule-strong);border-radius:3px;padding:4px 8px;cursor:pointer;margin-left:8px;min-height:28px}
+.codewrap .fname em{margin-left:auto}
+.codewrap .fname > span + .copy{margin-left:auto}
+.copy:hover{color:var(--client);border-color:var(--client)}
+.codewrap .fname{align-items:center}
+.codewrap .copy.float{position:absolute;top:8px;right:8px}
+.codewrap pre{-webkit-overflow-scrolling:touch;tab-size:2}
+
+@media(max-width:600px){
+  .codewrap pre{font-size:12px;padding:12px}
+  .codewrap .fname{flex-wrap:wrap}
+}
 @media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important;scroll-behavior:auto!important}}
 html{scroll-behavior:smooth}
 section[id]{scroll-margin-top:70px}

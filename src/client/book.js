@@ -78,7 +78,26 @@
     });
   }
 
+  /* ---- copy button on every code block ---- */
+  function addCopyButtons(){
+    document.querySelectorAll(".codewrap").forEach(function(wrap){
+      var pre=wrap.querySelector("pre"); if(!pre) return;
+      var btn=document.createElement("button");
+      btn.type="button"; btn.className="copy"; btn.textContent="Copy";
+      btn.setAttribute("aria-label","Copy code to clipboard");
+      btn.addEventListener("click",function(){
+        var text=pre.innerText;
+        var done=function(ok){ btn.textContent=ok?"Copied":"Press ⌘C"; setTimeout(function(){btn.textContent="Copy";},1600); };
+        if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(text).then(function(){done(true);},function(){done(false);}); }
+        else { var r=document.createRange(); r.selectNodeContents(pre); var sel=getSelection(); sel.removeAllRanges(); sel.addRange(r); done(false); }
+      });
+      var bar=wrap.querySelector(".fname");
+      if(bar){ bar.appendChild(btn); } else { btn.classList.add("float"); wrap.appendChild(btn); }
+    });
+  }
+
   try { setStats(); } catch(e) {}
+  try { addCopyButtons(); } catch(e) {}
   try { linkAcronyms(); } catch(e) {}
 
   var root=document.documentElement;
