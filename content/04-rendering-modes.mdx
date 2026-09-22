@@ -98,3 +98,15 @@ The pattern that does work today is the one in <Mod to="micro-frontends" />, und
 - They are the only position that server-renders every navigation *and* preserves client state.
 - They do not federate. The payload is more tightly version-coupled than a JS module, not less.
 </Recap>
+
+<Check>
+1. A product page is identical for every visitor except the stock level and the cart count; prices change a few times a day. Which mode fits, and why?
+2. A colleague proposes “selective SSR.” What do you ask before agreeing?
+3. Why do React Server Component payloads not federate across teams, and what crosses the boundary instead?
+
+<Answers>
+1. **Partial prerendering** — or ISR with streamed holes if you are not on a PPR-capable framework. The static shell (description, images, price if a few hours' staleness is acceptable) is served from the CDN; the stock level and cart count are dynamic holes streamed per request. Request-time SSR for the whole page would give up the CDN for two small regions.
+2. **Which of the three meanings they intend:** a per-route rendering choice, partial prerendering within one page, or React's selective hydration. The first two are SSR modes; the third is about which parts get JavaScript and in what order. A conversation where each side means a different one will appear to agree and produce the wrong design.
+3. **The payload is a serialized React tree tied to one React version and one build** — tighter coupling than a shared JavaScript module. The Module Federation maintainers' tracking issue lists four React singletons that would all need sharing, and was closed as not planned. What works today is a server component fetching another team's *rendered output* over HTTP: data or HTML crosses the boundary, not a React tree.
+</Answers>
+</Check>

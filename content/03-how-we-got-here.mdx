@@ -79,3 +79,15 @@ Each swing answers a constraint the previous swing created, and those constraint
 - The 2016+ swing back toward the server was driven by measurable costs, not taste.
 - The field is converging on per-route decisions rather than per-application ones.
 </Recap>
+
+<Check>
+1. `XMLHTTP` shipped in 1999 and AJAX was named in 2005. What does that gap tell you about today's platform features?
+2. Why could Google not index `example.com/#!/users/42`, and how was it patched?
+3. The chapter says the counter-arguments from each swing were “outvoted, not refuted.” How do you use that when adopting today's default?
+
+<Answers>
+1. **Capability and adoption run on different clocks.** A feature can sit unused for years until someone builds a culture around it. Expect the same of the Navigation API (Baseline in 2026): its existence does not mean your framework, your team or the tutorials you read have caught up.
+2. **The fragment is never sent to the server**, so every route was the same request. Google's 2009 scheme re-requested `#!` URLs as `?_escaped_fragment_=…`, which the server *did* see and had to answer with a pre-rendered snapshot. Both the hack and the patch died with `pushState`; Google deprecated the scheme in 2015.
+3. **Ask which constraint from the previous swing still applies to you.** The move back to the server answered bundle size and time-to-interactive; the move to the client answered interaction latency. If your users are on low-end phones, or your screens are canvas-heavy, the “outvoted” argument is the one that governs your case.
+</Answers>
+</Check>
