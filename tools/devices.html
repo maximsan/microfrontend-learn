@@ -1,0 +1,40 @@
+<!doctype html>
+<!-- Dev tool: preview dist/index.html at several viewport widths side by side.
+     Build first (npm run build), then open this file in a browser.
+     ?at=<chapter-id> scrolls every frame to that chapter; ?w=360,768 picks widths. -->
+<html lang="en">
+<meta charset="utf-8">
+<title>Device preview</title>
+<style>
+  body{margin:0;font:13px system-ui,sans-serif;background:#2a2f36;color:#e3e7ed}
+  header{display:flex;gap:1rem;align-items:center;padding:.5rem 1rem;position:sticky;top:0;background:#1d2127;z-index:1}
+  .row{display:flex;gap:16px;padding:16px;overflow-x:auto;align-items:flex-start}
+  figure{margin:0;flex:none}
+  figcaption{margin-bottom:6px;opacity:.8}
+  iframe{border:0;background:#fff;border-radius:6px;display:block}
+  input{font:inherit;width:12rem}
+</style>
+<header>
+  <strong>Device preview</strong>
+  <label>chapter id <input id="at" placeholder="e.g. micro-frontends"></label>
+  <label>widths <input id="w" placeholder="360,390,768,1024"></label>
+  <button id="go">Apply</button>
+</header>
+<div class="row" id="row"></div>
+<script>
+  const q = new URLSearchParams(location.search);
+  const widths = (q.get('w') || '360,390,768,1024').split(',').map(Number);
+  const at = q.get('at') || '';
+  document.getElementById('at').value = at;
+  document.getElementById('w').value = widths.join(',');
+  document.getElementById('go').onclick = () => {
+    location.search = new URLSearchParams({ at: document.getElementById('at').value, w: document.getElementById('w').value });
+  };
+  const height = Math.max(640, innerHeight - 90);
+  for (const w of widths) {
+    const f = document.createElement('figure');
+    f.innerHTML = `<figcaption>${w}px</figcaption><iframe width="${w}" height="${height}" src="../dist/index.html${at ? '#' + at : ''}"></iframe>`;
+    document.getElementById('row').append(f);
+  }
+</script>
+</html>
