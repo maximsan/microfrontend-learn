@@ -28,3 +28,10 @@ export function Mod({ to, num, title }) {
   const text = num ? c.num : title ? `${label(c)} · ${c.title}` : label(c);
   return <a className="xref" href={`#${c.id}`}>{text}</a>;
 }
+
+/** A comma-separated list of linked module numbers: <Mods to={['spectrum', 'choosing']} /> → "02, 05". */
+export function Mods({ to }) {
+  return to.map((id, i) => (
+    <span key={id}>{i ? ', ' : ''}<Mod to={id} num /></span>
+  ));
+}

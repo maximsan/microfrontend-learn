@@ -4,7 +4,7 @@ import * as callouts from './callouts.jsx';
 import * as diagrams from './diagrams.jsx';
 import * as reference from './reference.jsx';
 import { Pre, Table } from './code.jsx';
-import { Mod } from './xref.jsx';
+import { Mod, Mods } from './xref.jsx';
 
 export const mdxComponents = {
   ...inline,
@@ -12,6 +12,7 @@ export const mdxComponents = {
   ...diagrams,
   ...reference,
   Mod,
+  Mods,
   Table, // for hand-written JSX tables (e.g. with row headers)
   // Markdown-generated elements
   pre: Pre,
