@@ -111,7 +111,7 @@ Tailor's README still states the requirements better than anything written since
 
 [Podium](https://podium-lib.io/docs/introduction/hello-podium/) is the maintained equivalent, and its vocabulary is worth learning: <q>In Podium there are two types of servers: Podlets that serve page fragments / Layouts that compose podlets and serve the finished page.</q> The contract is explicit — <q>The contract between a podlet and a layout is defined in a JSON manifest</q> — and so is context propagation: <q>The layout is also responsible for providing a Podium context on requests made to each podlet. This context is a set of HTTP headers with information the podlet can use to generate dynamic content.</q>
 
-That last mechanism is how you propagate identity and locale into fragments during server rendering — the SSR half of <Mod to="auth" />'s auth discussion.
+That last mechanism is how you propagate identity and locale into fragments during server rendering — the SSR half of the identity discussion in <Mod to="sessions" />.
 
 <Recap>
 - Out-of-order streaming works by appending hidden HTML plus a tiny inline script that relocates it. React documents this; Marko did it first.

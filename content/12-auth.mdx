@@ -1,10 +1,9 @@
 ---
 id: "auth"
 part: "Part III · The wire"
-title: "Auth and session"
-nav: "Auth & session"
+title: "Auth architecture"
 section: "The wire"
-standfirst: "Tokens, cookies, CSRF, sessions and logout — the one-way door, against the IETF's August 2026 BCP."
+standfirst: "Where tokens live, which cookies to set, and how to hold them — the one-way door, against the IETF's August 2026 BCP."
 ---
 
 [**RFC 10017, “OAuth 2.0 for Browser-Based Applications”**](https://www.rfc-editor.org/info/rfc10017/) was published on **21 August 2026** as a Best Current Practice. It sits in [BCP 212](https://www.rfc-editor.org/info/bcp212/) alongside [RFC 8252](https://www.rfc-editor.org/info/rfc8252/) (native apps) — worth stating because BCP numbers can contain several RFCs and this is easy to get wrong.
@@ -92,102 +91,6 @@ A cookie without `Domain` is [host-only](https://developer.mozilla.org/en-US/doc
 A `Strict` cookie is not sent on cross-site navigation. A user following a link from email or a partner site arrives *logged out* until a same-site request fires. The RFC still says `Strict` — so handle it with a silent re-authentication bounce, not by quietly downgrading to `Lax`.
 </Trap>
 
-### CSRF — the bill that comes with cookie sessions
-
-This guide has recommended cookie-based sessions throughout, and until now said nothing about the class of attack that recommendation reopens. A cookie is attached by the browser *automatically*, on requests your application did not initiate. That is the entire point of a cookie and the entire mechanism of CSRF.
-
-Bearer tokens in JavaScript were immune to this, because an attacker's page cannot read your memory to construct the header. Moving to cookies trades an XSS exposure for a CSRF exposure. You have to close the second one deliberately.
-
-<Trap title={<><code>SameSite=Strict</code> is not a CSRF defence on its own</>}>
-The most common mistake after adopting a BFF: assuming the cookie flags from the checklist above finished the job. [OWASP is direct about this](https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html):
-
-<Quote>`SameSite` is useful as a defense-in-depth control but it does not replace a proper CSRF defense in most deployments.</Quote>
-
-The gap that matters most for micro-frontends is the second one they list: <q>**`SameSite` is scoped to the registrable domain, not the origin.** A cookie set on `app.example.com` with any `SameSite` value is still considered “same-site” when the request originates from `anything.example.com`.</q>
-
-If your teams deploy to sibling subdomains — which is exactly what a micro-frontend estate looks like — every sibling is inside your same-site boundary. OWASP names the amplified version: an attacker who claims a dangling subdomain <q>can issue requests that your `SameSite`-protected cookies will accompany.</q>
-</Trap>
-
-Their other documented gaps, each worth checking against your own estate:
-
-- **`Lax` only blocks unsafe methods.** <q>If any state-changing operation in the application is reachable via a `GET` request, `SameSite=Lax` will not stop it. This is the single most common way `SameSite`-based defenses fail in practice.</q>
-- **Top-level navigation tricks.** `window.open`, a crafted link or a prerender hint can produce a request the browser treats as same-site.
-- **Coverage is not universal.** Older and embedded browsers may behave as if no `SameSite` value were set.
-- **Client-side CSRF is untouched.** `SameSite` reasons about cross-site requests; it does nothing about your own same-origin JavaScript being manipulated into a state-changing call.
-
-#### What to actually implement
-
-OWASP's summary recommendation, in order:
-
-1. **Use your framework's built-in CSRF protection** if it has one. If not, <q>add CSRF tokens to all state-changing requests... and validate them on the backend.</q>
-2. **Stateful backend → synchronizer token.** Generated server-side, per session or per request. Per-request is stronger, at some usability cost.
-3. **Stateless backend → signed double-submit cookie**, and specifically the signed variant: <q>Simply signing tokens without session binding provides minimal protection and remains vulnerable to cookie injection attacks. Always bind the CSRF token explicitly to session-specific data.</q> The naive double-submit pattern is documented by OWASP as **discouraged** for new code.
-4. **Send the token in a custom request header, not a form field.** <q>Since requests with custom headers are automatically subject to the same-origin policy, it is more secure to insert the CSRF token in a custom HTTP request header via JavaScript.</q> For an API-shaped BFF this is the natural fit, and a custom header alone is a legitimate defence for AJAX endpoints.
-5. **Verify `Origin`, falling back to `Referer`,** on every state-changing endpoint. These are [forbidden headers](https://developer.mozilla.org/en-US/docs/Glossary/Forbidden_header_name) that only the browser can set. OWASP recommends **blocking** when neither is present.
-
-<Insight title="Where this lives in a micro-frontend">
-The BFF already owns the session, so it must also own CSRF. One token, minted by the BFF, exposed to micro-frontends through the shell's `getCsrfToken()` — the same tiny shell-owned contract from <Mod to="sharing" />, extended by one method.
-
-Per-micro-frontend CSRF tokens are the failure mode here. They multiply the surface, they break the moment one team's token is rotated by another team's request, and they tempt somebody into widening the cookie's `Domain` to share them — which reintroduces the exact subdomain weakness above.
-</Insight>
-
-### Sessions, not just tokens
-
-The chapter so far has been about OAuth architecture. The session itself has its own lifecycle, and [OWASP's session management guidance](https://cheatsheetseries.owasp.org/cheatsheets/Session_Management_Cheat_Sheet.html) covers the parts that are easy to skip.
-
-#### Rotate the session ID on privilege change
-
-A new session identifier must be issued at login, and again at any privilege elevation — step-up MFA, entering an admin context, impersonation. This is the defence against [session fixation](https://www.acrossecurity.com/papers/session_fixation.pdf), where an attacker plants a known session ID before the victim authenticates and inherits the authenticated session afterwards. Reusing the pre-login identifier is the vulnerability.
-
-OWASP also warns against the condition a micro-frontend estate creates by default: <q>it is recommended not to mix web applications of different security levels on the same domain. Vulnerabilities in one of the web applications would allow an attacker to set the session ID for a different web application on the same domain by using a permissive `Domain` attribute.</q> A third argument against the `Domain` cookie, from a different direction.
-
-#### Two timeouts, not one
-
-| Timeout | Measured from | What it limits | OWASP's ranges |
-| --- | --- | --- | --- |
-| **Idle** | Last request | The window for using a stolen ID on an abandoned session. Does *not* constrain an active attacker, who can keep it alive with traffic. | <q>2-5 minutes for high-value applications and 15-30 minutes for low risk applications</q> |
-| **Absolute** | Session creation | Total lifetime regardless of activity. This is the one that eventually evicts a hijacked session. | <q>between 4 and 8 hours</q> for a full working day |
-
-You need both, for the reason in the table: idle timeout alone never expires an attacker who is actively using the session.
-
-#### Logout has to invalidate the server side
-
-<Source>
-<Quote>When a session expires, the web application must take active actions to invalidate the session on both sides, client and server. **The latter is the most relevant and mandatory from a security perspective.**</Quote>
-
-<Cite>— [OWASP Session Management Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Session_Management_Cheat_Sheet.html)</Cite>
-</Source>
-
-Clearing the cookie is the cosmetic half. A logout that only deletes the client cookie leaves a session that still validates if the value was captured. In a BFF, one logout must clear the cookie, destroy the server-side session record, **and** revoke the refresh token at the authorisation server — otherwise the BFF can mint a new access token for a user who believes they have left.
-
-#### And logout has to propagate
-
-Two propagation problems that only appear once the frontend is split:
-
-- **Across micro-frontends in one tab.** The shell logs out; every mounted micro-frontend still holds rendered user data and possibly an open socket. The shell needs to broadcast a `session:ended` event and each micro-frontend must clear and unmount on it — the same event contract from <Mod to="sharing" />, and the one case where ignoring the event is a security bug rather than a staleness bug.
-- **Across tabs.** Other tabs keep rendering a logged-in UI against a dead session until their next request fails. `BroadcastChannel` or the `storage` event closes it. This is also the mechanism for the reverse case: a login in one tab should refresh the others rather than leaving them in a stale anonymous state.
-
-### Where authorization lives
-
-Everything above is authentication. Authorization is a separate decision that micro-frontend teams routinely leave implicit, and there are only three places to put it.
-
-| Placement | Good for | Cost |
-| --- | --- | --- |
-| **Resource server**<Sub>the only one that is load-bearing</Sub> | Every actual enforcement decision. Non-negotiable: this is the only layer an attacker cannot skip. | None. It is required. |
-| **BFF** | Coarse route gating, so an unauthorised user does not reach a shell they cannot use. | Duplicates policy in two places; they drift. |
-| **Browser** | Hiding controls the user cannot use. **Presentation only.** | Tempting to treat as enforcement. It is not — every check is editable by the person it applies to. |
-
-The practical question is what claims the shell publishes. Shipping a full permission set to the browser makes every micro-frontend's UI easy and leaks your authorization model to anyone who opens devtools. Shipping nothing means each micro-frontend fetches its own permissions and you get the `/me` fan-out described under *Supporting specs* below. The usable middle: the shell exposes a small, coarse set of *capability flags* — `canManageBilling`, not the role graph — purely to decide what to render, with the resource server enforcing the real thing on every call.
-
-### Auth during server rendering
-
-Expanding the one-line rule from earlier, because this is where composed pages leak.
-
-- **Propagate, do not re-authenticate.** The inbound request's identity travels to every internal call and every fragment render — Podium's context headers (<Mod to="streaming" />) exist for exactly this.
-- **Never cache user data at module scope.** In a long-lived Node process, a module-level variable is shared across every concurrent request. This is the highest-severity bug in this entire guide: it serves one user's data to another, it passes every test that runs one request at a time, and it appears under load.
-- **An authenticated render is not CDN-cacheable**, which is the cacheability floor from <Mod to="micro-frontends" /> arriving as a security constraint rather than a performance one. Keep the personalised part behind its own boundary and stream it.
-- **Decide what a mid-stream auth failure renders.** Once the shell has flushed, you cannot send a redirect — the status line is long gone. The fragment must degrade to a signed-out state inside its own boundary, and the shell must be designed to survive that.
-
 ### Token storage — the RFC is blunt
 
 <Source>
@@ -228,11 +131,7 @@ What survives: <q>CHIPS and FedCM… We'll continue to support those APIs. We'll
 <Recap>
 - RFC 10017 (Aug 2026) strongly recommends the BFF for anything sensitive, and does not recommend a pure browser OAuth client for it.
 - Cookies: `Secure` + `HttpOnly` MUST; `SameSite=Strict`, path `/`, `__Host-Http-` prefix and *no* `Domain` SHOULD.
-- **Cookies reopen CSRF.** `SameSite` is defence in depth, not a defence — it is scoped to the registrable domain, so every sibling subdomain is inside your boundary. Add a signed double-submit or synchronizer token, in a custom header, plus `Origin` verification.
-- Rotate the session ID at login and at every privilege change. Run **both** an idle and an absolute timeout — idle alone never expires an active attacker.
-- Logout must destroy the server-side session and revoke the refresh token, then propagate across micro-frontends and across tabs. Clearing the cookie is the cosmetic half.
-- Authorization is enforced at the resource server. The browser gets coarse capability flags for rendering, never the role graph, and never enforcement.
-- During SSR: propagate identity, never cache user data at module scope, and decide in advance what a mid-stream auth failure renders.
+- Cookie sessions reopen CSRF and bring their own lifecycle; <Mod to="sessions" /> covers both.
 - No token storage in the browser is safe against XSS — and micro-frontends enlarge the blast radius.
 - The shell owns refresh. One origin for API traffic. Deduplicate `/me`.
 - Third-party cookies survive in Chrome; CHIPS and FedCM are the surviving Privacy Sandbox pieces.
