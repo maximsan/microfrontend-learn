@@ -45,6 +45,10 @@ The part that is hard to picture from prose. A single HTTP response, arriving in
 
 Two consequences worth holding onto. Content arrives **in the order the data resolves**, so one slow fragment delays only itself. And the relocation is plain DOM work by an inline script, so the **HTML is complete for a crawler** even with the framework absent.
 
+<Moved title="Since React 19.2, reveals are batched">
+The step above describes React 18. <q>Starting in 19.2, React will batch reveals of server-rendered Suspense boundaries for a short time, to allow more content to be revealed together and align with the client-rendered behavior</q> — with a heuristic that stops batching as total load time approaches the 2.5 s LCP threshold ([React 19.2 release notes](https://react.dev/blog/2025/10/01/react-19-2#batching-suspense-boundaries-for-ssr)). On the wire the relocation script now queues blocks and flushes them on an animation frame. Streaming order and the crawler property are unchanged; what changed is that two blocks arriving a few milliseconds apart appear together. Lab 09 shows both on your own machine.
+</Moved>
+
 ### Per-fragment hydration — supported, with a caveat
 
 <Source>
