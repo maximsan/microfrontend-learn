@@ -1,0 +1,10 @@
+{
+  "name": "lab-13-bff-session",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node start.mjs",
+    "solution": "node start.mjs --solution",
+    "test": "node --test \"test/*.test.mjs\""
+  }
+}
