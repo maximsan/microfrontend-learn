@@ -2,6 +2,16 @@
 
 All notable changes to the book. Versions follow [Semantic Versioning](https://semver.org/) loosely: a major version is a new edition, a minor version adds chapters or labs, a patch fixes content.
 
+## 2.0.1 — 2026-09-23
+
+### Fixed
+- The single-spa sample passed an access token to every micro-frontend; it now passes the shell's CSRF accessor.
+- "The shell owns token refresh" contradicted the BFF default; refresh now has one owner, the BFF.
+
+### Changed
+- `npm run build` writes only `dist/index.html`; the hosted-copy variant moved to `npm run build:hosted`.
+- Lab 13's solution no longer duplicates the starter's page.
+
 ## 2.0.0 — 2026-09-23 · *Where State Lives*
 
 A new edition of what was *The Rendering Spectrum*: rebuilt as source files, restructured, corrected, and given hands-on material.
