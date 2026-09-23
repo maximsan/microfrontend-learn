@@ -1,6 +1,6 @@
 {
   "name": "where-state-lives",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "private": true,
   "type": "module",
   "description": "Where State Lives \u2014 a field guide to web architecture from documents to micro-frontends, authored in MDX and rendered with React to a single static HTML page.",
