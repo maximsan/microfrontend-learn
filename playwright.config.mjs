@@ -25,7 +25,13 @@ export default defineConfig({
   timeout: 30_000,
   expect: { timeout: 5_000 },
   reporter: [['list']],
-  use: { trace: 'retain-on-failure' },
+  use: {
+    trace: 'retain-on-failure',
+    // Starters are meant to fail: fail fast instead of burning the whole test
+    // timeout on a click that can never happen (the default action timeout is none).
+    actionTimeout: 5_000,
+    navigationTimeout: 10_000,
+  },
   projects: [
     { name: 'chrome', use: { ...devices['Desktop Chrome'], channel: 'chrome' } },
     { name: 'chromium', use: { ...devices['Desktop Chrome'] } },
