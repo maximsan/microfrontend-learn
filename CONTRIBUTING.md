@@ -52,6 +52,14 @@ All of these are available in every `.mdx` file without importing.
 | `<Acronyms>`, `<Acro term>`, `<Glossary>`, `<Term name>`, `<RefGroup title>` | Back matter |
 | `<Table>` | A hand-written JSX table, needed only when rows have `<th>` headers |
 
+### Writing a component
+
+- **Names are CamelCase**, and so is the file: `Callout` lives in `src/components/callouts/Callout.jsx`. Modules that are not components use lowerCamelCase: `src/lib/groupConsecutive.js`.
+- **One component family per file.** Parts that only make sense together share their parent's file (`Flow`, `Box`, `Arrow`, `FlowCaption` in `Flow.jsx`); anything reusable on its own gets its own file.
+- **No repeated code.** When two components render the same markup, extract it (`LabelledBox`, `DefinitionRow`); when they share data, import it from one place (`STATUS_CLASS`, `SIDE_COLOR`). Helpers that are not components go in `src/lib/`.
+- **Register it by name** in `src/components/index.js`, and add it to the table above. Shared building blocks such as `LabelledBox` are not registered, so chapters cannot use them directly.
+- A lab's `starter/` and `solution/` hold two versions of the same file on purpose: that is the exercise, not duplication.
+
 Code blocks take their frame from the fence's info string:
 
 ````mdx
