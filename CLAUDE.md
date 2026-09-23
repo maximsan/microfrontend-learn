@@ -27,9 +27,15 @@ Ask first, then wait for a clear "merge" or "yes", before you:
 - delete a branch or remove a worktree someone may be using
 - republish the hosted copy (see below)
 
-On 2026-09-23 a branch was merged and `v2.1.0` was tagged without asking, which is why these rules exist. If you get one wrong, say so straight away and offer the undo.
+On 2026-09-23 a branch was merged and `v2.1.0` was tagged without asking, which is why these rules exist. Max was offered the undo and kept both. If you get one wrong, say so straight away and offer the undo.
 
 `.claude/settings.json` backs this up: Claude Code prompts before merges, tags, pushes, branch deletes, branch switches, destructive resets, worktree removal and artifact publishing. The prompt is a backstop. It doesn't replace asking.
+
+## Environment
+
+- **Machine:** Max's Mac, Apple Silicon (`darwin-arm64`), time zone Europe/Warsaw.
+- **Git:** no remote. Every branch and tag is local.
+- **npm:** Max's npm blocks packages' install scripts. The `allowScripts` warning about esbuild is harmless.
 
 ## Max's checkout and worktrees
 
@@ -45,6 +51,7 @@ Max runs tests in his own checkout. A branch switch there once removed a spec fi
   Then work inside that directory. Don't use `claude --worktree <name>` here: it names the branch `worktree-<name>`, and with no remote it branches from whatever Max has checked out.
 - **Run `npm install` in a new worktree first.** It starts without `node_modules`, and the lab scripts install the per-lab dependencies themselves.
 - **Keep unverified work on its branch.** Remove the worktree only after the branch is merged.
+- **A `/sessions/...` path in `git worktree list` belongs to a Cowork sandbox.** It doesn't exist on the Mac. Don't run `git worktree prune` until Max confirms every Cowork session on this repo is closed, because pruning earlier breaks them.
 
 ## Finishing a branch (lead session only)
 
@@ -69,6 +76,7 @@ Do this for every branch, however small.
 - **Say whether each red result is the intended one.** On a starter, every `exercise` test must fail on an assertion, not a crash, timeout or port clash.
 - **Report counts, not "all good".** For example: "N of N passed", or "X red, Y green".
 - **Lab servers use fixed ports** (51xx for labs, 52xx for the capstone). Two test runs at once collide, Node or browser, including a run Max has going. Run one suite at a time. Add `--workers=1` when running several browser projects in one command.
+- **Browsers.** The `chrome` project in [`playwright.config.mjs`](playwright.config.mjs) drives the installed Google Chrome, and the `test:browser` scripts use only that one. The `chromium` and `firefox` projects need `npx playwright install chromium firefox` first ([docs](https://playwright.dev/docs/browsers)). Safari may refuse the `__Host-` cookies that lab 13 and the capstone set on `localhost` ([lab 13 README](labs/13-bff-session/README.md)).
 - **Don't copy `node_modules` between machines.** Labs 09 and 10 carry native binaries (Rspack, esbuild). `npm run setup:labs` reinstalls them when `node_modules/.installed-for` names another platform.
 - **No CI for now.** Max doesn't want GitHub Actions yet.
 
