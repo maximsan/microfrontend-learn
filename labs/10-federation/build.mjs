@@ -1,6 +1,5 @@
 // Builds cart (remote) and shell (host) for the chosen variant.
 // solution/ files override starter/ files at the same path.
-import { rspack } from '@rspack/core';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
@@ -8,6 +7,9 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 const here = path.dirname(fileURLToPath(import.meta.url));
 
 export async function build(variant, { quiet = false } = {}) {
+  // Imported here, not at the top: a broken native install then fails this lab's
+  // tests only, instead of every test file that Playwright loads.
+  const { rspack } = await import('@rspack/core');
   const work = path.join(here, '.build', variant);
   fs.rmSync(work, { recursive: true, force: true });
   copyTree(path.join(here, 'starter'), work);
