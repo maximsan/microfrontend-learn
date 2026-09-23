@@ -121,7 +121,7 @@ The strongest argument for keeping tokens out of the browser entirely — strong
 
 - [RFC 9700](https://www.rfc-editor.org/info/rfc9700) (BCP **240**, not 212): <q>Refresh tokens for public clients MUST be sender-constrained or use refresh token rotation.</q> Also <q>The resource owner password credentials grant \[RFC6749\] MUST NOT be used.</q>
 - Foundations: [RFC 6749](https://www.rfc-editor.org/info/rfc6749) (framework), [RFC 6750](https://www.rfc-editor.org/info/rfc6750) (bearer tokens), [RFC 7636](https://www.rfc-editor.org/info/rfc7636) (PKCE).
-- **The shell owns token refresh.** Never let each micro-frontend run its own refresh loop — you get a thundering herd on expiry and a race on rotation that logs users out at random. Common, and very hard to diagnose.
+- **One owner for refresh.** With a BFF, that is the BFF: refresh happens server-side and the browser never sees a refresh token. Until you get there, it is the shell. Never let each micro-frontend run its own refresh loop — you get a thundering herd on expiry and a race on rotation that logs users out at random. Common, and very hard to diagnose.
 - **Proxy API calls through one origin** rather than configuring CORS with credentials across N origins. Note [a wildcard origin is rejected when credentials are used](https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/CORS/Errors/CORSNotSupportingCredentials) — the server must echo the specific origin.
 - **Deduplicate the fan-out.** Five micro-frontends each calling `/me` on load is the signature performance bug of this architecture.
 - **On the server side:** SSR calls go over the internal network, propagate the inbound auth context and a trace ID, and never cache user data at module scope — in a long-lived Node process that is a cross-user data leak.
@@ -139,7 +139,7 @@ What survives: <q>CHIPS and FedCM… We'll continue to support those APIs. We'll
 - Cookies: `Secure` + `HttpOnly` MUST; `SameSite=Strict`, path `/`, `__Host-Http-` prefix and *no* `Domain` SHOULD.
 - Cookie sessions reopen CSRF and bring their own lifecycle; <Mod to="sessions" /> covers both.
 - No token storage in the browser is safe against XSS — and micro-frontends enlarge the blast radius.
-- The shell owns refresh. One origin for API traffic. Deduplicate `/me`.
+- One owner for refresh: the BFF, or the shell until you have one, never each micro-frontend. One origin for API traffic. Deduplicate `/me`.
 - Third-party cookies survive in Chrome; CHIPS and FedCM are the surviving Privacy Sandbox pieces.
 </Recap>
 
