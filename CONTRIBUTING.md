@@ -36,12 +36,19 @@ All of these are available in every `.mdx` file without importing.
 | `<Trap title="…">` | A mistake that is easy to make, and the fix |
 | `<Source>` + `<Quote>` + `<Cite>` | A verbatim quote from a primary source, ending with its link |
 | `<Moved title="…">` | Something that changed recently; older material gets it wrong |
+| `<Callout kind tag>` | The frame the four above are built on; use it only for a one-off label |
 | `<Recap>` | End-of-module bullet list |
 | `<Check>` + `<Answers>` | Numbered questions, then collapsed numbered answers |
 | `<Mod to="id" />` | Cross-reference: renders a linked "Module 07" / "Appendix C". `num` for just the number, `title` to add the title. An unknown id fails the build |
 | `<Mods to={["a","b"]} />` | A comma-separated list of linked module numbers |
 | `<Ok>`, `<No>`, `<Warn>` | Colour a whole table cell: `| <Ok>Yes</Ok> |` |
 | `<Sub>` | Muted second line inside a table cell |
+| `<ServerSide>`, `<ClientSide>` | Text coloured as the server or client end of the spectrum |
+| `<Light>` | Regular-weight text inside a bold decision-tree outcome |
+| `<Chip kind="yes\|no\|star" inline>` | A small label chip, as in decision trees |
+| `<Expiry>` | "Re-check in N months" pill (Appendix C) |
+| `<VerifiedDate />` | The "sources verified" date from `book.config.mjs` |
+| `<Lede small>`, `<Colophon>` | Hero paragraphs; a muted closing line |
 | `<Rev kind="oneway\|costly\|cheap" />` | Reversibility marker |
 | `<Badge kind="live\|dead\|spec">`, `<Src>` | Reference-library entries |
 | `<Flow>`, `<Box kind="good\|hot" title>`, `<Arrow sym>`, `<FlowCaption>` | Request flows. More than three boxes stack vertically |
@@ -51,6 +58,14 @@ All of these are available in every `.mdx` file without importing.
 | `<Timeline>`, `<Era yr dir title>` | History |
 | `<Acronyms>`, `<Acro term>`, `<Glossary>`, `<Term name>`, `<RefGroup title>` | Back matter |
 | `<Table>` | A hand-written JSX table, needed only when rows have `<th>` headers |
+
+### Writing a component
+
+- **Names are CamelCase**, and so is the file: `Callout` lives in `src/components/callouts/Callout.jsx`. Modules in `src/` that are not components use lowerCamelCase: `src/lib/groupConsecutive.js`. Command-line scripts in `scripts/` keep kebab-case names like the npm commands that run them (`install-labs.mjs`).
+- **One component family per file.** Parts that only make sense together share their parent's file (`Flow`, `Box`, `Arrow`, `FlowCaption` in `Flow.jsx`); anything reusable on its own gets its own file.
+- **No repeated code.** When two components render the same markup, extract it (`LabelledBox`, `DefinitionRow`); when they share data, import it from one place (`lib/statusClass.js`). A component that is only one element with a fixed class is `classed('span', 'src')`. Styles live in `book.css`, not in `style` props, unless the value is data (a spectrum dot's position). Helpers that are not components go in `src/lib/`.
+- **Register it by name** in `src/components/index.js`, and add it to the table above. Shared building blocks such as `LabelledBox` are not registered, so chapters cannot use them directly.
+- A lab's `starter/` and `solution/` hold two versions of the same file on purpose: that is the exercise, not duplication.
 
 Code blocks take their frame from the fence's info string:
 

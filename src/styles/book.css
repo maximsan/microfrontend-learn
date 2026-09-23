@@ -135,12 +135,15 @@ a:hover{text-decoration-thickness:2px}
 main{min-width:0;padding:0 0 120px}
 .wrap{max-width:var(--measure);margin:0 auto;padding-inline:28px}
 .wide{max-width:960px;margin:0 auto;padding-inline:28px}
+/* a wide chapter keeps its heading and pager at reading width */
+.wide>.modhead,.wide>.pager{max-width:var(--measure);margin-inline:auto}
 
 #top{padding-block:80px 56px;border-bottom:1px solid var(--rule)}
 .eyebrow{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--faint);margin:0 0 18px}
 #top h2{font-family:var(--f-display);font-weight:700;letter-spacing:-.025em;font-size:clamp(34px,6vw,58px);line-height:1.04;margin:0 0 20px;text-wrap:balance}
 #top .lede{font-size:19px;line-height:1.65;color:var(--ink-2);margin:0 0 28px}
 #top .lede em{color:var(--ink);font-style:italic}
+#top .lede.small{font-size:17px}
 .meta{display:flex;flex-wrap:wrap;gap:10px 22px;font-family:var(--f-ui);font-size:12.5px;color:var(--muted);padding-top:22px;border-top:1px solid var(--rule)}
 .meta b{color:var(--ink-2);font-weight:600}
 
@@ -185,6 +188,7 @@ a code{color:inherit}
 .spec-row .lbl{font-size:12.5px;font-weight:600;color:var(--ink);line-height:1.3}
 .spec-track{position:relative;height:22px;background:var(--surface);border:1px solid var(--rule);border-radius:3px}
 .spec-dot{position:absolute;top:50%;transform:translate(-50%,-50%);height:12px;width:12px;border-radius:50%;border:2px solid var(--surface)}
+.spec-dot.server{background:var(--server)}.spec-dot.mid{background:var(--ink-2)}.spec-dot.client{background:var(--client)}
 @media(max-width:620px){
   .spec-row{grid-template-columns:1fr;gap:4px}
   .spec-row .lbl{font-size:12px}
@@ -195,6 +199,7 @@ a code{color:inherit}
 .dtree .q{font-weight:600;color:var(--ink);padding:7px 0;line-height:1.4}
 .dtree .kids{margin-left:5px;padding-left:18px;border-left:2px solid var(--rule)}
 .dtree .row{display:flex;gap:10px;align-items:flex-start;padding:5px 0}
+.dtree .row>.q{padding:0}
 .dtree .out{font-weight:600;line-height:1.35}
 .dtree .out .why{display:block;font-weight:400;font-size:12.5px;color:var(--muted);margin-top:2px}
 .dtree .out.srv{color:var(--server)}
@@ -207,6 +212,7 @@ a code{color:inherit}
 .chip.yes{background:var(--client-soft);color:var(--client)}
 .chip.no{background:var(--surface-2);color:var(--muted)}
 .chip.star{background:var(--verified-soft);color:var(--verified)}
+.chip.inline{margin-left:6px}
 
 /* ============ FLOW DIAGRAM ============ */
 .flow{display:flex;flex-wrap:wrap;align-items:stretch;margin:22px 0;font-family:var(--f-ui)}
@@ -339,6 +345,12 @@ td code{font-size:12px}
 .ok{color:var(--verified);font-weight:600}
 .no{color:var(--trap);font-weight:600}
 .warn{color:var(--server);font-weight:600}
+/* small inline pieces used in prose and table cells */
+.sub{display:block;color:var(--muted);font-size:12px}
+.side-server{color:var(--server);font-weight:600}
+.side-client{color:var(--client);font-weight:600}
+.light{font-weight:400}
+.colophon{margin-top:36px;color:var(--muted);font-size:15px}
 
 /* ============ TIMELINE ============ */
 .tl{margin:30px 0;border-left:2px solid var(--rule);padding-left:0;list-style:none}
