@@ -45,7 +45,7 @@ node build.mjs && node serve.mjs --no-cart
 
 The `import('cart/CartWidget')` rejects, nothing catches it, and the shell's whole tree unmounts, taking the shell team's page down for the cart team's outage.
 
-**Fix** `starter/shell/src/App.jsx` so an unavailable remote shows a small fallback and the rest of the page stays. Compare with `solution/shell/src/App.jsx`.
+**Fix** `starter/shell/src/App.jsx` so an unavailable remote shows a small fallback and the rest of the page stays. Compare with `solution/shell/src/App.jsx` and its `RemoteBoundary.jsx`.
 
 ## Tests
 
