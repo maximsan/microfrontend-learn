@@ -56,6 +56,18 @@ Give every fragment a lifecycle. Create an `AbortController` in `hydrate()`, reg
 
 Compare with `solution/swap/app.js`, or run the server with `--solution`.
 
+## Tests
+
+3 browser tests. The timer test fails until part 5 is fixed; the two observation tests pass on both.
+
+```sh
+# from the repository root, once:  npm install   (and Google Chrome, or: npx playwright install chromium)
+LAB_VARIANT=starter npx playwright test labs/01-runtime-lifetime --project=chrome   # your copy: red until you finish
+npx playwright test labs/01-runtime-lifetime --project=chrome                       # the reference: green
+```
+
+Tests named *observe* describe the platform and pass on both. Tests named *exercise* are the ones you turn green.
+
 ## Check your understanding
 
 - The fragment-swap page is often described as having “no client state”. Which part of that is true, and which part did step 4 disprove?
