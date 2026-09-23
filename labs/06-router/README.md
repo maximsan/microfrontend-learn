@@ -55,6 +55,18 @@ Compare with `solution/router.js`.
 
 Add a second, independent router for a widget, for example one that keeps a `?tab=` parameter in sync, and give it its own `pushState` calls. Watch Back take two presses to leave a page: two routers pushed two entries. Then fix it by giving the widget the current URL as input and letting the page router own history. This is the micro-frontend rule from the chapter in miniature: **one router owns history per document; everyone else receives the path.**
 
+## Tests
+
+5 browser tests. All five fail on the starter; each turns green as your router takes over one of the four duties, and Back.
+
+```sh
+# from the repository root, once:  npm install   (and Google Chrome, or: npx playwright install chromium)
+LAB_VARIANT=starter npx playwright test labs/06-router --project=chrome   # your copy: red until you finish
+npx playwright test labs/06-router --project=chrome                       # the reference: green
+```
+
+Tests named *observe* describe the platform and pass on both. Tests named *exercise* are the ones you turn green.
+
 ## Check your understanding
 
 - Why did every micro-frontend framework patch `history.pushState`, and why does a shell built on the `navigate` event not need to?

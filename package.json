@@ -1,6 +1,6 @@
 {
   "name": "where-state-lives",
-  "version": "2.0.1",
+  "version": "2.1.0",
   "private": true,
   "type": "module",
   "description": "Where State Lives \u2014 a field guide to web architecture from documents to micro-frontends, authored in MDX and rendered with React to a single static HTML page.",
@@ -9,7 +9,10 @@
     "build:hosted": "tsx scripts/build.mjs --hosted",
     "watch": "tsx scripts/build.mjs --watch",
     "check": "tsx scripts/check.mjs",
-    "test:labs": "node scripts/test-labs.mjs"
+    "test:labs": "node scripts/test-labs.mjs",
+    "test:browser": "node scripts/install-labs.mjs && playwright test --project=chrome",
+    "test:browser:starter": "node scripts/install-labs.mjs && LAB_VARIANT=starter CAPSTONE_VARIANT=starter playwright test --project=chrome",
+    "setup:labs": "node scripts/install-labs.mjs"
   },
   "dependencies": {
     "@mdx-js/mdx": "^3.1.1",
@@ -21,6 +24,7 @@
     "remark-mdx-frontmatter": "^5.2.0"
   },
   "devDependencies": {
+    "@playwright/test": "^1.63.0",
     "tsx": "^4.23.15"
   }
 }

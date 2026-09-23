@@ -1,6 +1,5 @@
 // Bundles the chosen variant for the server and the browser. solution/ files
 // override starter/ files of the same name, so solutions contain only changes.
-import * as esbuild from 'esbuild';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -20,6 +19,7 @@ const layered = (variant) => ({
 });
 
 export async function build(variant) {
+  const esbuild = await import('esbuild'); // lazily, so a broken install fails only this lab
   const out = path.join(here, '.build', variant);
   const common = { bundle: true, jsx: 'automatic', format: 'esm', logLevel: 'warning', plugins: [layered(variant)] };
   await esbuild.build({ ...common, entryPoints: [path.join(here, 'starter/App.jsx')], platform: 'node', packages: 'external', outfile: path.join(out, 'app.mjs') });

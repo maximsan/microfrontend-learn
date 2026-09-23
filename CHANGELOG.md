@@ -2,6 +2,21 @@
 
 All notable changes to the book. Versions follow [Semantic Versioning](https://semver.org/) loosely: a major version is a new edition, a minor version adds chapters or labs, a patch fixes content.
 
+## 2.1.0 — 2026-09-23
+
+### Added
+- **Red-first browser tests.** 26 Playwright tests across every lab and the capstone. *Exercise* tests fail on each starter and pass on its solution; *observe* tests show platform behaviour and pass on both. Verified in Chrome on macOS: `npm run test:browser:starter` fails every exercise, `npm run test:browser` passes all 26 in about 16 s.
+- **Capstone starter.** `capstone/starter/` stubs the gateway, both zones and the shared shell (each answers `501`); the other teams' services run as-is. All 22 acceptance tests and 7 browser tests start red.
+- `npm run setup:labs`: installs each lab's dependencies for the current OS and CPU, and reinstalls when `node_modules` came from another platform.
+
+### Changed
+- Browser test files run in parallel (one worker per file); the Node lab suites run in parallel (about 23 s → 5.5 s).
+- Failing browser actions give up after 5 s and navigations after 10 s, so a red run finishes in seconds.
+- Every lab server exports `start({ variant })`.
+
+### Fixed
+- Labs 09 and 10 load their bundlers lazily, so one broken native install fails only that lab.
+
 ## 2.0.1 — 2026-09-23
 
 ### Fixed

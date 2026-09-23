@@ -60,6 +60,20 @@ Run the solution (or yours) and repeat part 1:
 
 `__Host-` cookies require `Secure`. Chrome and Firefox treat `http://localhost` as a secure context for this; Safari may refuse the cookie. Use Chrome or Firefox, or put the app behind HTTPS.
 
+## Tests
+
+9 Node tests + 3 browser tests. All Node tests and the two browser exercises fail on the starter; the sign-in observation passes on both.
+
+```sh
+# from the repository root, once:  npm install   (and Google Chrome, or: npx playwright install chromium)
+LAB_VARIANT=starter npx playwright test labs/13-bff-session --project=chrome   # your copy: red until you finish
+npx playwright test labs/13-bff-session --project=chrome                       # the reference: green
+```
+
+The Node tests run from this folder with `LAB_VARIANT=starter npm test` (yours) or `npm test` (reference).
+
+Tests named *observe* describe the platform and pass on both. Tests named *exercise* are the ones you turn green.
+
 ## Check your understanding
 
 - The logout test replays a cookie captured *before* logout. Why would a logout that only sends `Set-Cookie: …; Max-Age=0` fail it?

@@ -40,6 +40,18 @@ With the solution running:
 3. Close the leader tab. Within a moment another tab takes the lock, opens a new stream, and the log shows `- leader-…` then `+ leader-…`.
 4. **Call the API** answers immediately.
 
+## Tests
+
+3 browser tests. All three fail on the starter: seven streams, a stalled API call, no shared leader.
+
+```sh
+# from the repository root, once:  npm install   (and Google Chrome, or: npx playwright install chromium)
+LAB_VARIANT=starter npx playwright test labs/11-connection-budget --project=chrome   # your copy: red until you finish
+npx playwright test labs/11-connection-budget --project=chrome                       # the reference: green
+```
+
+Tests named *observe* describe the platform and pass on both. Tests named *exercise* are the ones you turn green.
+
 ## Check your understanding
 
 - Serving the same page over HTTP/2 lifts the six-connection cap. Why is the shell-owned stream still the right design?

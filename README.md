@@ -21,7 +21,7 @@ open dist/index.html
 | [`labs/`](labs/) | Six labs that reproduce a chapter's traps on your machine and fix them, most with tests |
 | [`capstone/`](capstone/) | *Acme Shop*: five services behind one origin, with 22 acceptance tests you can also run against your own rebuild |
 
-`npm run test:labs` runs every lab's tests and the capstone's.
+Every lab and the capstone start red: their tests fail on the starter and pass once the exercise is done. See [labs/README.md](labs/README.md#running-the-tests).
 
 ## Repository layout
 
@@ -50,7 +50,10 @@ tools/devices.html     preview the build at several widths side by side
 | `npm run build:hosted` | Also writes `dist/hosted.html`, the same page without its outer wrapper, used only to republish the hosted copy |
 | `npm run watch` | Rebuilds on change |
 | `npm run check` | Build, then fail on broken in-page links, duplicate ids, or a module without recap or self-check |
-| `npm run test:labs` | Every lab's and the capstone's test suite |
+| `npm run setup:labs` | Install each lab's own dependencies for this machine (the test scripts do it for you) |
+| `npm run test:labs` | Every lab's and the capstone's Node tests, against the references |
+| `npm run test:browser` | Every lab's and the capstone's Playwright tests in Chrome, against the references |
+| `npm run test:browser:starter` | The same tests against the starters: the exercises should all fail |
 
 ## Contributing
 

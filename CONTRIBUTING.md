@@ -66,7 +66,15 @@ Tables are plain Markdown. On phones, tables with three or more columns turn int
 
 ## Labs
 
-A lab lives in `labs/NN-name/`, with the number matching its chapter at the time it was written. It has a `README.md` (goal, run, observe, break, fix, check your understanding), a `starter/`, and a `solution/` that contains **only the files that change**. Add tests wherever the behaviour can be checked without a browser: `npm test` checks the solution and `LAB_VARIANT=starter npm test` checks the learner's copy. Prefer Node built-ins; add a dependency only when the lab is *about* it.
+A lab lives in `labs/NN-name/`, with the number matching its chapter at the time it was written. It has a `README.md` (goal, run, observe, break, fix, tests, check your understanding), a `starter/`, and a `solution/` that contains **only the files that change**.
+
+Every exercise needs a test that **fails on the starter and passes on the solution**:
+
+- Prefer a Node test (`test/*.test.mjs`, `node --test`) when the behaviour is visible over HTTP or in build output.
+- Otherwise add a Playwright test (`test/*.spec.mjs`), which drives a real browser. Name its groups `observe` (platform behaviour, green on both variants) and `exercise` (red until solved).
+- Tests read `LAB_VARIANT` (`starter` | `solution`, default `solution`) and start the lab's servers themselves through the exported `start({ variant })`.
+
+Check both directions before merging: `npm run test:browser` must be all green, and `npm run test:browser:starter` must fail every `exercise` test. Prefer Node built-ins; add a dependency only when the lab is *about* it.
 
 ## Git conventions
 
@@ -98,4 +106,4 @@ from the diff. Wrap at 72 characters.
 
 Scopes in use: `ch04`…`ch17` for chapters, `appendix-c`, `glossary`, `part-1`…`part-4`, `components`, `layout`, `client`, `labs`, `capstone`, `diagrams`, `mobile`, `nav`, `tools`.
 
-Before opening a merge, run `npm run check` and, if you touched labs or the capstone, `npm run test:labs`.
+Before opening a merge, run `npm run check` and, if you touched labs or the capstone, `npm run test:labs`, `npm run test:browser` and `npm run test:browser:starter`.
