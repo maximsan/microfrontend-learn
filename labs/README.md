@@ -30,6 +30,8 @@ npx playwright test labs/06-router --project=chrome      # one lab
 LAB_VARIANT=starter npx playwright test labs/06-router --project=chrome
 ```
 
+The browser tests run one worker per test file (each lab has its own ports), up to your CPU count minus one; `PW_WORKERS=2` caps it. Running several browsers in one command (`--project=chrome --project=firefox`) would put the same file in two workers on the same ports, so add `--workers=1` then.
+
 Tests named **observe** describe how the platform behaves and pass on both variants; they are there so you can see it for yourself. Tests named **exercise** are the ones your work turns green. Firefox runs too: `--project=firefox` after `npx playwright install firefox`.
 
 Labs 09 and 10 have their own dependencies, which include native binaries for your OS. The test scripts install them for this machine first, and reinstall them if `node_modules` came from another platform. `npm run setup:labs` does only that step.
