@@ -7,7 +7,12 @@ const page = fileURLToPath(new URL('./devices.html', import.meta.url));
 const [cmd, ...args] =
   process.platform === 'darwin' ? ['open'] : process.platform === 'win32' ? ['cmd', '/c', 'start', ''] : ['xdg-open'];
 
-spawn(cmd, [...args, page], { detached: true, stdio: 'ignore' })
-  .on('error', () => console.log(`Open this file in a browser: ${page}`))
-  .unref();
 console.log(`Device preview: ${page}`);
+let reported = false;
+const cannotOpen = () => {
+  if (!reported) console.log('Could not open a browser; open the file above by hand.');
+  reported = true;
+};
+spawn(cmd, [...args, page], { stdio: 'ignore', windowsHide: true })
+  .on('error', cannotOpen) // no opener installed
+  .on('exit', (code) => code && cannotOpen()); // the opener ran but failed
