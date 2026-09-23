@@ -50,6 +50,7 @@ tools/devices.html     preview the build at several widths side by side
 | `npm run build:hosted` | Also writes `dist/hosted.html`, the same page without its outer wrapper, used only to republish the hosted copy |
 | `npm run watch` | Rebuilds on change |
 | `npm run check` | Build, then fail on broken in-page links, duplicate ids, or a module without recap or self-check |
+| `npm run setup:labs` | Install each lab's own dependencies for this machine (the test scripts do it for you) |
 | `npm run test:labs` | Every lab's and the capstone's Node tests, against the references |
 | `npm run test:browser` | Every lab's and the capstone's Playwright tests in Chrome, against the references |
 | `npm run test:browser:starter` | The same tests against the starters: the exercises should all fail |

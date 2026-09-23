@@ -32,6 +32,8 @@ LAB_VARIANT=starter npx playwright test labs/06-router --project=chrome
 
 Tests named **observe** describe how the platform behaves and pass on both variants; they are there so you can see it for yourself. Tests named **exercise** are the ones your work turns green. Firefox runs too: `--project=firefox` after `npx playwright install firefox`.
 
+Labs 09 and 10 have their own dependencies, which include native binaries for your OS. The test scripts install them for this machine first, and reinstall them if `node_modules` came from another platform. `npm run setup:labs` does only that step.
+
 Labs 09, 10 and 13 also have Node tests that run without a browser: `LAB_VARIANT=starter npm test` in the lab folder, or `npm run test:labs` at the root for every reference.
 
 ## Conventions
