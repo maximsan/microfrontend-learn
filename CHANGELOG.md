@@ -4,6 +4,9 @@ All notable changes to the book. Versions follow [Semantic Versioning](https://s
 
 ## Unreleased
 
+### Added
+- `npm run preview:devices`: builds the book and opens the side-by-side width preview (moved from `tools/devices.html` to `scripts/devices.html`).
+
 ### Fixed
 - **Capstone browser tests follow the milestones.** The M1 and M2 tests no longer sign in, so they turn green once M1 and M2 are built instead of waiting for M6. The two checks that do need a session (the session surviving a zone crossing, and the cart badge) moved to M6, which now has 5 browser tests; 10 in all.
 - The account zone's router no longer paints a slow, stale view over the page the reader has already navigated to, with an M6 browser test that delays the orders response to prove it.

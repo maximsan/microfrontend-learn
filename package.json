@@ -8,6 +8,7 @@
     "build": "tsx scripts/build.mjs",
     "build:hosted": "tsx scripts/build.mjs --hosted",
     "watch": "tsx scripts/build.mjs --watch",
+    "preview:devices": "npm run build && node scripts/open-devices.mjs",
     "check": "tsx scripts/check.mjs",
     "test:labs": "node scripts/test-labs.mjs",
     "test:browser": "node scripts/install-labs.mjs && playwright test --project=chrome",

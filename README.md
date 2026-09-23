@@ -39,9 +39,8 @@ src/
   styles/book.css      all styles, light and dark
   client/book.js       the only JavaScript the reader runs (no React in the browser)
   mdx/                 the rehype plugin that colours status table cells
-scripts/               build, check, test-labs
+scripts/               build, check, test-labs, and devices.html (the width preview)
 labs/  capstone/       hands-on material
-tools/devices.html     preview the build at several widths side by side
 ```
 
 ## Commands
@@ -51,6 +50,7 @@ tools/devices.html     preview the build at several widths side by side
 | `npm run build` | Writes `dist/index.html`, the whole book as one page |
 | `npm run build:hosted` | Also writes `dist/hosted.html`, the same page without its outer wrapper, used only to republish the hosted copy |
 | `npm run watch` | Rebuilds on change |
+| `npm run preview:devices` | Builds, then opens `scripts/devices.html`: the book at phone, tablet and desktop widths side by side |
 | `npm run check` | Build, then fail on broken in-page links, duplicate ids, or a module without recap or self-check |
 | `npm run setup:labs` | Install each lab's own dependencies for this machine (the test scripts do it for you) |
 | `npm run test:labs` | Every lab's and the capstone's Node tests, against the references |
