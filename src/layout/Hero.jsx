@@ -10,9 +10,9 @@ export const Hero = ({ stats, children }) => (
       {children}
       <div className="meta">
         <span>
-          <b data-count="modules">{stats.modules} modules</b> + <span data-count="appendices">{stats.appendices} appendices</span>
+          <b>{stats.modules} modules</b> + {stats.appendices} appendices
         </span>
-        <span><b data-count="readtime">{stats.readtime}</b> read end to end</span>
+        <span><b>{stats.readtime}</b> read end to end</span>
         <span><b>Verified</b> <VerifiedDate /></span>
       </div>
     </div>

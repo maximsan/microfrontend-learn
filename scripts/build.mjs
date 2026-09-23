@@ -85,7 +85,7 @@ async function build() {
 
   const hero = render(await compile(rel('content', '_hero.mdx')));
 
-  // Stats shown in the hero. The client script recomputes them the same way.
+  // Stats shown in the hero, computed once here.
   const bodyHtml = renderToStaticMarkup(h(runtime.Fragment, null, ...chapters.map((c) => c.body)));
   const words = countWords(bodyHtml);
   const mins = Math.max(5, Math.round(words / 200 / 5) * 5);

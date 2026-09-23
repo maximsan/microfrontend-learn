@@ -2,30 +2,6 @@
   "use strict";
 
 
-  /* ---- document stats, counted from the DOM instead of hand-maintained ---- */
-  var VERIFIED = "September 2026";   // the single place this date is written
-  var WPM = 200;
-
-  function setStats(){
-    var main = document.querySelector("main");
-    var mods = document.querySelectorAll('section.module:not([data-kind="appendix"])').length;
-    var apps = document.querySelectorAll('section.module[data-kind="appendix"]').length;
-    var put = function(key, val){
-      document.querySelectorAll('[data-count="' + key + '"]').forEach(function(el){ el.textContent = val; });
-    };
-    if(mods) put("modules", mods + (mods === 1 ? " module" : " modules"));
-    if(apps) put("appendices", apps + (apps === 1 ? " appendix" : " appendices"));
-    if(main){
-      var clone = main.cloneNode(true);
-      clone.querySelectorAll("pre").forEach(function(el){ el.remove(); });
-      var n = (clone.textContent || "").trim().split(/\s+/).length;
-      var mins = Math.max(1, Math.round(n / WPM / 5) * 5);
-      var h = Math.floor(mins / 60), m = mins % 60;
-      put("readtime", mins < 60 ? "~" + mins + " min" : "~" + h + "h" + (m ? " " + m + "m" : ""));
-    }
-    document.querySelectorAll(".verified-date").forEach(function(el){ el.textContent = VERIFIED; });
-  }
-
   /* ---- first use of each acronym in each module links to its glossary row ---- */
   function linkAcronyms(){
     var rows = document.querySelectorAll('.acro .row2[id]');
@@ -96,7 +72,6 @@
     });
   }
 
-  try { setStats(); } catch(e) {}
   try { addCopyButtons(); } catch(e) {}
   try { linkAcronyms(); } catch(e) {}
 
