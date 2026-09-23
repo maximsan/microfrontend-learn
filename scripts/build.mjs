@@ -13,6 +13,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const rel = (...p) => path.join(ROOT, ...p);
+const WORDS_PER_MINUTE = 200;
 
 if (process.argv.includes('--watch')) {
   runWatch();
@@ -32,7 +33,7 @@ async function build() {
   const rehypeMdxCodeProps = (await import('rehype-mdx-code-props')).default;
   const rehypeCellStatus = (await import('../src/mdx/rehypeCellStatus.mjs')).default;
   const { mdxComponents } = await import('../src/components/index.js');
-  const { setChapters } = await import('../src/lib/chapters.js');
+  const { setChapters, label } = await import('../src/lib/chapters.js');
   const { Page } = await import('../src/layout/Page.jsx');
   const book = (await import('../book.config.mjs')).default;
 
@@ -70,9 +71,7 @@ async function build() {
     }
     // Numbers come from file order: modules 00, 01, …; appendices A, B, …
     meta.num = meta.appendix ? String.fromCharCode(65 + appendixNo++) : String(moduleNo++).padStart(2, '0');
-    meta.kicker = meta.appendix
-      ? `Appendix ${meta.num}`
-      : `Module ${meta.num}${meta.section ? ` · ${meta.section}` : ''}`;
+    meta.kicker = label(meta) + (!meta.appendix && meta.section ? ` · ${meta.section}` : '');
     chapters.push({ file: f, meta, mod });
   }
   const dup = chapters.map((c) => c.meta.id).find((id, i, a) => a.indexOf(id) !== i);
@@ -80,7 +79,7 @@ async function build() {
   setChapters(chapters.map((c) => c.meta));
   for (const c of chapters) {
     c.body = render(c.mod);
-    c.meta.minutes = Math.max(1, Math.round(countWords(renderToStaticMarkup(c.body)) / 200));
+    c.meta.minutes = Math.max(1, Math.round(countWords(renderToStaticMarkup(c.body)) / WORDS_PER_MINUTE));
   }
 
   const hero = render(await compile(rel('content', '_hero.mdx')));
@@ -88,7 +87,7 @@ async function build() {
   // Stats shown in the hero, computed once here.
   const bodyHtml = renderToStaticMarkup(h(runtime.Fragment, null, ...chapters.map((c) => c.body)));
   const words = countWords(bodyHtml);
-  const mins = Math.max(5, Math.round(words / 200 / 5) * 5);
+  const mins = Math.max(5, Math.round(words / WORDS_PER_MINUTE / 5) * 5);
   const stats = {
     modules: chapters.filter((c) => !c.meta.appendix).length,
     appendices: chapters.filter((c) => c.meta.appendix).length,
