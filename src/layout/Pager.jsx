@@ -1,10 +1,10 @@
 // Previous / next links at the end of every chapter.
 import { label, shortTitle } from '../lib/chapters.js';
 
-export function Pager({ prev, next, wide }) {
+export function Pager({ prev, next }) {
   if (!prev && !next) return null;
   return (
-    <nav className="pager" aria-label="Chapter navigation" style={wide ? { maxWidth: 'var(--measure)', marginInline: 'auto' } : undefined}>
+    <nav className="pager" aria-label="Chapter navigation">
       <PagerLink chapter={prev} dir="prev" />
       <PagerLink chapter={next} dir="next" />
     </nav>

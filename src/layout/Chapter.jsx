@@ -7,14 +7,14 @@ export const Chapter = ({ meta, prev, next, children }) => (
     <div className={meta.wide ? 'wide' : 'wrap'}>
       <ChapterHead meta={meta} />
       {children}
-      <Pager prev={prev} next={next} wide={meta.wide} />
+      <Pager prev={prev} next={next} />
     </div>
   </section>
 );
 
 /** Kicker, title, standfirst and (for modules, not appendices) the brief. */
 const ChapterHead = ({ meta }) => (
-  <div className="modhead" style={meta.wide ? { maxWidth: 'var(--measure)', marginLeft: 'auto', marginRight: 'auto' } : undefined}>
+  <div className="modhead">
     <span className="modnum">{meta.kicker}</span>
     <h2>{meta.title}</h2>
     <p className="standfirst">{meta.standfirst}</p>
