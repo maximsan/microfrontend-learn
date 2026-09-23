@@ -2,13 +2,13 @@
    every zone on next load with nobody redeploying. Everything is prefixed --acme-. */
 :root{
   --acme-ink:#16202a; --acme-muted:#5f6b7a; --acme-paper:#f6f7f9; --acme-surface:#ffffff;
-  --acme-rule:#d5dbe3; --acme-brand:#1f5fbf; --acme-danger:#b3401f; --acme-ok:#16705f;
+  --acme-rule:#d5dbe3; --acme-brand:#1f5fbf; --acme-danger:#b3401f;
   --acme-radius:8px; --acme-space:1rem;
   --acme-font:system-ui,-apple-system,"Segoe UI",sans-serif;
 }
 @media (prefers-color-scheme:dark){:root{
   --acme-ink:#e4e8ee; --acme-muted:#95a1b0; --acme-paper:#0f141a; --acme-surface:#171e26;
-  --acme-rule:#2a3440; --acme-brand:#7aa6f0; --acme-danger:#e58a6c; --acme-ok:#58c2ac;
+  --acme-rule:#2a3440; --acme-brand:#7aa6f0; --acme-danger:#e58a6c;
 }}
 *{box-sizing:border-box}
 body{margin:0;font:16px/1.55 var(--acme-font);color:var(--acme-ink);background:var(--acme-paper)}

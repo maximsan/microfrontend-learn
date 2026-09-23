@@ -21,8 +21,9 @@
 //  6. Sessions expire after IDLE_MS of inactivity and ABS_MS after creation, whichever first.
 import { json } from '../lib.mjs';
 
-export const IDLE_MS = Number(process.env.IDLE_MS ?? 15 * 60_000);
-export const ABS_MS = Number(process.env.ABS_MS ?? 8 * 60 * 60_000);
+// For requirement 6. Unused until you write it; the tests shorten them through the environment.
+const IDLE_MS = Number(process.env.IDLE_MS ?? 15 * 60_000);
+const ABS_MS = Number(process.env.ABS_MS ?? 8 * 60 * 60_000);
 
 const todo = (req, res) => json(res, 501, { error: 'not implemented yet' });
 

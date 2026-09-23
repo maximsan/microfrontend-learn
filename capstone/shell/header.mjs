@@ -3,7 +3,7 @@
 // The runtime half (client.js, tokens.css) is served centrally by the gateway.
 import { escapeHtml } from '../lib.mjs';
 
-export const SHELL_VERSION = 'shell@1.4.0';
+const SHELL_VERSION = 'shell@1.4.0';
 
 /** <head> contents every zone needs: runtime tokens, the runtime shell, and its own build id. */
 export function head({ title, zone, build }) {

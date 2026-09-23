@@ -8,7 +8,7 @@ const CONTENT = {
     body: 'The shell arrives first. Each Suspense boundary arrives when its data does — not in markup order.',
   },
 };
-export const DELAY = { sidebar: 400, post: 1500 };
+const DELAY = { sidebar: 400, post: 1500 };
 
 const cache = new Map();
 /** Returns the same promise for the same key within one render (per request on the server). */

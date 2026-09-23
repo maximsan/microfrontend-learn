@@ -2,8 +2,6 @@
 // real navigation gives you. It listens for the `routed` event your router fires.
 const panel = document.querySelector('#checks');
 const announcer = document.querySelector('#announcer');
-let lastScrollBefore = 0;
-addEventListener('scroll', () => { lastScrollBefore = scrollY; }, { passive: true });
 
 function check() {
   const h1 = document.querySelector('#view h1');

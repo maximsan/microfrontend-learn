@@ -66,12 +66,6 @@ export function send(res, status, body, extra = {}) {
   res.end(isJson ? JSON.stringify(body) : body);
 }
 
-export async function readBody(req) {
-  const chunks = [];
-  for await (const c of req) chunks.push(c);
-  return Buffer.concat(chunks).toString('utf8');
-}
-
 /** Close a server started by serve(), including long-lived connections such as SSE. */
 export const close = (server) => new Promise((r) => { server.closeAllConnections?.(); server.close(() => r()); });
 

@@ -9,7 +9,7 @@ import { head, header, footer } from '../../shell/header.mjs';
 const BUILD = buildId('account');
 const APP_JS = new URL('./public/app.js', import.meta.url);
 
-export function createAccount() {
+function createAccount() {
   return http.createServer(async (req, res) => {
     const url = new URL(req.url, 'http://account');
     res.on('finish', () => log('account', req, res.statusCode));

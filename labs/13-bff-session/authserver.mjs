@@ -18,7 +18,6 @@ export const isValidAccess = (token) => {
   const t = access.get(token);
   return t && t.exp > Date.now() ? t : null;
 };
-export const isActiveRefresh = (token) => refresh.get(token)?.active === true;
 /** For the tests: how many refresh tokens could still mint an access token. */
 export const activeRefreshCount = () => [...refresh.values()].filter((r) => r.active).length;
 
