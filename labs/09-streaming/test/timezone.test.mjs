@@ -2,8 +2,9 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { build } from '../build.mjs';
 import path from 'node:path';
+import { readVariant } from '../../_shared/variant.mjs';
 
-const variant = process.env.LAB_VARIANT ?? 'solution';
+const variant = readVariant();
 
 test('the first render of <Published> does not depend on the runtime time zone', async () => {
   const out = await build(variant);

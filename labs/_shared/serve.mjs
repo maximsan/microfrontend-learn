@@ -72,9 +72,6 @@ export async function readBody(req) {
   return Buffer.concat(chunks).toString('utf8');
 }
 
-/** Pick the starter or the solution from the command line: `node server.mjs --solution`. */
-export const variant = () => (process.argv.includes('--solution') ? 'solution' : 'starter');
-
 /** Close a server started by serve(), including long-lived connections such as SSE. */
 export const close = (server) => new Promise((r) => { server.closeAllConnections?.(); server.close(() => r()); });
 

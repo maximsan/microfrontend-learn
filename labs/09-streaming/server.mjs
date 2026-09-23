@@ -1,4 +1,4 @@
-// Lab 09 — streaming SSR.   node server.mjs [--solution]
+// Lab 09 — streaming SSR.   [VARIANT=solution] node server.mjs
 // The server runs in UTC on purpose, so its clock disagrees with yours (part 2).
 process.env.TZ = 'UTC';
 import http from 'node:http';
@@ -8,8 +8,9 @@ import { createElement } from 'react';
 import { renderToPipeableStream } from 'react-dom/server';
 import { build } from './build.mjs';
 import { isMain } from '../_shared/isMain.mjs';
+import { readVariant } from '../_shared/variant.mjs';
 
-export async function start({ variant = process.argv.includes('--solution') ? 'solution' : 'starter', port = 5109, log = true } = {}) {
+export async function start({ variant = readVariant('starter'), port = 5109, log = true } = {}) {
   const out = await build(variant);
   const { App } = await import(`${path.join(out, 'app.mjs')}?v=${Date.now()}`);
   const client = await fs.readFile(path.join(out, 'client.js'));

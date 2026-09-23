@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "start": "node start.mjs",
-    "solution": "node start.mjs --solution",
+    "solution": "VARIANT=solution npm start",
     "test": "node --test \"test/*.test.mjs\""
   }
 }

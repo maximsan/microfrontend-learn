@@ -2,8 +2,9 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { build } from '../build.mjs';
+import { readVariant } from '../../_shared/variant.mjs';
 
-const variant = process.env.LAB_VARIANT ?? 'solution';
+const variant = readVariant();
 const { stats } = await build(variant, { quiet: true });
 
 const consumed = (app) => stats[app].modules.filter((m) => m.moduleType === 'consume-shared-module').map((m) => m.name);

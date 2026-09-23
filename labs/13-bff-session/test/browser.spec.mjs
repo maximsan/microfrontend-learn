@@ -1,9 +1,10 @@
 // Lab 13 in a real browser: what an injected script can reach, and logout across tabs.
-//   npx playwright test labs/13-bff-session        (LAB_VARIANT=starter to check your copy)
+//   npx playwright test labs/13-bff-session        (VARIANT=starter to check your copy)
 // Needs a browser that accepts Secure cookies on http://localhost: Chrome, Chromium, Firefox.
 import { test, expect } from '@playwright/test';
+import { readVariant } from '../../_shared/variant.mjs';
 
-const variant = process.env.LAB_VARIANT ?? 'solution';
+const variant = readVariant();
 const APP = 'http://localhost:5122';
 let stack;
 test.beforeAll(async () => {

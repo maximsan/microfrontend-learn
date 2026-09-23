@@ -15,7 +15,7 @@ objectives:
 
 Every module so far has isolated one mechanism. This one puts them together. **Acme Shop** is a deliberately small estate of five services owned by five imaginary teams, behind one origin, and it lives in the repository under `capstone/`. It uses Node built-ins only, with no framework and no bundler, so every mechanism is a few dozen lines you can read, and nothing is hidden inside a dependency.
 
-There are two ways to use it. **Read and run it**: `npm start`, then `npm test`, and trace each behaviour to the module that argues for it. Or **rebuild it** in `capstone/starter/`, where the other teams' services already run and every stub you replace answers `501`. All 22 acceptance tests and 10 browser tests start red (`CAPSTONE_VARIANT=starter npm test`) and turn green milestone by milestone. The milestones below are ordered so that each one leaves you with a working system.
+There are two ways to use it. **Read and run it**: `npm start`, then `npm test`, and trace each behaviour to the module that argues for it. Or **rebuild it** in `capstone/starter/`, where the other teams' services already run and every stub you replace answers `501`. All 22 acceptance tests and 10 browser tests start red (`VARIANT=starter npm test`) and turn green milestone by milestone. The milestones below are ordered so that each one leaves you with a working system.
 
 ### The estate
 

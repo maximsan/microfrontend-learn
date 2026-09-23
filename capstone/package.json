@@ -5,8 +5,6 @@
   "description": "Capstone: routing-level zones, a shared shell, hand-rolled fragment streaming, a BFF session, shell-owned realtime and traceable deploys \u2014 Node built-ins only.",
   "scripts": {
     "start": "node start.mjs",
-    "starter": "CAPSTONE_VARIANT=starter node start.mjs",
-    "test": "node --test \"test/*.test.mjs\"",
-    "test:starter": "CAPSTONE_VARIANT=starter node --test \"test/*.test.mjs\""
+    "test": "node --test \"test/*.test.mjs\""
   }
 }

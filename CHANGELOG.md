@@ -7,6 +7,9 @@ All notable changes to the book. Versions follow [Semantic Versioning](https://s
 ### Added
 - `npm run preview:devices`: builds the book and opens the side-by-side width preview (moved from `tools/devices.html` to `scripts/devices.html`).
 
+### Changed
+- **One switch picks the copy you run: `VARIANT`.** `LAB_VARIANT` and `CAPSTONE_VARIANT` always meant the same thing (`starter` or `solution`), so there is now one variable for every lab and the capstone, and it replaces the `--solution` flag too: `VARIANT=starter npm test` checks your copy, `VARIANT=solution node server.mjs` runs the reference. Any other value is an error instead of silently running the wrong copy.
+
 ### Fixed
 - **Capstone browser tests follow the milestones.** The M1 and M2 tests no longer sign in, so they turn green once M1 and M2 are built instead of waiting for M6. The two checks that do need a session (the session surviving a zone crossing, and the cart badge) moved to M6, which now has 5 browser tests; 10 in all.
 - The account zone's router no longer paints a slow, stale view over the page the reader has already navigated to, with an M6 browser test that delays the orders response to prove it.

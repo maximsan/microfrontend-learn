@@ -1,10 +1,11 @@
 // Lab 06 in a real browser: the four things a real navigation does for free.
-//   npx playwright test labs/06-router          (LAB_VARIANT=starter to check your copy)
+//   npx playwright test labs/06-router          (VARIANT=starter to check your copy)
 import { test, expect } from '@playwright/test';
 import { start, PORT } from '../server.mjs';
 import { close } from '../../_shared/serve.mjs';
+import { readVariant } from '../../_shared/variant.mjs';
 
-const variant = process.env.LAB_VARIANT ?? 'solution';
+const variant = readVariant();
 const base = `http://localhost:${PORT}`;
 let server;
 test.beforeAll(async () => { server = await start({ variant, log: false }); });

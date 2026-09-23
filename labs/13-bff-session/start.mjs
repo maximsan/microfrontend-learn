@@ -1,4 +1,4 @@
-// Starts all three services.   node start.mjs [--solution]
+// Starts all three services.   [VARIANT=solution] node start.mjs
 import http from 'node:http';
 import fs from 'node:fs/promises';
 import path from 'node:path';
@@ -7,11 +7,11 @@ import { startAuthServer } from './authserver.mjs';
 import { startApi } from './api.mjs';
 import { ORIGINS } from './lib.mjs';
 import { isMain } from '../_shared/isMain.mjs';
+import { readVariant, variantRoots } from '../_shared/variant.mjs';
 
-const here = path.dirname(fileURLToPath(import.meta.url));
 const TYPES = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8' };
 
-export async function startAll({ variant = process.argv.includes('--solution') ? 'solution' : 'starter', log = true } = {}) {
+export async function startAll({ variant = readVariant('starter'), log = true } = {}) {
   const { routes } = await import(`./${variant}/bff.mjs`);
   const app = http.createServer(async (req, res) => {
     const url = new URL(req.url, ORIGINS.app);
@@ -23,8 +23,8 @@ export async function startAll({ variant = process.argv.includes('--solution') ?
     // solution/public overrides starter/public, so the solution holds only the files it changes.
     const name = url.pathname === '/' ? 'index.html' : url.pathname;
     let file = null, body = null;
-    for (const dir of variant === 'solution' ? ['solution', 'starter'] : ['starter']) {
-      file = path.join(here, dir, 'public', name);
+    for (const root of variantRoots(variant, import.meta.url)) {
+      file = path.join(fileURLToPath(root), 'public', name);
       body = await fs.readFile(file).catch(() => null);
       if (body) break;
     }

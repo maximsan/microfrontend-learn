@@ -1,7 +1,8 @@
-// Lab 11 — the six-connection budget.   node server.mjs [--solution]
+// Lab 11 — the six-connection budget.   [VARIANT=solution] node server.mjs
 // Plain HTTP/1.1 on purpose: browsers allow only six connections per host on it.
-import { serve, variant, send, listening } from '../_shared/serve.mjs';
+import { serve, send, listening } from '../_shared/serve.mjs';
 import { isMain } from '../_shared/isMain.mjs';
+import { readVariant, variantRoots } from '../_shared/variant.mjs';
 
 export const PORT = 5112;
 const open = new Set();
@@ -23,12 +24,11 @@ function events(req, res, url) {
   req.on('close', () => { clearInterval(tick); open.delete(conn); if (!quiet) console.log(`- ${who.padEnd(14)} open streams: ${open.size}`); });
 }
 
-export function start({ variant: v = variant(), port = PORT, log = true } = {}) {
-  const dirs = v === 'solution' ? ['./solution/', './starter/'] : ['./starter/'];
+export function start({ variant = readVariant('starter'), port = PORT, log = true } = {}) {
   quiet = !log;
-  if (log) console.log(`Lab 11 · connection budget (${v})`);
+  if (log) console.log(`Lab 11 · connection budget (${variant})`);
   return listening(serve({
-    root: dirs.map((d) => new URL(d, import.meta.url)),
+    root: variantRoots(variant, import.meta.url),
     port,
     log,
     routes: {

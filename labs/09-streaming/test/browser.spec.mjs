@@ -1,9 +1,10 @@
 // Lab 09 in a real browser: hydration and failure isolation.
-//   npx playwright test labs/09-streaming          (LAB_VARIANT=starter to check your copy)
+//   npx playwright test labs/09-streaming          (VARIANT=starter to check your copy)
 import { test, expect } from '@playwright/test';
 import { start } from '../server.mjs';
+import { readVariant } from '../../_shared/variant.mjs';
 
-const variant = process.env.LAB_VARIANT ?? 'solution';
+const variant = readVariant();
 const base = 'http://localhost:5109';
 let server;
 test.beforeAll(async () => { server = await start({ variant, log: false }); });

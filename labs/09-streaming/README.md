@@ -11,7 +11,7 @@ cd labs/09-streaming
 npm install
 npm start            # starter  → http://localhost:5109
 npm run solution     # reference fix
-npm test             # checks the solution; LAB_VARIANT=starter npm test checks your copy
+npm test             # checks the solution; VARIANT=starter npm test checks your copy
 ```
 
 The page has a shell (header), a **post** that takes 1.5 s to load, and a **sidebar** that takes 0.4 s, even though the sidebar comes *after* the post in the markup.
@@ -45,7 +45,7 @@ The server deliberately runs in **UTC**. The header's `<Published>` formats a da
 
 This is invisible to a developer who sits in the same zone as the server, which is why it is the most common production mismatch.
 
-**Fix** `starter/Published.jsx` so the first render is the same everywhere, and the reader still ends up seeing local time. Run `LAB_VARIANT=starter npm test`: the time-zone test fails until you do.
+**Fix** `starter/Published.jsx` so the first render is the same everywhere, and the reader still ends up seeing local time. Run `VARIANT=starter npm test`: the time-zone test fails until you do.
 
 <details>
 <summary>Hint</summary>
@@ -67,11 +67,11 @@ This lab keeps one React root and contains failures with per-fragment error boun
 
 ```sh
 # from the repository root, once:  npm install   (and Google Chrome, or: npx playwright install chromium)
-LAB_VARIANT=starter npx playwright test labs/09-streaming --project=chrome   # your copy: red until you finish
+VARIANT=starter npx playwright test labs/09-streaming --project=chrome       # your copy: red until you finish
 npx playwright test labs/09-streaming --project=chrome                       # the reference: green
 ```
 
-The Node tests run from this folder with `LAB_VARIANT=starter npm test` (yours) or `npm test` (reference).
+The Node tests run from this folder with `VARIANT=starter npm test` (yours) or `npm test` (reference).
 
 Tests named *observe* describe the platform and pass on both. Tests named *exercise* are the ones you turn green.
 

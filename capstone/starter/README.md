@@ -13,10 +13,10 @@ Every stub answers `501` and names what is missing, so all tests start red:
 
 ```sh
 cd capstone
-CAPSTONE_VARIANT=starter npm test              # 22 HTTP acceptance tests, all red
-CAPSTONE_VARIANT=starter npm test -- --test-name-pattern=M3   # one milestone at a time
-CAPSTONE_VARIANT=starter node start.mjs        # run your estate at http://localhost:5200
-npm run test:browser:starter                   # from the repo root: the browser checks
+VARIANT=starter npm test                             # 22 HTTP acceptance tests, all red
+VARIANT=starter npm test -- --test-name-pattern=M3   # one milestone at a time
+VARIANT=starter node start.mjs                       # run your estate at http://localhost:5200
+npm run test:browser:starter                         # from the repo root: the browser checks
 ```
 
 Keep the same ports and paths as the reference (`capstone/lib.mjs` has them), and work through the milestones in order. Each one turns its group green. The reference implementation sits one folder up; open it only when you are stuck.

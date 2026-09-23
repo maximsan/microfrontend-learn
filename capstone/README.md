@@ -35,10 +35,10 @@ node start.mjs --without=recommendations   # a team is down; the page should not
 `starter/` is the skeleton to build in. The recommendations fragment service and the API are other teams' and already run; you build the gateway, both zones and the shared shell. Every stub answers `501`, so every test starts red:
 
 ```sh
-CAPSTONE_VARIANT=starter npm test                                  # 22 HTTP acceptance tests
-CAPSTONE_VARIANT=starter npm test -- --test-name-pattern="M3"      # one milestone
-CAPSTONE_VARIANT=starter npx playwright test capstone --project=chrome   # 10 browser tests (from the repo root)
-CAPSTONE_VARIANT=starter npm start                                 # your estate on :5200
+VARIANT=starter npm test                                        # 22 HTTP acceptance tests
+VARIANT=starter npm test -- --test-name-pattern="M3"            # one milestone
+VARIANT=starter npx playwright test capstone --project=chrome   # 10 browser tests (from the repo root)
+VARIANT=starter npm start                                       # your estate on :5200
 ```
 
 Work through the milestones in the chapter (M1 → M7); each one turns its group green. `starter/README.md` lists which file serves which milestone. The reference code in this folder is there for when you are stuck.
