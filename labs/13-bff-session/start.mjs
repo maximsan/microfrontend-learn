@@ -19,8 +19,14 @@ export async function startAll({ variant = process.argv.includes('--solution') ?
       return (method === '*' || method === req.method) && (p.endsWith('*') ? url.pathname.startsWith(p.slice(0, -1)) : url.pathname === p);
     });
     if (handler) return handler[1](req, res, url);
-    const file = path.join(here, variant, 'public', url.pathname === '/' ? 'index.html' : url.pathname);
-    const body = await fs.readFile(file).catch(() => null);
+    // solution/public overrides starter/public, so the solution holds only the files it changes.
+    const name = url.pathname === '/' ? 'index.html' : url.pathname;
+    let file = null, body = null;
+    for (const dir of variant === 'solution' ? ['solution', 'starter'] : ['starter']) {
+      file = path.join(here, dir, 'public', name);
+      body = await fs.readFile(file).catch(() => null);
+      if (body) break;
+    }
     if (!body) return res.writeHead(404).end('Not found');
     res.writeHead(200, { 'content-type': TYPES[path.extname(file)] ?? 'text/plain' }).end(body);
   });

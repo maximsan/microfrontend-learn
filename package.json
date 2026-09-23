@@ -3,9 +3,10 @@
   "version": "2.0.0",
   "private": true,
   "type": "module",
-  "description": "Where State Lives — a field guide to web architecture from documents to micro-frontends, authored in MDX and rendered with React to a single static HTML page.",
+  "description": "Where State Lives \u2014 a field guide to web architecture from documents to micro-frontends, authored in MDX and rendered with React to a single static HTML page.",
   "scripts": {
     "build": "tsx scripts/build.mjs",
+    "build:hosted": "tsx scripts/build.mjs --hosted",
     "watch": "tsx scripts/build.mjs --watch",
     "check": "tsx scripts/check.mjs",
     "test:labs": "node scripts/test-labs.mjs"

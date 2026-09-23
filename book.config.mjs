@@ -7,6 +7,6 @@ export default {
   eyebrow: 'A field guide for senior engineers',
   // The one place the "sources verified" date is written.
   verified: 'September 2026',
-  // Where the published copy lives (used by `npm run build` messages only).
-  artifactUrl: 'https://claude.ai/artifact/VsdCpeBVajAtxf2fzov46S',
+  // The private hosted copy on claude.ai, republished from `npm run build:hosted`.
+  hostedUrl: 'https://claude.ai/artifact/VsdCpeBVajAtxf2fzov46S',
 };
