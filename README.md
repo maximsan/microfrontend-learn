@@ -57,8 +57,8 @@ tools/devices.html     preview the build at several widths side by side
 
 ## Contributing
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for the authoring components, the evidence rule, and the git conventions: trunk-based branches off `main` and Conventional Commits.
+See [CONTRIBUTING.md](CONTRIBUTING.md) for the authoring components, the evidence rule, and the git conventions: trunk-based development (short-lived branches off `main`) and Conventional Commits.
 
 ## Published copy
 
-A private hosted copy lives at <https://claude.ai/artifact/VsdCpeBVajAtxf2fzov46S>. **This repository is the source of truth**; the hosted page is only ever republished from `dist/hosted.html`.
+A private hosted copy lives at <https://claude.ai/artifact/VsdCpeBVajAtxf2fzov46S>. **This repository is the source of truth**; the hosted page is only ever republished from `dist/hosted.html`, built from a release tag.
