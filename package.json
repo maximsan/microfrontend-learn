@@ -12,7 +12,7 @@
     "check": "tsx scripts/check.mjs",
     "test:labs": "node scripts/test-labs.mjs",
     "test:browser": "node scripts/install-labs.mjs && playwright test --project=chrome",
-    "test:browser:starter": "node scripts/install-labs.mjs && LAB_VARIANT=starter CAPSTONE_VARIANT=starter playwright test --project=chrome",
+    "test:browser:starter": "node scripts/install-labs.mjs && VARIANT=starter playwright test --project=chrome",
     "setup:labs": "node scripts/install-labs.mjs"
   },
   "dependencies": {

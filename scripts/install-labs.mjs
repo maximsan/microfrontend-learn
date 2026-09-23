@@ -9,6 +9,7 @@
 import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
+import { isMain } from '../labs/_shared/isMain.mjs';
 
 const here = `${process.platform}-${process.arch}`;
 const npm = process.platform === 'win32' ? 'npm.cmd' : 'npm';
@@ -34,4 +35,4 @@ export function installLabs({ quiet = false } = {}) {
   }
 }
 
-if (process.argv[1] && path.resolve(process.argv[1]) === path.resolve('scripts/install-labs.mjs')) installLabs();
+if (isMain(import.meta.url)) installLabs();

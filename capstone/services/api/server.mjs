@@ -7,7 +7,7 @@ import { PORTS, INTERNAL_SECRET, safeEqual, readJson, json, log, listen } from '
 const carts = new Map();   // user → [{ product, qty }]
 const orders = new Map([['max', [{ id: 1042, items: 2, status: 'shipped' }]]]);
 
-export function createApi() {
+function createApi() {
   return http.createServer(async (req, res) => {
     res.on('finish', () => log('api', req, res.statusCode));
     if (!safeEqual(String(req.headers['x-internal-auth'] ?? ''), INTERNAL_SECRET)) return json(res, 401, { error: 'unauthenticated' });

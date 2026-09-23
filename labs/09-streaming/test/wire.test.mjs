@@ -1,8 +1,9 @@
 import { test, after } from 'node:test';
 import assert from 'node:assert/strict';
 import { start } from '../server.mjs';
+import { readVariant } from '../../_shared/variant.mjs';
 
-const variant = process.env.LAB_VARIANT ?? 'solution';
+const variant = readVariant();
 const server = await start({ variant, port: 0, log: false });
 after(() => server.close());
 const base = `http://localhost:${server.address().port}`;

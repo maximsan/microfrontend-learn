@@ -7,8 +7,8 @@
 Seven micro-frontends on one page each want live updates. The starter lets each open its own `EventSource`, which is the pattern the chapter calls out. You will watch the page run out of connections, then replace it with one shell-owned stream per **browser**, not per tab.
 
 ```sh
-node labs/11-connection-budget/server.mjs             # starter
-node labs/11-connection-budget/server.mjs --solution  # reference fix
+node labs/11-connection-budget/server.mjs                   # starter
+VARIANT=solution node labs/11-connection-budget/server.mjs  # reference fix
 ```
 
 The server speaks plain HTTP/1.1 on purpose and logs every stream as it opens and closes.
@@ -46,7 +46,7 @@ With the solution running:
 
 ```sh
 # from the repository root, once:  npm install   (and Google Chrome, or: npx playwright install chromium)
-LAB_VARIANT=starter npx playwright test labs/11-connection-budget --project=chrome   # your copy: red until you finish
+VARIANT=starter npx playwright test labs/11-connection-budget --project=chrome       # your copy: red until you finish
 npx playwright test labs/11-connection-budget --project=chrome                       # the reference: green
 ```
 

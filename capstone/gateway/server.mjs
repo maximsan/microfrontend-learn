@@ -133,7 +133,7 @@ function proxy(req, res, port) {
   req.pipe(up);
 }
 
-export function createGateway() {
+function createGateway() {
   return http.createServer(async (req, res) => {
     const url = new URL(req.url, ORIGIN);
     req.headers['x-trace-id'] ??= random(9);

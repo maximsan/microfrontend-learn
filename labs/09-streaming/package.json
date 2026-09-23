@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "start": "node server.mjs",
-    "solution": "node server.mjs --solution",
+    "solution": "VARIANT=solution npm start",
     "wire": "node wire.mjs",
     "test": "node --test \"test/*.test.mjs\""
   },

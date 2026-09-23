@@ -9,8 +9,8 @@ The starter is a typical `pushState` router. It looks fine with a mouse. You wil
 ## Run
 
 ```sh
-node labs/06-router/server.mjs             # your working copy (starter/)
-node labs/06-router/server.mjs --solution  # the reference router
+node labs/06-router/server.mjs                   # your working copy (starter/)
+VARIANT=solution node labs/06-router/server.mjs  # the reference router
 ```
 
 Open <http://localhost:5106>. The **self-check** panel in the corner re-tests four things after every navigation.
@@ -61,7 +61,7 @@ Add a second, independent router for a widget, for example one that keeps a `?ta
 
 ```sh
 # from the repository root, once:  npm install   (and Google Chrome, or: npx playwright install chromium)
-LAB_VARIANT=starter npx playwright test labs/06-router --project=chrome   # your copy: red until you finish
+VARIANT=starter npx playwright test labs/06-router --project=chrome       # your copy: red until you finish
 npx playwright test labs/06-router --project=chrome                       # the reference: green
 ```
 

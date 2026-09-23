@@ -1,10 +1,11 @@
 // Lab 11 in a real browser: one stream per browser, whatever the tabs.
-//   npx playwright test labs/11-connection-budget   (LAB_VARIANT=starter to check your copy)
+//   npx playwright test labs/11-connection-budget   (VARIANT=starter to check your copy)
 import { test, expect } from '@playwright/test';
 import { start, streams, PORT } from '../server.mjs';
 import { close } from '../../_shared/serve.mjs';
+import { readVariant } from '../../_shared/variant.mjs';
 
-const variant = process.env.LAB_VARIANT ?? 'solution';
+const variant = readVariant();
 const base = `http://localhost:${PORT}`;
 let server;
 test.beforeAll(async () => { server = await start({ variant, log: false }); });

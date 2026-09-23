@@ -1,6 +1,6 @@
 // Capstone in a real browser: what the HTTP tests cannot see.
-//   npx playwright test capstone                 the reference build
-//   CAPSTONE_VARIANT=starter npx playwright test capstone   your build in capstone/starter/
+//   npx playwright test capstone                   the reference build
+//   VARIANT=starter npx playwright test capstone   your build in capstone/starter/
 import { test, expect } from '@playwright/test';
 
 const BASE = 'http://localhost:5200';

@@ -1,11 +1,12 @@
-// The requirements from starter/bff.mjs, as tests.   npm test   (LAB_VARIANT=starter npm test)
+// The requirements from starter/bff.mjs, as tests.   npm test   (VARIANT=starter npm test)
 import { test, before, after } from 'node:test';
 import assert from 'node:assert/strict';
+import { readVariant } from '../../_shared/variant.mjs';
 
 process.env.IDLE_MS ??= '800';     // short timeouts so the expiry tests run fast
 process.env.ABS_MS ??= '2500';
 process.env.ACCESS_TTL_S ??= '2'; // access tokens near expiry on every call, so the BFF must refresh
-const variant = process.env.LAB_VARIANT ?? 'solution';
+const variant = readVariant();
 const { startAll } = await import('../start.mjs');
 const APP = 'http://localhost:5122';
 let stack;

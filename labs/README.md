@@ -27,7 +27,7 @@ npx playwright install chromium     # then add --project=chromium instead of chr
 npm run test:browser:starter        # every lab's starter and the capstone starter: red
 npm run test:browser                # every reference: green
 npx playwright test labs/06-router --project=chrome      # one lab
-LAB_VARIANT=starter npx playwright test labs/06-router --project=chrome
+VARIANT=starter npx playwright test labs/06-router --project=chrome
 ```
 
 The browser tests run one worker per test file (each lab has its own ports), up to your CPU count minus one; `PW_WORKERS=2` caps it. Running several browsers in one command (`--project=chrome --project=firefox`) would put the same file in two workers on the same ports, so add `--workers=1` then.
@@ -36,10 +36,10 @@ Tests named **observe** describe how the platform behaves and pass on both varia
 
 Labs 09 and 10 have their own dependencies, which include native binaries for your OS. The test scripts install them for this machine first, and reinstall them if `node_modules` came from another platform. `npm run setup:labs` does only that step.
 
-Labs 09, 10 and 13 also have Node tests that run without a browser: `LAB_VARIANT=starter npm test` in the lab folder, or `npm run test:labs` at the root for every reference.
+Labs 09, 10 and 13 also have Node tests that run without a browser: `VARIANT=starter npm test` in the lab folder, or `npm run test:labs` at the root for every reference.
 
 ## Conventions
 
 - **Node 20 or newer.** Labs without an install use Node built-ins only.
-- `node server.mjs` runs the starter; `node server.mjs --solution` (or `npm run solution`) runs the reference. Every server also exports `start({ variant })`, which is what the tests call.
+- `node server.mjs` runs the starter; `VARIANT=solution node server.mjs` (or `npm run solution`) runs the reference. Every server also exports `start({ variant })`, which is what the tests call.
 - Ports: 51xx for labs, 52xx for the capstone, so several can run at once. The browser tests start and stop their own servers, so stop yours first.

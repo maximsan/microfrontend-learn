@@ -9,8 +9,8 @@ You will see, on screen, whether the JavaScript runtime survives each kind of in
 ## Run
 
 ```sh
-node labs/01-runtime-lifetime/server.mjs            # your working copy (starter/)
-node labs/01-runtime-lifetime/server.mjs --solution # the reference fix
+node labs/01-runtime-lifetime/server.mjs                   # your working copy (starter/)
+VARIANT=solution node labs/01-runtime-lifetime/server.mjs  # the reference fix
 ```
 
 Open <http://localhost:5101>. Every page shows a badge with a **runtime id** (random, created once per JavaScript runtime), how long that runtime has been **alive**, and a click counter kept **only in memory**.
@@ -54,7 +54,7 @@ Edit `starter/swap/app.js` so that swapping a fragment tears down whatever the o
 Give every fragment a lifecycle. Create an `AbortController` in `hydrate()`, register a cleanup for each interval on its `signal`, return it, and call `abort()` on the old one before replacing `slot.innerHTML`. Stimulus's `disconnect()`, htmx's `htmx:beforeCleanupElement` and single-spa's `unmount()` all exist for this reason.
 </details>
 
-Compare with `solution/swap/app.js`, or run the server with `--solution`.
+Compare with `solution/swap/app.js`, or run the server with `VARIANT=solution`.
 
 ## Tests
 
@@ -62,7 +62,7 @@ Compare with `solution/swap/app.js`, or run the server with `--solution`.
 
 ```sh
 # from the repository root, once:  npm install   (and Google Chrome, or: npx playwright install chromium)
-LAB_VARIANT=starter npx playwright test labs/01-runtime-lifetime --project=chrome   # your copy: red until you finish
+VARIANT=starter npx playwright test labs/01-runtime-lifetime --project=chrome       # your copy: red until you finish
 npx playwright test labs/01-runtime-lifetime --project=chrome                       # the reference: green
 ```
 

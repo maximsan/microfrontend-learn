@@ -6,7 +6,7 @@ import { PUBLISHED_AT } from '../shared/data.js';
  * zone explicitly. After hydration we switch to the reader's local time —
  * an effect never runs on the server, so it cannot cause a mismatch.
  */
-export function formatPublished(iso = PUBLISHED_AT, timeZone = 'UTC') {
+function formatPublished(iso = PUBLISHED_AT, timeZone = 'UTC') {
   const s = new Date(iso).toLocaleString('en-GB', { dateStyle: 'medium', timeStyle: 'short', timeZone });
   return timeZone === 'UTC' ? `${s} UTC` : s;
 }

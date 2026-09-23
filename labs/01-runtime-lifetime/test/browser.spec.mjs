@@ -1,11 +1,12 @@
 // Lab 01 in a real browser.   npx playwright test labs/01-runtime-lifetime
 // "observe" tests describe the platform and pass on both variants.
-// "exercise" tests fail on the starter until you fix it (LAB_VARIANT=starter).
+// "exercise" tests fail on the starter until you fix it (VARIANT=starter).
 import { test, expect } from '@playwright/test';
 import { start, PORT } from '../server.mjs';
 import { close } from '../../_shared/serve.mjs';
+import { readVariant } from '../../_shared/variant.mjs';
 
-const variant = process.env.LAB_VARIANT ?? 'solution';
+const variant = readVariant();
 const base = `http://localhost:${PORT}`;
 let server;
 test.beforeAll(async () => { server = await start({ variant, log: false }); });

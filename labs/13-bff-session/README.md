@@ -16,7 +16,7 @@ Three services run locally, each on its own origin:
 cd labs/13-bff-session
 npm start                     # starter
 npm run solution              # reference BFF
-LAB_VARIANT=starter npm test  # your progress: 9 failing tests to turn green
+VARIANT=starter npm test      # your progress: 9 failing tests to turn green
 npm test                      # the reference passes all 9
 ```
 
@@ -34,7 +34,7 @@ Start the starter and open <http://localhost:5122>.
 Open `starter/bff.mjs`. It lists six requirements, taken from RFC 10017 §6.1 and the OWASP CSRF and Session Management cheat sheets, and stubs every route with `501`. Work through them with the tests:
 
 ```sh
-LAB_VARIANT=starter npm test
+VARIANT=starter npm test
 ```
 
 Do it in the order *Migration paths* prescribes for Path C, so every step is safe to ship:
@@ -66,11 +66,11 @@ Run the solution (or yours) and repeat part 1:
 
 ```sh
 # from the repository root, once:  npm install   (and Google Chrome, or: npx playwright install chromium)
-LAB_VARIANT=starter npx playwright test labs/13-bff-session --project=chrome   # your copy: red until you finish
+VARIANT=starter npx playwright test labs/13-bff-session --project=chrome       # your copy: red until you finish
 npx playwright test labs/13-bff-session --project=chrome                       # the reference: green
 ```
 
-The Node tests run from this folder with `LAB_VARIANT=starter npm test` (yours) or `npm test` (reference).
+The Node tests run from this folder with `VARIANT=starter npm test` (yours) or `npm test` (reference).
 
 Tests named *observe* describe the platform and pass on both. Tests named *exercise* are the ones you turn green.
 

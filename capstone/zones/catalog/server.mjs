@@ -16,7 +16,7 @@ import { head, header, footer } from '../../shell/header.mjs';
 const BUILD = buildId('catalog');
 const RECS_BUDGET_MS = Number(process.env.RECS_BUDGET_MS ?? 400);
 
-export const PRODUCTS = [
+const PRODUCTS = [
   { id: 'p1', name: 'Mechanical keyboard', price: 129 },
   { id: 'p2', name: '27" monitor', price: 349 },
   { id: 'p3', name: 'USB-C dock', price: 89 },
@@ -111,7 +111,7 @@ ${pageScript}
 </body></html>`);
 }
 
-export function createCatalog() {
+function createCatalog() {
   return http.createServer(async (req, res) => {
     const url = new URL(req.url, 'http://catalog');
     res.on('finish', () => log('catalog', req, res.statusCode));

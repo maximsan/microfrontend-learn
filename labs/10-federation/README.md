@@ -11,7 +11,7 @@ cd labs/10-federation
 npm install
 npm start               # build the starter and serve both apps
 npm run solution        # build and serve the reference fix
-LAB_VARIANT=starter npm test   # checks your copy (fails until you fix parts 1–2)
+VARIANT=starter npm test       # checks your copy (fails until you fix parts 1–2)
 npm test                       # checks the solution
 ```
 
@@ -53,11 +53,11 @@ The `import('cart/CartWidget')` rejects, nothing catches it, and the shell's who
 
 ```sh
 # from the repository root, once:  npm install   (and Google Chrome, or: npx playwright install chromium)
-LAB_VARIANT=starter npx playwright test labs/10-federation --project=chrome   # your copy: red until you finish
+VARIANT=starter npx playwright test labs/10-federation --project=chrome       # your copy: red until you finish
 npx playwright test labs/10-federation --project=chrome                       # the reference: green
 ```
 
-The Node tests run from this folder with `LAB_VARIANT=starter npm test` (yours) or `npm test` (reference).
+The Node tests run from this folder with `VARIANT=starter npm test` (yours) or `npm test` (reference).
 
 Tests named *observe* describe the platform and pass on both. Tests named *exercise* are the ones you turn green.
 

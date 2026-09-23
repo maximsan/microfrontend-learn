@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "start": "node build.mjs && node serve.mjs",
-    "solution": "node build.mjs --solution && node serve.mjs --solution",
+    "solution": "VARIANT=solution npm start",
     "test": "node --test \"test/*.test.mjs\""
   },
   "dependencies": {

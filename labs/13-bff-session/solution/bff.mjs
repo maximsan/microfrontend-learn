@@ -2,8 +2,8 @@
 // The browser holds one HttpOnly cookie. Tokens never leave this process.
 import { ORIGINS, random, s256, safeEqual, parseCookies, readForm, json, redirect } from '../lib.mjs';
 
-export const IDLE_MS = Number(process.env.IDLE_MS ?? 15 * 60_000);
-export const ABS_MS = Number(process.env.ABS_MS ?? 8 * 60 * 60_000);
+const IDLE_MS = Number(process.env.IDLE_MS ?? 15 * 60_000);
+const ABS_MS = Number(process.env.ABS_MS ?? 8 * 60 * 60_000);
 const CLIENT = { id: 'bff', secret: 'bff-secret', redirect: `${ORIGINS.app}/bff/callback` };
 
 const SESSION = '__Host-session';

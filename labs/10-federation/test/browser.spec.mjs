@@ -1,12 +1,13 @@
 // Lab 10 in a real browser: the widget renders with the shell's React, and a
 // missing remote costs one widget, not the page.
-//   npx playwright test labs/10-federation          (LAB_VARIANT=starter to check your copy)
+//   npx playwright test labs/10-federation          (VARIANT=starter to check your copy)
 import { test, expect } from '@playwright/test';
 import { build } from '../build.mjs';
 import { start, PORTS } from '../serve.mjs';
 import { close } from '../../_shared/serve.mjs';
+import { readVariant } from '../../_shared/variant.mjs';
 
-const variant = process.env.LAB_VARIANT ?? 'solution';
+const variant = readVariant();
 const shell = `http://localhost:${PORTS.shell}`;
 
 test.beforeAll(async () => {

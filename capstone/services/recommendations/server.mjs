@@ -7,7 +7,7 @@ import { PORTS, buildId, escapeHtml, log, listen } from '../../lib.mjs';
 const BUILD = buildId('recommendations');
 const PICKS = { en: ['Wrist rest', 'Cable organiser', 'Monitor arm'], de: ['Handballenauflage', 'Kabelorganizer', 'Monitorarm'] };
 
-export function createRecommendations() {
+function createRecommendations() {
   return http.createServer(async (req, res) => {
     const url = new URL(req.url, 'http://recs');
     res.on('finish', () => log('recommendations', req, res.statusCode));

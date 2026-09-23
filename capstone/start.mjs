@@ -1,13 +1,14 @@
 // Starts the whole estate: five services, five processes' worth of ownership,
 // one process here for convenience.   node start.mjs
-import { fileURLToPath } from 'node:url';
 import * as recommendations from './services/recommendations/server.mjs';
 import * as api from './services/api/server.mjs';
 import { ORIGIN } from './lib.mjs';
+import { isMain } from '../labs/_shared/isMain.mjs';
+import { readVariant } from '../labs/_shared/variant.mjs';
 
 // The reference build lives here; your own build lives in starter/.
 // Recommendations and the API are other teams' services and always run as-is.
-export async function startAll({ skip = [], variant = process.env.CAPSTONE_VARIANT ?? 'solution' } = {}) {
+export async function startAll({ skip = [], variant = readVariant() } = {}) {
   const dir = variant === 'starter' ? './starter' : '.';
   const [gateway, catalog, account] = await Promise.all([
     import(`${dir}/gateway/server.mjs`),
@@ -22,8 +23,9 @@ export async function startAll({ skip = [], variant = process.env.CAPSTONE_VARIA
   };
 }
 
-if (process.argv[1] === fileURLToPath(import.meta.url)) {
+if (isMain(import.meta.url)) {
   const skip = process.argv.filter((a) => a.startsWith('--without=')).flatMap((a) => a.slice(10).split(','));
-  await startAll({ skip });
-  console.log(`Acme Shop (${process.env.CAPSTONE_VARIANT ?? 'solution'}) → ${ORIGIN}${skip.length ? `   (not running: ${skip.join(', ')})` : ''}`);
+  const variant = readVariant();
+  await startAll({ skip, variant });
+  console.log(`Acme Shop (${variant}) → ${ORIGIN}${skip.length ? `   (not running: ${skip.join(', ')})` : ''}`);
 }
