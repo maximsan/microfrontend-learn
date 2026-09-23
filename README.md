@@ -57,7 +57,7 @@ tools/devices.html     preview the build at several widths side by side
 
 ## Contributing
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for the authoring components, the evidence rule, and the git conventions: git-flow branches and Conventional Commits.
+See [CONTRIBUTING.md](CONTRIBUTING.md) for the authoring components, the evidence rule, and the git conventions: trunk-based branches off `main` and Conventional Commits.
 
 ## Published copy
 

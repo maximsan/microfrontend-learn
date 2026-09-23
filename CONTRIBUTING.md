@@ -78,13 +78,11 @@ Check both directions before merging: `npm run test:browser` must be all green, 
 
 ## Git conventions
 
-**Branches: git flow.**
+**Branches: [trunk-based development](https://trunkbaseddevelopment.com/).** `main` is the only long-lived branch; there is no `develop`.
 
-- `main`: released editions only, each tagged `vX.Y.Z`.
-- `develop`: the integration branch.
-- `feature/<topic>`, `bugfix/<topic>`: branched from and merged back into `develop` with `--no-ff`, then deleted.
-- `release/<version>`: from `develop`; bump version and changelog, then merge into `main` (tag) and back into `develop`.
-- `hotfix/<topic>`: from `main`, merged into both.
+- Cut a short-lived branch from `main`, named after its commit type: `feat/<topic>`, `fix/<topic>`, `docs/<topic>`, `test/<topic>`, `chore/<topic>`.
+- Keep it small and merge it back into `main` as soon as it is reviewed and green, then delete it.
+- A release is a tag `vX.Y.Z` on `main`. The branch that ships it bumps `package.json` and adds the `CHANGELOG.md` entry.
 
 **Commits: [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/).** One logical change per commit.
 
@@ -106,4 +104,8 @@ from the diff. Wrap at 72 characters.
 
 Scopes in use: `ch04`…`ch17` for chapters, `appendix-c`, `glossary`, `part-1`…`part-4`, `components`, `layout`, `client`, `labs`, `capstone`, `diagrams`, `mobile`, `nav`, `tools`.
 
-Before opening a merge, run `npm run check` and, if you touched labs or the capstone, `npm run test:labs`, `npm run test:browser` and `npm run test:browser:starter`.
+**Before merging into `main`:**
+
+1. Run `npm run check` and, if you touched labs or the capstone, `npm run test:labs`, `npm run test:browser` and `npm run test:browser:starter`.
+2. Get two independent reviews of `git diff main...<branch>`. The reviewers do not see each other's findings; the branch author reconciles them, fixes what is real on the same branch, and records what was rejected and why.
+3. Merge only with the maintainer's explicit approval.
