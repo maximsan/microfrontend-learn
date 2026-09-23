@@ -1,7 +1,9 @@
 // Build the book: content/*.mdx → React (server-side only) → one self-contained HTML page.
 //
-//   npm run build     writes dist/index.html      (open it in a browser)
-//                     and    dist/artifact.html   (body-only variant for publishing as an artifact)
+//   npm run build          writes dist/index.html (open it in a browser)
+//   npm run build:hosted   also writes dist/hosted.html: the same book without the
+//                          <html>/<head>/<body> wrapper, which is the form the hosted
+//                          copy on claude.ai is republished from (the host adds its own)
 //   npm run watch     rebuilds on every change under content/ and src/
 import fs from 'node:fs/promises';
 import { watch } from 'node:fs';
@@ -120,12 +122,13 @@ ${fonts}
 ${inner}</body>
 </html>
 `;
-  // Body-only variant: the artifact host supplies <html>/<head>/<body>.
-  const artifact = `${title}\n${fonts}\n\n${inner}`;
 
   await fs.mkdir(rel('dist'), { recursive: true });
   await fs.writeFile(rel('dist/index.html'), full);
-  await fs.writeFile(rel('dist/artifact.html'), artifact);
+  if (process.argv.includes('--hosted')) {
+    // The hosting page supplies <html>, <head> and <body>; it wants only what goes inside.
+    await fs.writeFile(rel('dist/hosted.html'), `${title}\n${fonts}\n\n${inner}`);
+  }
   const kb = (Buffer.byteLength(full) / 1024).toFixed(0);
   console.log(`Built ${chapters.length} chapters, ${words} words, ${kb} KB → dist/index.html  (${Date.now() - t0} ms)`);
 }

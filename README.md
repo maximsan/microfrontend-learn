@@ -46,7 +46,8 @@ tools/devices.html     preview the build at several widths side by side
 
 | Command | What it does |
 | --- | --- |
-| `npm run build` | Writes `dist/index.html` (open locally) and `dist/artifact.html` (body-only, for republishing the hosted copy) |
+| `npm run build` | Writes `dist/index.html`, the whole book as one page |
+| `npm run build:hosted` | Also writes `dist/hosted.html`, the same page without its outer wrapper, used only to republish the hosted copy |
 | `npm run watch` | Rebuilds on change |
 | `npm run check` | Build, then fail on broken in-page links, duplicate ids, or a module without recap or self-check |
 | `npm run test:labs` | Every lab's and the capstone's test suite |
@@ -57,4 +58,4 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for the authoring components, the evidenc
 
 ## Published copy
 
-A private hosted copy lives at <https://claude.ai/artifact/VsdCpeBVajAtxf2fzov46S>. **This repository is the source of truth**; the hosted page is only ever republished from `dist/artifact.html`.
+A private hosted copy lives at <https://claude.ai/artifact/VsdCpeBVajAtxf2fzov46S>. **This repository is the source of truth**; the hosted page is only ever republished from `dist/hosted.html`.
