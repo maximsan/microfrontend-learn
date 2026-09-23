@@ -1,18 +1,25 @@
 # Changelog
 
-All notable changes to the book. Versions follow [Semantic Versioning](https://semver.org/) loosely: a major version is a new edition, a minor version adds chapters or labs, a patch fixes content.
+All notable changes to the book. Versions follow [Semantic Versioning](https://semver.org/) loosely: a major version is a new edition, a minor version adds chapters or labs, or changes how the labs are run or tested, a patch fixes content.
 
-## Unreleased
+## 2.2.0 — 2026-09-23
 
 ### Added
 - `npm run preview:devices`: builds the book and opens the side-by-side width preview (moved from `tools/devices.html` to `scripts/devices.html`).
 
 ### Changed
-- **One switch picks the copy you run: `VARIANT`.** `LAB_VARIANT` and `CAPSTONE_VARIANT` always meant the same thing (`starter` or `solution`), so there is now one variable for every lab and the capstone, and it replaces the `--solution` flag too: `VARIANT=starter npm test` checks your copy, `VARIANT=solution node server.mjs` runs the reference. Any other value is an error instead of silently running the wrong copy.
+- **One switch picks the copy you run: `VARIANT`.** `LAB_VARIANT` and `CAPSTONE_VARIANT` always meant the same thing (`starter` or `solution`), so there is now one variable for every lab and the capstone, and it replaces the `--solution` flag too: `VARIANT=starter npm test` checks your copy, `VARIANT=solution node server.mjs` runs the reference. Any other value is an error instead of silently running the wrong copy. `LAB_VARIANT`, `CAPSTONE_VARIANT`, `--solution` and the capstone's `npm run starter` and `test:starter` are removed and no longer read: set `VARIANT` instead.
+- **Components follow one layout.** Every MDX component family has its own CamelCase file, grouped by kind under `src/components/`; the page shell is split by region under `src/layout/`; code that is not a component lives in `src/lib/`. Repeated markup and data exist once, and wrapper styles live in `book.css`. The rendered book is unchanged apart from classes replacing inline styles.
+- The contributing guide describes trunk-based development: short-lived branches off `main`, merge commits, releases tagged on `main`, and a merge gate of checks, two independent reviews and the maintainer's approval.
+- Variables and exports that nothing used are removed across the book, the labs and the capstone.
+- Lab 10's solution keeps its remote error boundary in its own `RemoteBoundary.jsx`, as lab 09 does, so the file you compare `App.jsx` with holds one component.
 
 ### Fixed
-- **Capstone browser tests follow the milestones.** The M1 and M2 tests no longer sign in, so they turn green once M1 and M2 are built instead of waiting for M6. The two checks that do need a session (the session surviving a zone crossing, and the cart badge) moved to M6, which now has 5 browser tests; 10 in all.
+- **Capstone browser tests follow the milestones.** The M1 and M2 tests no longer sign in, so they turn green once M1 and M2 are built instead of waiting for M6. The two checks that do need a session (the session surviving a zone crossing, and the cart badge) moved to M6, which now has 5 browser tests: 10 for the capstone, 29 across every lab and the capstone.
+- The capstone chapter's M2 names `client.js`, the runtime shell behind `window.acme`, as part of that milestone; the M2 browser test already expected it.
 - The account zone's router no longer paints a slow, stale view over the page the reader has already navigated to, with an M6 browser test that delays the orders response to prove it.
+- The page no longer recounts its stats in the browser: the reading time could change after load, and a hard-coded date could override the "sources verified" date in `book.config.mjs`. The hero also says "1 module" and "1 appendix" when there is one.
+- Lab 09's server did nothing when started from a folder whose path contains a space. Every lab entry point now shares one `isMain()` check.
 
 ## 2.1.0 — 2026-09-23
 
