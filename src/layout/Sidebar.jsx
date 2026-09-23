@@ -2,6 +2,7 @@
 import book from '../../book.config.mjs';
 import { VerifiedDate } from '../components/inline/VerifiedDate.jsx';
 import { Mod } from '../components/xref/Mod.jsx';
+import { ChapterLink } from '../components/xref/ChapterLink.jsx';
 import { shortTitle } from '../lib/chapters.js';
 import { groupConsecutive } from '../lib/groupConsecutive.js';
 
@@ -30,10 +31,10 @@ const TocGroup = ({ label, items }) => (
     <ol>
       {items.map(({ meta }) => (
         <li key={meta.id}>
-          <a href={`#${meta.id}`}>
+          <ChapterLink chapter={meta} className={null}>
             <span className="n">{meta.num}</span>
             <span>{shortTitle(meta)}</span>
-          </a>
+          </ChapterLink>
         </li>
       ))}
     </ol>

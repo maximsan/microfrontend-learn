@@ -1,36 +1,26 @@
 // Time, prerequisites, objectives and lab for one module, from its frontmatter.
 import { ChapterLink } from '../components/xref/ChapterLink.jsx';
+import { DefinitionRow } from '../components/reference/DefinitionRow.jsx';
 import { chapter, label, shortTitle } from '../lib/chapters.js';
+import { joinElements } from '../lib/joinElements.jsx';
 
 export function ModuleBrief({ meta }) {
   const prereqs = (meta.prereqs ?? []).map(chapter);
   return (
     <dl className="brief">
-      <div>
-        <dt>Time</dt>
-        <dd>{meta.minutes} min read{meta.lab ? ' + lab' : ''}</dd>
-      </div>
+      <DefinitionRow term="Time">{meta.minutes} min read{meta.lab ? ' + lab' : ''}</DefinitionRow>
       {prereqs.length ? (
-        <div>
-          <dt>Before this</dt>
-          <dd>
-            {prereqs.map((c, i) => (
-              <span key={c.id}>{i ? ' · ' : ''}<ChapterLink chapter={c}>{label(c)} {shortTitle(c)}</ChapterLink></span>
-            ))}
-          </dd>
-        </div>
+        <DefinitionRow term="Before this">
+          {joinElements(prereqs, ' · ', (c) => c.id, (c) => <ChapterLink chapter={c}>{label(c)} {shortTitle(c)}</ChapterLink>)}
+        </DefinitionRow>
       ) : null}
       {meta.objectives?.length ? (
-        <div className="brief-obj">
-          <dt>You will be able to</dt>
-          <dd><ul>{meta.objectives.map((o) => <li key={o}>{o}</li>)}</ul></dd>
-        </div>
+        <DefinitionRow className="brief-obj" term="You will be able to">
+          <ul>{meta.objectives.map((o) => <li key={o}>{o}</li>)}</ul>
+        </DefinitionRow>
       ) : null}
       {meta.lab ? (
-        <div>
-          <dt>Lab</dt>
-          <dd><code>{meta.lab}</code> in the repository</dd>
-        </div>
+        <DefinitionRow term="Lab"><code>{meta.lab}</code> in the repository</DefinitionRow>
       ) : null}
     </dl>
   );

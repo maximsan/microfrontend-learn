@@ -1,4 +1,5 @@
 // Previous / next links at the end of every chapter.
+import { ChapterLink } from '../components/xref/ChapterLink.jsx';
 import { label, shortTitle } from '../lib/chapters.js';
 
 export function Pager({ prev, next }) {
@@ -14,8 +15,8 @@ export function Pager({ prev, next }) {
 /** One side of the pager; an empty placeholder keeps the other side in place. */
 const PagerLink = ({ chapter, dir }) =>
   chapter ? (
-    <a className={`pg ${dir}`} href={`#${chapter.id}`}>
+    <ChapterLink chapter={chapter} className={`pg ${dir}`}>
       <span className="pg-k">{dir === 'prev' ? '← Previous' : 'Next →'}</span>
       <span className="pg-t">{label(chapter)} · {shortTitle(chapter)}</span>
-    </a>
+    </ChapterLink>
   ) : <span className="pg" aria-hidden="true"></span>;

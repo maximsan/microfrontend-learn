@@ -6,6 +6,7 @@
 //   <Mod to="auth" title />    → "Module 12 · Auth architecture"
 import { chapter, label } from '../../lib/chapters.js';
 import { ChapterLink } from './ChapterLink.jsx';
+import { joinElements } from '../../lib/joinElements.jsx';
 
 export function Mod({ to, num, title }) {
   const c = chapter(to);
@@ -14,8 +15,4 @@ export function Mod({ to, num, title }) {
 }
 
 /** A comma-separated list of linked module numbers: <Mods to={['spectrum', 'choosing']} /> → "02, 05". */
-export function Mods({ to }) {
-  return to.map((id, i) => (
-    <span key={id}>{i ? ', ' : ''}<Mod to={id} num /></span>
-  ));
-}
+export const Mods = ({ to }) => joinElements(to, ', ', (id) => id, (id) => <Mod to={id} num />);

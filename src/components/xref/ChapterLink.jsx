@@ -1,2 +1,4 @@
-/** An in-page link to a chapter, styled as a cross-reference. */
-export const ChapterLink = ({ chapter, children }) => <a className="xref" href={`#${chapter.id}`}>{children}</a>;
+/** An in-page link to a chapter. Styled as a cross-reference unless another class (or null, for none) is given. */
+export const ChapterLink = ({ chapter, className = 'xref', children }) => (
+  <a className={className} href={`#${chapter.id}`}>{children}</a>
+);
