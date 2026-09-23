@@ -1,19 +1,24 @@
 {
   "permissions": {
     "allow": [
+      "Bash(npm install)",
       "Bash(npm run build *)",
       "Bash(npm run check *)",
+      "Bash(npm run preview:devices *)",
+      "Bash(npm run setup:labs *)",
       "Bash(npm run test:labs *)",
       "Bash(npm run test:browser *)",
       "Bash(npm run test:browser:starter *)",
+      "Bash(npm test *)",
       "Bash(npx playwright test *)",
-      "Bash(git status *)",
-      "Bash(git diff *)",
-      "Bash(git log *)",
-      "Bash(git show *)",
-      "Bash(git worktree list *)"
+      "Bash(VARIANT=starter npx playwright test *)",
+      "Bash(VARIANT=starter npm test *)",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(git worktree add *)"
     ],
     "ask": [
+      "Artifact",
       "Bash(git merge *)",
       "Bash(git -C * merge *)",
       "Bash(git tag *)",
@@ -23,10 +28,21 @@
       "Bash(git branch -d *)",
       "Bash(git branch -D *)",
       "Bash(git branch --delete *)",
+      "Bash(git branch -f *)",
+      "Bash(git branch -M *)",
+      "Bash(git -C * branch *)",
       "Bash(git checkout *)",
+      "Bash(git -C * checkout *)",
       "Bash(git switch *)",
+      "Bash(git -C * switch *)",
       "Bash(git reset --hard *)",
-      "Bash(git rebase *)"
+      "Bash(git -C * reset --hard *)",
+      "Bash(git rebase *)",
+      "Bash(git -C * rebase *)",
+      "Bash(git clean *)",
+      "Bash(git stash drop *)",
+      "Bash(git worktree remove *)",
+      "Bash(git worktree prune *)"
     ]
   }
 }
