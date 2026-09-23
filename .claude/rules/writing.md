@@ -1,8 +1,11 @@
 ---
 paths:
-  - "content/**/*.mdx"
-  - "labs/**/README.md"
+  - "content/*.mdx"
+  - "labs/*/README.md"
   - "capstone/**/README.md"
+  - ".claude/worktrees/*/content/*.mdx"
+  - ".claude/worktrees/*/labs/*/README.md"
+  - ".claude/worktrees/*/capstone/**/README.md"
 ---
 
 # Writing the book
@@ -21,7 +24,8 @@ Max agreed these with Claude while writing the first edition. They add to the ev
 
 ## Structure
 
-- **Decision diagrams.** When a choice depends on the reader's inputs, draw it with `<Tree>`. Use `<Flow>` and `<Wire>` for flows and step-by-step sequences. The existing trees cover which rendering model, where to compose, and which SSR mode.
+- **Components before markup.** Use an existing component (CONTRIBUTING's table) before writing ad-hoc markup. When a pattern repeats, add a component.
+- **Decision diagrams.** When a choice depends on the reader's inputs, draw it with `<Tree>`. Use `<Flow>` and `<Wire>` for flows and step-by-step sequences.
 - **Every module ends with a `<Recap>` and a `<Check>`.** Put the answers inside `<Answers>` so they stay collapsed and the reader thinks first.
 - **Every acronym goes in the glossary.** Add it as an `<Acro term="…">` row in `content/app-a-glossary.mdx`.
   - The client script then links its first use in each module automatically.
@@ -37,4 +41,5 @@ Max agreed these with Claude while writing the first edition. They add to the ev
   - 16px gutters and no horizontal scroll.
   - Tables with 3 or more columns become labelled cards, so write header cells that read well as labels.
   - Long flows stack.
+  - The sidebar becomes a drawer.
 - **Check narrow widths after any layout change** with `npm run preview:devices`.
