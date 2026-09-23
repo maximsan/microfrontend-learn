@@ -33,7 +33,7 @@ async function build() {
   const rehypeCellStatus = (await import('../src/mdx/rehypeCellStatus.mjs')).default;
   const { mdxComponents } = await import('../src/components/index.js');
   const { setChapters } = await import('../src/lib/chapters.js');
-  const Page = (await import('../src/layout/Page.jsx')).default;
+  const { Page } = await import('../src/layout/Page.jsx');
   const book = (await import('../book.config.mjs')).default;
 
   const compile = async (file) => {

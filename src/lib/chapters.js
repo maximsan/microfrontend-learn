@@ -17,3 +17,6 @@ export function chapter(id) {
 
 /** "Module 12" or "Appendix C". */
 export const label = (c) => (c.appendix ? `Appendix ${c.num}` : `Module ${c.num}`);
+
+/** The sidebar-length title: `nav` from the frontmatter when set, else the full title. */
+export const shortTitle = (c) => c.nav ?? c.title;
