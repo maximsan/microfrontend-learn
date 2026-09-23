@@ -1,6 +1,7 @@
 // Lab 11 — the six-connection budget.   node server.mjs [--solution]
 // Plain HTTP/1.1 on purpose: browsers allow only six connections per host on it.
-import { serve, variant, send, isMain, listening } from '../_shared/serve.mjs';
+import { serve, variant, send, listening } from '../_shared/serve.mjs';
+import { isMain } from '../_shared/isMain.mjs';
 
 export const PORT = 5112;
 const open = new Set();

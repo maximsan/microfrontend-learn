@@ -1,5 +1,6 @@
 // Lab 06 — a router that does what the browser did for free.   node server.mjs [--solution]
-import { serve, variant, isMain, listening } from '../_shared/serve.mjs';
+import { serve, variant, listening } from '../_shared/serve.mjs';
+import { isMain } from '../_shared/isMain.mjs';
 
 export const PORT = 5106;
 

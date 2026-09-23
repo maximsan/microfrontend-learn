@@ -6,6 +6,7 @@ import { fileURLToPath } from 'node:url';
 import { startAuthServer } from './authserver.mjs';
 import { startApi } from './api.mjs';
 import { ORIGINS } from './lib.mjs';
+import { isMain } from '../_shared/isMain.mjs';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const TYPES = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8' };
@@ -35,4 +36,4 @@ export async function startAll({ variant = process.argv.includes('--solution') ?
   return { close: () => Promise.all(servers.map((s) => new Promise((r) => { s.closeAllConnections?.(); s.close(r); }))) };
 }
 
-if (process.argv[1] === fileURLToPath(import.meta.url)) startAll();
+if (isMain(import.meta.url)) startAll();

@@ -2,7 +2,8 @@
 //   http://localhost:5110  shell (host)      http://localhost:5111  cart (remote)
 // Stop the cart with `--no-cart` to see what the shell does when a remote is down.
 // Build first: node build.mjs [--solution]
-import { serve, isMain, listening } from '../_shared/serve.mjs';
+import { serve, listening } from '../_shared/serve.mjs';
+import { isMain } from '../_shared/isMain.mjs';
 
 export const PORTS = { shell: 5110, cart: 5111 };
 

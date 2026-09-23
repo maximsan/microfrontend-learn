@@ -7,6 +7,7 @@ import path from 'node:path';
 import { createElement } from 'react';
 import { renderToPipeableStream } from 'react-dom/server';
 import { build } from './build.mjs';
+import { isMain } from '../_shared/isMain.mjs';
 
 export async function start({ variant = process.argv.includes('--solution') ? 'solution' : 'starter', port = 5109, log = true } = {}) {
   const out = await build(variant);
@@ -37,4 +38,4 @@ export async function start({ variant = process.argv.includes('--solution') ? 's
   return server;
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) start();
+if (isMain(import.meta.url)) start();

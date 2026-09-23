@@ -3,6 +3,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
+import { isMain } from '../_shared/isMain.mjs';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 
@@ -39,6 +40,6 @@ function copyTree(from, to) {
   }
 }
 
-if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+if (isMain(import.meta.url)) {
   await build(process.argv.includes('--solution') ? 'solution' : 'starter');
 }
