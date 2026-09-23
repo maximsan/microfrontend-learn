@@ -1,9 +1,9 @@
 {
-  "name": "rendering-spectrum",
+  "name": "where-state-lives",
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "description": "The Rendering Spectrum — a field guide to web architecture, authored in MDX and rendered with React to a single static HTML page.",
+  "description": "Where State Lives \u2014 a field guide to web architecture from documents to micro-frontends, authored in MDX and rendered with React to a single static HTML page.",
   "scripts": {
     "build": "tsx scripts/build.mjs",
     "watch": "tsx scripts/build.mjs --watch",

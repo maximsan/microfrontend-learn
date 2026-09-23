@@ -1,9 +1,9 @@
 // Book-wide settings. Chapter order and content live in content/*.mdx.
 export default {
-  title: 'The Rendering Spectrum',
+  title: 'Where State Lives',
   mark: 'Field guide · 2026',
   tagline:
-    'Web application architecture from the document model to micro-frontends — with every claim sourced.',
+    'Web architecture from documents to micro-frontends — with every claim sourced.',
   eyebrow: 'A field guide for senior engineers',
   // The one place the "sources verified" date is written.
   verified: 'September 2026',
