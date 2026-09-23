@@ -9,7 +9,9 @@
     "build:hosted": "tsx scripts/build.mjs --hosted",
     "watch": "tsx scripts/build.mjs --watch",
     "check": "tsx scripts/check.mjs",
-    "test:labs": "node scripts/test-labs.mjs"
+    "test:labs": "node scripts/test-labs.mjs",
+    "test:browser": "playwright test --project=chrome",
+    "test:browser:starter": "LAB_VARIANT=starter CAPSTONE_VARIANT=starter playwright test --project=chrome"
   },
   "dependencies": {
     "@mdx-js/mdx": "^3.1.1",
@@ -21,6 +23,7 @@
     "remark-mdx-frontmatter": "^5.2.0"
   },
   "devDependencies": {
+    "@playwright/test": "^1.63.0",
     "tsx": "^4.23.15"
   }
 }
