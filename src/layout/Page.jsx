@@ -1,7 +1,8 @@
 // The page shell: sidebar contents, mobile bar, hero and one <section> per chapter.
 import book from '../../book.config.mjs';
-import { VerifiedDate } from '../components/inline.jsx';
-import { chapter, label, Mod } from '../components/xref.jsx';
+import { VerifiedDate } from '../components/inline/VerifiedDate.jsx';
+import { chapter, label } from '../lib/chapters.js';
+import { Mod } from '../components/xref/Mod.jsx';
 
 /**
  * @param {{ hero: JSX.Element, chapters: { meta: object, body: JSX.Element }[], stats: object }} props

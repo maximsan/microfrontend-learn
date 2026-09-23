@@ -30,9 +30,9 @@ async function build() {
   const remarkFrontmatter = (await import('remark-frontmatter')).default;
   const remarkMdxFrontmatter = (await import('remark-mdx-frontmatter')).default;
   const rehypeMdxCodeProps = (await import('rehype-mdx-code-props')).default;
-  const rehypeCellStatus = (await import('../src/mdx/rehype-cell-status.mjs')).default;
+  const rehypeCellStatus = (await import('../src/mdx/rehypeCellStatus.mjs')).default;
   const { mdxComponents } = await import('../src/components/index.js');
-  const { setChapters } = await import('../src/components/xref.jsx');
+  const { setChapters } = await import('../src/lib/chapters.js');
   const Page = (await import('../src/layout/Page.jsx')).default;
   const book = (await import('../book.config.mjs')).default;
 
