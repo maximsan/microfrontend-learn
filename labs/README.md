@@ -10,7 +10,7 @@ Hands-on exercises for the book. Each lab reproduces a trap from one chapter, ma
 | [10 · Module Federation, and where React comes from](10-federation/) | Bundlers and Module Federation | 45 min | `npm install` | 2 Node + 2 browser |
 | [11 · The six-connection budget](11-connection-budget/) | APIs and transports | 25 min | none | 3 browser |
 | [13 · From tokens in localStorage to a BFF](13-bff-session/) | Auth architecture · Sessions · Migration paths | 60–90 min | none | 9 Node + 3 browser |
-| [Capstone · Acme Shop](../capstone/) | Capstone: Acme Shop | a weekend | none | 22 Node + 7 browser |
+| [Capstone · Acme Shop](../capstone/) | Capstone: Acme Shop | a weekend | none | 22 Node + 10 browser |
 
 Lab numbers match the chapter numbers at the time of writing.
 

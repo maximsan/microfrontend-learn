@@ -21,38 +21,58 @@ test.beforeEach(async ({ context }) => {
   });
 });
 
+// Only M6 tests sign in. Everything before M6 must go green without a BFF,
+// so a milestone's tests never wait on work from a later milestone.
 async function signIn(page) {
   await page.goto(`${BASE}/catalog`);
   await page.locator('[data-acme-session]').getByRole('link', { name: 'Sign in' }).click();
   await expect(page.locator('[data-acme-session]')).toContainText('Signed in as max');
 }
 
+/** Mark the current document; after a full page load the mark is gone. */
+const markDocument = (page) => page.evaluate(() => { window.__sameDocument = true; });
+const sameDocument = (page) => page.evaluate(() => window.__sameDocument === true);
+
 test.describe('M1 · zones', () => {
-  test('crossing into another zone is a full page load, and the session survives it', async ({ page }) => {
-    await signIn(page);
-    await page.evaluate(() => { window.__sameDocument = true; });
-    await page.locator('.acme-header nav').getByRole('link', { name: 'Account' }).click();
-    await page.waitForURL(`${BASE}/account`);
-    expect(await page.evaluate(() => window.__sameDocument), 'a zone crossing must replace the document').toBeUndefined();
-    await expect(page.locator('[data-acme-session]')).toContainText('Signed in as max');
+  test('crossing into another zone is a full page load, in both directions', async ({ page }) => {
+    // The links the M1 acceptance tests require: /catalog/p1 → /account/orders, /account → /catalog.
+    await page.goto(`${BASE}/catalog/p1`);
+    await markDocument(page);
+    await page.locator('a[href="/account/orders"]').first().click();
+    await page.waitForURL(`${BASE}/account/orders`);
+    expect(await sameDocument(page), 'catalog → account must replace the document').toBe(false);
+
+    await markDocument(page);
+    await page.getByRole('link', { name: 'Catalog', exact: true }).first().click();
+    await page.waitForURL(`${BASE}/catalog`);
+    expect(await sameDocument(page), 'the account router must leave links into another zone to the browser').toBe(false);
   });
 
   test('inside the account zone, navigation is client-side and moves focus', async ({ page }) => {
-    await signIn(page);
-    await page.goto(`${BASE}/account`);
-    await page.evaluate(() => { window.__sameDocument = true; });
-    await page.getByRole('navigation', { name: 'Account' }).getByRole('link', { name: 'Orders' }).click();
-    await expect(page.getByRole('heading', { level: 1, name: 'Orders' })).toBeFocused();
-    expect(await page.evaluate(() => window.__sameDocument)).toBe(true);
-    await expect(page.locator('main')).toContainText('#1042');
+    // Start and end on views that need no data (an unknown route, then Overview),
+    // so this passes with the zone and its router alone: no shell, no BFF.
+    await page.goto(`${BASE}/account/no-such-page`);
+    await markDocument(page);
+    await page.getByRole('navigation', { name: 'Account' }).getByRole('link', { name: 'Overview' }).click();
+    await expect(page).toHaveURL(`${BASE}/account`);
+    await expect(page.getByRole('heading', { level: 1, name: 'Account', exact: true })).toBeFocused();
+    expect(await sameDocument(page), 'a route inside the zone must not reload the page').toBe(true);
   });
 });
 
 test.describe('M2 · shared shell', () => {
-  test('adding to the cart in the catalog updates the shell’s cart badge', async ({ page }) => {
-    await signIn(page);
-    await page.getByRole('button', { name: 'Add to cart' }).first().click();
-    await expect(page.locator('[data-acme-cart]').first()).toHaveText(/^[1-9]\d*$/);
+  test('both zones apply the runtime tokens and run the runtime shell served by the gateway', async ({ page }) => {
+    // The HTTP tests see the <link> and <script> tags; only a browser sees them take effect
+    // (wrong MIME type, wrong path, a module that throws).
+    const brand = {};
+    for (const path of ['/catalog', '/account']) {
+      await page.goto(`${BASE}${path}`);
+      await expect(page.locator('.acme-header')).toBeVisible();
+      await expect.poll(() => page.evaluate(() => typeof window.acme?.on), { message: `window.acme on ${path}` }).toBe('function');
+      brand[path] = await page.evaluate(() => getComputedStyle(document.documentElement).getPropertyValue('--acme-brand').trim());
+      expect(brand[path], `--acme-brand is not applied on ${path}`).not.toBe('');
+    }
+    expect(brand['/account'], 'both zones read the same tokens').toBe(brand['/catalog']);
   });
 });
 
@@ -67,6 +87,37 @@ test.describe('M3 · streaming with a budget', () => {
 });
 
 test.describe('M6 · session', () => {
+  test('the session survives a zone crossing, and the account zone shows your orders', async ({ page }) => {
+    await signIn(page);
+    await page.locator('.acme-header nav').getByRole('link', { name: 'Account' }).click();
+    await page.waitForURL(`${BASE}/account`);
+    await expect(page.locator('[data-acme-session]')).toContainText('Signed in as max');
+    await page.getByRole('navigation', { name: 'Account' }).getByRole('link', { name: 'Orders' }).click();
+    await expect(page.locator('main')).toContainText('#1042');
+  });
+
+  test('adding to the cart in the catalog updates the shell’s cart badge', async ({ page }) => {
+    await signIn(page);
+    await page.getByRole('button', { name: 'Add to cart' }).first().click();
+    await expect(page.locator('[data-acme-cart]').first()).toHaveText(/^[1-9]\d*$/);
+  });
+
+  test('a slow view does not paint over the page the reader has moved to', async ({ page }) => {
+    await signIn(page);
+    await page.route('**/bff/api/orders', async (route) => { await new Promise((r) => setTimeout(r, 1_000)); await route.continue(); });
+    const ordersRequested = page.waitForRequest('**/bff/api/orders');
+    const ordersAnswered = page.waitForResponse('**/bff/api/orders');
+    await page.goto(`${BASE}/account/orders`);
+    await ordersRequested; // the Orders view is now waiting for its data
+    await page.getByRole('navigation', { name: 'Account' }).getByRole('link', { name: 'Overview' }).click();
+    const heading = page.getByRole('heading', { level: 1, name: 'Account', exact: true });
+    await expect(heading).toBeFocused();
+    await ordersAnswered;
+    await page.waitForTimeout(300); // let the late Orders render finish, if it is going to paint
+    await expect(heading, 'the late Orders view replaced the page the reader navigated to').toBeVisible();
+    await expect(page.locator('main')).not.toContainText('#1042');
+  });
+
   test('signing out in one tab signs out the others', async ({ context }) => {
     const a = await context.newPage();
     await signIn(a);

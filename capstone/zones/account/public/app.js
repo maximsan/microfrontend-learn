@@ -21,9 +21,14 @@ const VIEWS = {
 };
 const signedOut = (what) => ({ title: 'Sign in', html: `<p>Sign in to see ${what}. <a href="/bff/login?returnTo=${encodeURIComponent(location.pathname)}">Sign in</a></p>` });
 
+let latest = 0;
 async function render(pathname) {
+  const seq = ++latest;
   const view = VIEWS[pathname] ?? (async () => ({ title: 'Not found', html: '<p>No such page.</p>' }));
   const { title, html } = await view();
+  // A newer render started while this one waited for data: painting now would
+  // put the old view over the page the user has already moved to.
+  if (seq !== latest) return;
   main.innerHTML = `<h1 tabindex="-1">${title}</h1>${html}`;
   document.title = `${title} · Acme`;
   announcer.textContent = `${title} page`;

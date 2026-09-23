@@ -37,7 +37,7 @@ node start.mjs --without=recommendations   # a team is down; the page should not
 ```sh
 CAPSTONE_VARIANT=starter npm test                                  # 22 HTTP acceptance tests
 CAPSTONE_VARIANT=starter npm test -- --test-name-pattern="M3"      # one milestone
-CAPSTONE_VARIANT=starter npx playwright test capstone --project=chrome   # 7 browser tests (from the repo root)
+CAPSTONE_VARIANT=starter npx playwright test capstone --project=chrome   # 10 browser tests (from the repo root)
 CAPSTONE_VARIANT=starter npm start                                 # your estate on :5200
 ```
 
