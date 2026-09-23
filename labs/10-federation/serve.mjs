@@ -8,7 +8,7 @@ import { readVariant } from '../_shared/variant.mjs';
 
 export const PORTS = { shell: 5110, cart: 5111 };
 
-export async function start({ variant = readVariant('starter'), cart = !process.argv.includes('--no-cart'), log = true } = {}) {
+export async function start({ variant = readVariant('starter'), cart = true, log = true } = {}) {
   const dist = (app) => new URL(`./.build/${variant}/${app}/dist/`, import.meta.url);
   if (log) console.log(`Lab 10 · federation (${variant})`);
   const servers = [await listening(serve({ root: dist('shell'), port: PORTS.shell, log }))];
@@ -17,4 +17,4 @@ export async function start({ variant = readVariant('starter'), cart = !process.
   return servers;
 }
 
-if (isMain(import.meta.url)) start();
+if (isMain(import.meta.url)) start({ cart: !process.argv.includes('--no-cart') });
