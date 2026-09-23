@@ -47,6 +47,20 @@ The `import('cart/CartWidget')` rejects, nothing catches it, and the shell's who
 
 **Fix** `starter/shell/src/App.jsx` so an unavailable remote shows a small fallback and the rest of the page stays. Compare with `solution/shell/src/App.jsx`.
 
+## Tests
+
+2 Node tests + 2 browser tests. All four fail on the starter; the Node tests read the build, the browser tests run it.
+
+```sh
+# from the repository root, once:  npm install   (and Google Chrome, or: npx playwright install chromium)
+LAB_VARIANT=starter npx playwright test labs/10-federation --project=chrome   # your copy: red until you finish
+npx playwright test labs/10-federation --project=chrome                       # the reference: green
+```
+
+The Node tests run from this folder with `LAB_VARIANT=starter npm test` (yours) or `npm test` (reference).
+
+Tests named *observe* describe the platform and pass on both. Tests named *exercise* are the ones you turn green.
+
 ## Check your understanding
 
 - Why does `index.js` only contain `import('./bootstrap.jsx')`? What error do you get if you move the `createRoot` call into `index.js`?

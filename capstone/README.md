@@ -7,7 +7,7 @@ The capstone puts the book's main defaults together in one small working system.
 ```sh
 cd capstone
 npm start            # http://localhost:5200
-npm test             # 22 acceptance tests against the running estate
+npm test             # 22 acceptance tests against the reference estate
 node start.mjs --without=recommendations   # a team is down; the page should not care
 ```
 
@@ -32,10 +32,15 @@ node start.mjs --without=recommendations   # a team is down; the page should not
 
 ## Rebuilding it yourself
 
-The tests only talk HTTP to the gateway, so they work against any implementation:
+`starter/` is the skeleton to build in. The recommendations fragment service and the API are other teams' and already run; you build the gateway, both zones and the shared shell. Every stub answers `501`, so every test starts red:
 
 ```sh
-CAPSTONE_URL=http://localhost:5200 npm test
+CAPSTONE_VARIANT=starter npm test                                  # 22 HTTP acceptance tests
+CAPSTONE_VARIANT=starter npm test -- --test-name-pattern="M3"      # one milestone
+CAPSTONE_VARIANT=starter npx playwright test capstone --project=chrome   # 7 browser tests (from the repo root)
+CAPSTONE_VARIANT=starter npm start                                 # your estate on :5200
 ```
 
-Start your own estate on port 5200, work through the milestones in the chapter (M1 → M7), and use the reference code here only when you are stuck.
+Work through the milestones in the chapter (M1 → M7); each one turns its group green. `starter/README.md` lists which file serves which milestone. The reference code in this folder is there for when you are stuck.
+
+The acceptance tests only talk HTTP to the gateway, so they also work against an estate you run some other way: `CAPSTONE_URL=http://localhost:5200 npm test`.
