@@ -4,3 +4,8 @@ dist/
 *.log
 test-results/
 playwright-report/
+
+# Claude Code: personal files and worktrees
+CLAUDE.local.md
+.claude/settings.local.json
+.claude/worktrees/
