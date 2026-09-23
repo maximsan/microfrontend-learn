@@ -1,0 +1,93 @@
+---
+id: "how-we-got-here"
+part: "Part I · Foundations"
+title: "How we got here"
+section: "Foundations"
+standfirst: "35 years in one timeline: the problems that caused each shift, not the frameworks that followed."
+prereqs: ["spectrum"]
+objectives:
+  - "Connect each architectural shift to the constraint that caused it"
+  - "Explain why pushState, not a framework, legitimised the SPA"
+  - "Read the post-2016 swing back to the server as a response to measured costs"
+---
+
+History matters here for a practical reason: nearly every architecture in <Mod to="spectrum" /> exists because a specific, identifiable pain made someone build it. Knowing which pain tells you whether you have that pain.
+
+<Timeline>
+<Era yr="1990 – 1993" dir="server" title="The web is a document system">
+Hypertext, links, no application model whatsoever. Every navigation is a fresh request for a file. This is the ground state the rest of the story reacts against.
+</Era>
+
+<Era yr="1993" dir="server" title="CGI">
+HTML becomes generated per request; forms give you input. The application server is born, and with it the first stateless-protocol problem.
+</Era>
+
+<Era yr="1995 – 2000" dir="server" title="JavaScript ships; the classic MPA crystallises">
+PHP, ASP and JSP explode. Session cookies solve statelessness. POST/Redirect/GET becomes the pattern for form handling. Anything genuinely “rich” goes to Java applets or Flash, because the DOM cannot do it.
+</Era>
+
+<Era yr="1999" dir="client" title={<><code>XMLHTTP</code> ships in Internet Explorer 5</>}>
+Built by Microsoft's Outlook Web Access team. It sits largely unnoticed for five years — the capability existed well before anyone built a culture around it.
+</Era>
+
+<Era yr="2004 – 2006" dir="client" title="Gmail, Google Maps, and the naming of AJAX">
+Two products prove partial page updates work at scale. Jesse James Garrett names the technique in February 2005. jQuery arrives in 2006 and makes the DOM and XHR bearable for ordinary teams.
+</Era>
+
+<Era yr="2010" dir="client" title="Backbone.js — “SPA” enters the vocabulary">
+The first widely-adopted client-side MVC — and the reason URLs looked like `example.com/#!/users/42` for several years.
+
+**Why the `#`:** changing any part of the URL *before* the hash triggers a page load. The [fragment](https://developer.mozilla.org/en-US/docs/Web/API/Location/hash) is the one part that does not — by design it is a pointer *into* the current document, so it is never sent to the server and changing it fires `hashchange` instead of a request. Before `pushState`, it was the only writable part of the URL.
+
+**Why that broke:** since the server never sees the fragment, `/#!/users/42` and `/` are the same request. Every route in the application was one URL as far as a crawler was concerned, so none of them could be indexed.
+
+**The patch:** [Google's 2009 proposal](https://developers.google.com/search/blog/2009/10/proposal-for-making-ajax-crawlable) gave `#!` a special meaning — on seeing it, the crawler would re-request the page as `?_escaped_fragment_=/users/42`, a normal URL the server *does* see, and the server was expected to answer with a pre-rendered HTML snapshot. You therefore had to run a headless renderer server-side just to be indexed.
+
+Both the hack and the patch died with `pushState`. Google [deprecated the scheme in October 2015](https://developers.google.com/search/blog/2015/10/deprecating-our-ajax-crawling-scheme), by which point Googlebot could render JavaScript itself.
+</Era>
+
+<Era yr="2012" dir="client" title="The History API lands broadly">
+**The actual enabling technology.** `pushState()` gives you real URLs without a reload. Before this, SPAs were a hack with a fragment identifier; after it, a legitimate architecture. Everything in <Mod to="navigation" /> starts here.
+</Era>
+
+<Era yr="2013 – 2016" dir="client" title="React, and the SPA as unexamined default">
+AngularJS then React: virtual DOM, unidirectional data flow. Webpack, Babel and npm make the build pipeline both powerful and enormous. The SPA stops being a choice and becomes the starting template.
+</Era>
+
+<Era yr="2016 – 2020" dir="server" title="The bill arrives">
+Bundle size, time-to-interactive, SEO, broken back buttons, accessibility regressions on low-end mobile hardware. The answer is to push work back to the server: SSR with hydration (Next.js, 2016), static generation, and the PWA push for offline.
+</Era>
+
+<Era yr="2020 – 2024" dir="server" title="The correction">
+htmx and Hotwire revive hypermedia. Astro popularises islands. Svelte and Solid attack the runtime cost directly. React ships Server Components. Simultaneously the browser closes the gap natively: bfcache, speculation rules, cross-document View Transitions.
+</Era>
+
+<Era yr="2026" dir="client" title="Convergence, and the Navigation API">
+“SPA vs MPA” is no longer an application-wide decision — serious meta-frameworks let you set it per route. And the [Navigation API reached Baseline in January 2026](https://developer.mozilla.org/en-US/docs/Web/API/Navigation_API), finally giving the platform one central place to intercept navigation. Fourteen years after `pushState`, the API SPAs actually needed has arrived.
+</Era>
+</Timeline>
+
+<Insight title="Read the oscillation">
+Server, server, server — then a long swing to client through the 2010s — then back from 2016.
+
+Each swing answers a constraint the previous swing created, and those constraints are still there. The counter-arguments from the previous swing were not refuted. They were outvoted.
+</Insight>
+
+<Recap>
+- The capability for AJAX existed in 1999 and the culture arrived in 2005. Capability and adoption run on different clocks.
+- `pushState` (2012), not any framework, is what made SPAs architecturally legitimate.
+- The 2016+ swing back toward the server was driven by measurable costs, not taste.
+- The field is converging on per-route decisions rather than per-application ones.
+</Recap>
+
+<Check>
+1. `XMLHTTP` shipped in 1999 and AJAX was named in 2005. What does that gap tell you about today's platform features?
+2. Why could Google not index `example.com/#!/users/42`, and how was it patched?
+3. The chapter says the counter-arguments from each swing were “outvoted, not refuted.” How do you use that when adopting today's default?
+
+<Answers>
+1. **Capability and adoption run on different clocks.** A feature can sit unused for years until someone builds a culture around it. Expect the same of the Navigation API (Baseline in 2026): its existence does not mean your framework, your team or the tutorials you read have caught up.
+2. **The fragment is never sent to the server**, so every route was the same request. Google's 2009 scheme re-requested `#!` URLs as `?_escaped_fragment_=…`, which the server *did* see and had to answer with a pre-rendered snapshot. Both the hack and the patch died with `pushState`; Google deprecated the scheme in 2015.
+3. **Ask which constraint from the previous swing still applies to you.** The move back to the server answered bundle size and time-to-interactive; the move to the client answered interaction latency. If your users are on low-end phones, or your screens are canvas-heavy, the “outvoted” argument is the one that governs your case.
+</Answers>
+</Check>

@@ -1,0 +1,72 @@
+---
+id: "glossary"
+part: "Back matter"
+title: "Glossary"
+standfirst: "Terms of art, defined as they are used in practice rather than as they are marketed."
+appendix: true
+---
+
+### Acronyms
+
+<Acronyms>
+<Acro term="AJAX">**Asynchronous JavaScript and XML.** Named by Jesse James Garrett in 2005 for updating part of a page without reloading it. The XML part was obsolete almost immediately; the name stuck.</Acro>
+<Acro term="BCP">**Best Current Practice.** An IETF document class carrying normative guidance rather than a protocol. RFC 10017 is one.</Acro>
+<Acro term="CDN">**Content Delivery Network.** Edge caches that serve a response without reaching your server. Whether a rendering mode can use one is the deciding question in <Mod to="rendering-modes" />.</Acro>
+<Acro term="CEF">**Chromium Embedded Framework.** Embeds a Chromium browser in a native application. Spotify's desktop client uses it; Electron is a different wrapper around the same engine.</Acro>
+<Acro term="CGI">**Common Gateway Interface** (1993). The first standard for a web server to run a program per request rather than serve a file: request metadata arrived as environment variables, the body on stdin, and the response came back on stdout. It made URLs name computations instead of files. It died of forking one OS process per request, and returned as serverless.</Acro>
+<Acro term="CORS">**Cross-Origin Resource Sharing.** The headers that let a server opt in to being called from another origin. A wildcard origin is rejected when credentials are sent.</Acro>
+<Acro term="CRDT">**Conflict-free Replicated Data Type.** A data structure whose concurrent edits merge deterministically without a coordinating server. The usual foundation for local-first.</Acro>
+<Acro term="CSR">**Client-Side Rendering.** The browser builds the HTML from JavaScript. The plain SPA case.</Acro>
+<Acro term="CSRF">**Cross-Site Request Forgery.** Another site causes the browser to send an authenticated request to yours, using cookies the browser attaches automatically. The cost of cookie sessions; see <Mod to="sessions" />.</Acro>
+<Acro term="ESI">**Edge Side Includes.** Markup that tells a CDN or proxy to fetch a fragment and splice it into a response. Server-side composition, invented for exactly the cacheability problem micro-frontends hit.</Acro>
+<Acro term="IETF">**Internet Engineering Task Force.** Publishes the RFC series, including the OAuth documents this guide leans on.</Acro>
+<Acro term="ISR">**Incremental Static Regeneration.** Render once, cache, revalidate in the background on a timer or webhook. Stale-while-revalidate at page level.</Acro>
+<Acro term="MF">**Module Federation.** Abbreviated this way in its own documentation.</Acro>
+<Acro term="MPA">**Multi-Page Application.** Every navigation replaces the document, destroying the JavaScript runtime. The default the SPA was defined against — see <Mod to="dividing-line" />.</Acro>
+<Acro term="OWASP">**Open Worldwide Application Security Project.** Publishes the Cheat Sheet Series, the practical source for the CSRF, session and WebSocket guidance here. CWE is the separate MITRE weakness catalogue.</Acro>
+<Acro term="PKCE">**Proof Key for Code Exchange** (RFC 7636, said "pixie"). Binds an authorization code to the client that requested it, so an intercepted code cannot be redeemed by anyone else.</Acro>
+<Acro term="PPR">**Partial Prerendering.** One response carrying a static shell from the CDN plus dynamic holes streamed per request.</Acro>
+<Acro term="PWA">**Progressive Web App.** Service worker, manifest, offline, installable. Orthogonal to everything on the rendering axis — it describes distribution, not rendering.</Acro>
+<Acro term="RFC">**Request for Comments.** The IETF's document series. Despite the name, a published RFC is a fixed standards document, not a draft.</Acro>
+<Acro term="RPC">**Remote Procedure Call.** Calling a function on another machine as if it were local. gRPC and Connect are the current implementations.</Acro>
+<Acro term="RSC">**React Server Components.** Components that render on the server to a serialized payload and ship no JavaScript. See <Mod to="rendering-modes" />.</Acro>
+<Acro term="RTT">**Round-Trip Time.** Network latency for one request and response. The number that decides whether server-driven interaction feels instant or sluggish.</Acro>
+<Acro term="SEO">**Search Engine Optimisation.** In this guide it means one thing: can a crawler read your content without executing your JavaScript.</Acro>
+<Acro term="SPA">**Single-Page Application.** The document loads once and the JavaScript runtime survives every navigation. The definition this guide is built on — see <Mod to="dividing-line" />.</Acro>
+<Acro term="SSE">**Server-Sent Events.** A one-way stream from server to browser over plain HTTP, with automatic reconnect. Capped at six connections per domain on HTTP/1.1.</Acro>
+<Acro term="SSG">**Static Site Generation.** HTML produced at build time. Fully cacheable, stale until the next build.</Acro>
+<Acro term="SSI">**Server Side Includes.** The original directive-based server composition, predating ESI by years.</Acro>
+<Acro term="SSR">**Server-Side Rendering.** HTML produced by the server rather than the browser — but it is five different things, distinguished in <Mod to="rendering-modes" />.</Acro>
+<Acro term="TTFB">**Time To First Byte.** How long before the response starts arriving. Streaming improves it; blocking on data destroys it.</Acro>
+<Acro term="TTI">**Time To Interactive.** When the page actually responds to input. The metric hydration cost shows up in.</Acro>
+<Acro term="WHATWG">**Web Hypertext Application Technology Working Group.** Maintains the HTML Living Standard, which is where import maps and server-sent events are specified.</Acro>
+<Acro term="XSS">**Cross-Site Scripting.** Attacker-controlled script executing in your origin. The threat every token-storage decision in <Mod to="auth" /> is measured against.</Acro>
+</Acronyms>
+
+### Concepts
+
+<Glossary>
+<Term name="bfcache">Back/forward cache. The browser freezes a page's entire JS heap on navigation away and thaws it on return, making back-navigation instant. Disqualified by an `unload` handler or `Cache-Control: no-store`. Does not apply to SPA soft navigations.</Term>
+<Term name="BFF">Backend for Frontend. A backend owned by and shaped for one frontend. In RFC 10017 it specifically means a confidential OAuth client that holds tokens server-side and proxies all API traffic, exposing only a cookie session to the browser.</Term>
+<Term name="CHIPS">Cookies Having Independent Partitioned State. A cookie marked `Partitioned` is double-keyed on both the setting origin and the top-level site, so an embedded widget gets separate state per embedding site.</Term>
+<Term name="CSWSH">Cross-Site WebSocket Hijacking. Because browsers attach cookies to WebSocket handshakes and do not apply CORS to them, a malicious site can open an authenticated socket to your server unless you validate `Origin`.</Term>
+<Term name="Cacheability floor">A composed page is only as cacheable as its least cacheable fragment. One team's per-user fragment makes the whole document uncacheable at the CDN unless the composition layer caches per fragment.</Term>
+<Term name="One-way door">A decision whose reversal costs a rewrite rather than a refactor. Micro-frontends, auth architecture and local-first are the three in this guide; see <Mod to="synthesis" />.</Term>
+<Term name="Selective SSR">Not a standard term. Used for three different things: per-route rendering choice, partial prerendering within one page, or React's selective hydration. Establish which is meant before agreeing to anything.</Term>
+<Term name="Share scope">Module Federation's runtime namespace of shared dependencies. Each build registers what it has and consumers take the highest version satisfying their requirement — unless `singleton` forces one instance.</Term>
+<Term name={<>Hashbang (<code>#!</code>)</>}>A URL fragment beginning with `!`, used by pre-2012 SPAs because the fragment was the only part of the URL writable without triggering a page load. Google's 2009 crawling scheme gave it special meaning so crawlers could request a server-rendered snapshot; deprecated 2015, obsoleted by `pushState`.</Term>
+<Term name="Hydration">Attaching a client-side framework to server-rendered HTML so it becomes interactive, reusing the existing DOM rather than rebuilding it.</Term>
+<Term name="Hypermedia-driven">An architecture where the server returns HTML fragments the client swaps into the existing document — SPA-like responsiveness with server-owned state. htmx, Turbo, Unpoly.</Term>
+<Term name="Islands architecture">Mostly-static server-rendered HTML with small, independently hydrated interactive regions. Coined by Katie Sylor-Miller (2019), popularised by Jason Miller (2020) and Astro.</Term>
+<Term name="Local-first">The client holds the authoritative copy of data in local storage (IndexedDB, SQLite-wasm) and syncs to the server opportunistically. Usually built on CRDTs or a sync engine.</Term>
+<Term name="Module Federation">A bundler feature allowing one build to load modules from another build at runtime, with negotiated sharing of common dependencies. Originated in webpack 5; now an independent project supporting several bundlers.</Term>
+<Term name="Multi-Zones">Next.js's name for routing-level composition: several independent applications each owning a set of URL paths behind one domain. Navigation within a zone is soft; between zones it is a full page load.</Term>
+<Term name="Out-of-order streaming">Sending HTML for later parts of a page before earlier parts are ready, appending them as hidden blocks and relocating them with a small inline script.</Term>
+<Term name="Podlet / Layout">Podium's terms: a podlet serves one page fragment as a service; a layout composes podlets into a finished page and supplies each with context headers.</Term>
+<Term name="Runtime lifetime">How long one JavaScript execution context — global object, heap, module registry, event-loop registrations — survives. The property that actually distinguishes SPA from MPA.</Term>
+<Term name="Shell (React streaming)">The part of a React tree outside any `<Suspense>` boundary — the HTML that must be ready before streaming can begin.</Term>
+<Term name="Shell (micro-frontends)">The host application that owns routing, layout and cross-cutting concerns, into which micro-frontends are mounted. Also called the container or orchestrator.</Term>
+<Term name="Singleton (federation)">A shared dependency constrained to exactly one instance across all federated builds. Required for libraries with global internal state, such as React.</Term>
+<Term name="Subgraph / Supergraph">Apollo Federation's terms: subgraphs are the constituent GraphQL APIs; the supergraph is the composed graph; the router is the client-facing entry point that distributes requests.</Term>
+<Term name="Version skew">A client running an older deployed bundle against a newer backend, or two micro-frontends running mutually incompatible versions of a shared library. The dominant failure mode of non-atomic deployment.</Term>
+</Glossary>

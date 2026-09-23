@@ -1,0 +1,190 @@
+---
+id: "micro-frontends"
+part: "Part II · The machinery"
+title: "Micro-frontends"
+section: "The machinery"
+standfirst: "When to split a frontend, where to compose it, and what changes for rendering once several teams share a page."
+prereqs: ["rendering-modes", "navigation"]
+objectives:
+  - "Decide whether independent deployment is really your problem"
+  - "Choose a composition point before choosing a tool"
+  - "Predict which rendering modes survive a given composition pattern"
+---
+
+<Insight title="Start here or waste a year">
+Micro-frontends solve exactly one problem: **N teams need to deploy independently onto one URL surface.** They are Conway's law (Melvin Conway, 1967) expressed as a build system.
+
+Three teams and one deploy pipeline? You do not have this problem. Do not pay the cost.
+</Insight>
+
+<Source>
+<Quote>If your teams can deploy together and you mainly want faster builds, runtime composition is the wrong tool for that problem.</Quote>
+
+<Cite>— [Nx, Micro Frontend Architecture](https://nx.dev/docs/kb/micro-frontend-architecture)</Cite>
+</Source>
+
+#### And the answer changes with team count
+
+This guide otherwise speaks as if there is one answer. There is not — the same architecture is wrong at one scale and necessary at another.
+
+| Teams on the surface | What is usually right |
+| --- | --- |
+| **1–3** | A modular monolith. Enforced module boundaries (<Mod to="delivery" />) give you most of the discipline with none of the runtime cost. Micro-frontends here are almost always a mistake. |
+| **4–8** | Routing-level zones. Real deploy independence, boring failure modes, no platform team required. |
+| **9–20** | Zones plus fragment composition where teams genuinely share a screen. You now need someone to own the shell contract full-time. |
+| **20+** | A platform team is not optional — version negotiation, the shell, the deploy pipeline and the governance become somebody's actual job. This is the scale the published case studies later in this module are drawn from. |
+
+Reading a Zalando or Amex writeup at four teams is the most common way this architecture gets adopted for the wrong reasons.
+
+### Where you compose
+
+The real taxonomy is not “which framework” but “at what point in the pipeline do the pieces become one page.” The canonical treatment is [Cam Jackson's article on martinfowler.com](https://martinfowler.com/articles/micro-frontends.html), covering server-side template composition, build-time integration, and run-time integration via iframes, JavaScript and Web Components.
+
+<Flow>
+<Box title="Build">npm packages imported by the shell. One deployable — not independent.</Box>
+<Arrow>deploy</Arrow>
+<Box title="Origin server">Podium layouts, a routing proxy or Multi-Zones, a server component fetching HTML.</Box>
+<Arrow>HTTP</Arrow>
+<Box title="Edge">ESI at the CDN, streaming Workers.</Box>
+<Arrow>HTML + JS</Arrow>
+<Box title="Browser">iframes, Web Components, Module Federation, single-spa.</Box>
+</Flow>
+<FlowCaption>The same four points, in pipeline order, as the table below. The later the pieces meet, the more seamless the page and the more the teams share at runtime.</FlowCaption>
+
+| Composition point | Mechanism | Independent deploy | SEO / first paint | Isolation | Cost |
+| --- | --- | --- | --- | --- | --- |
+| Build time | npm packages, shell imports them | <No>No</No> | <Ok>Good</Ok> | Weak | Low |
+| Server side | Podium, Multi-Zones, SSI/ESI | <Ok>Yes</Ok> | <Ok>Best</Ok> | Good | Medium |
+| Edge | ESI at CDN, Workers streaming | <Ok>Yes</Ok> | <Ok>Good</Ok> | Good | Medium |
+| Runtime — iframe | `<iframe>` | <Ok>Yes</Ok> | <No>Poor</No> | <Ok>Strongest</Ok> | UX pain |
+| Runtime — web components | Custom Elements + Shadow DOM | <Ok>Yes</Ok> | Partial | Real CSS isolation | Medium |
+| Runtime — Module Federation | webpack / Rspack / Vite | <Ok>Yes</Ok> | Needs SSR work | <No>Weak — shared graph</No> | High |
+| Runtime — orchestrator | single-spa + import maps | <Ok>Yes</Ok> | Needs SSR work | Weak | Medium |
+
+<Insight title="The tension you cannot escape">
+**The more seamless your UX integration, the more coupled your dependency graph.**
+
+Iframes: perfectly independent, unpleasant to use. A federated single React tree: seamless, and every team is now on one React version. No configuration gives you both.
+
+Choose which pain you accept — deliberately, not in month eight.
+</Insight>
+
+It is worth noting that the other canonical reference takes the opposite side of this trade. [Michael Geers' micro-frontends.org](https://micro-frontends.org/) lists among its core principles: <q>Isolate Team Code — Don't share a runtime, even if all teams use the same framework.</q> and <q>Build a Resilient Site — Your feature should be useful, even if JavaScript failed or hasn't executed yet.</q> Both positions are defensible. Know that you are picking a side.
+
+### Who actually does this
+
+Worth knowing because the published adoptions cluster in one place: large catalogue-and-checkout retail, where independent teams own genuinely separate parts of a single funnel.
+
+| Company | Approach | Evidence |
+| --- | --- | --- |
+| **Zalando** | Server-side fragment streaming → in-house framework → Module Federation | Three published generations: [Tailor](https://github.com/zalando/tailor), then <q>a replacement for Tailor … which we call 'Interface Framework'</q> ([2018](https://engineering.zalando.com/posts/2018/12/front-end-micro-services.html)), then [a Module Federation portal (2024)](https://engineering.zalando.com/posts/2024/10/building-modular-portal-with-webpack-module-federation.html) |
+| **FINN.no** | Server-side composition | Built and open-sourced [Podium](https://github.com/podium-lib/podium) |
+| **HelloFresh** | Front-end microservices | [HelloFresh Engineering](https://engineering.hellofresh.com/front-end-microservices-at-hellofresh-23978a611b87) |
+| **IKEA** | ESI + web components, static-file composition | [Flat Pack Tech](https://medium.com/flat-pack-tech/history-of-ikea-com-static-files-and-microfrontends-6def9d7c4285), IKEA's engineering publication, and ["Microservice Websites" (Øredev)](https://www.youtube.com/watch?v=j2ynHColelw) by their own engineer |
+| **DAZN** | Monolithic SPA split into five build-time micro-frontends on S3/CloudFront | [DAZN Tech](https://medium.com/dazn-tech/adopting-a-micro-frontends-architecture-e283e6a3c4f3) |
+| **American Express** | Holocron modules, Node SSR, CDN-hosted | [One App](https://github.com/americanexpress/one-app) — the whole framework is open source |
+
+Widely repeated but not sourceable: the Upwork micro-frontends post everyone cites is a dead link, and the IKEA "50% developer time / 75% page load" figures trace only to aggregator blogs, not to IKEA. Both are left out.
+
+<Moved title="The abandonment case">
+Spotify's old desktop client was a micro-frontend architecture — <q>every 'page' in the client was built as a standalone 'app' to run inside its own iframe. **This architecture was designed to foster autonomy.**</q>
+
+They removed it. From the same post: <q>Eventually, however, one team became responsible for the user interface of the entire application</q> and <q>this architecture was causing severe friction for developers</q> — they <q>were not shipping new features at the pace we would have liked to.</q> The replacement is a single shared React codebase across desktop and web.
+
+Read that first sentence against the rule at the top of this module. The architecture was built for team autonomy; when the org changed and one team owned the UI, the justification disappeared and only the cost remained. **Micro-frontends are indexed to your org chart, and org charts change.**
+
+<Cite>— [Spotify Engineering, "Building the future of our desktop apps"](https://engineering.atspotify.com/2021/04/building-the-future-of-our-desktop-apps)</Cite>
+</Moved>
+
+### Which rendering modes survive composition
+
+<Mod to="rendering-modes" /> separates the five things people mean by “SSR”. They behave very differently once more than one team contributes to a page, and this is the part that is absent from most micro-frontend writing — it is where the real constraint lives:
+
+<Insight title="The cacheability floor">
+**A composed page is only as cacheable as its least cacheable fragment.**
+
+One team's per-user fragment makes the whole assembled document uncacheable at the CDN — unless the composition layer caches each fragment separately. That single property decides which composition pattern you can afford.
+</Insight>
+
+| Composition pattern | What happens to the SSR modes |
+| --- | --- |
+| **Routing-level zones** | <Ok>All five survive, independently. Each zone is a whole application with its own cache policy — team A can be fully static, team B can run PPR, and neither constrains the other. This is the strongest argument for zones that nobody makes.</Ok> |
+| **Server fragment composition** | Survives, but you must do the work. Every fragment needs its own TTL and the layout must honour it — this is precisely what ESI was invented for, and what Podium's manifest and context headers carry. Streaming is the natural fit. The trap: fragments then have *different ages* on one page, which is fine for nav and footer and dangerous for price next to stock level. |
+| **Federated SSR** | <No>Mostly collapses. One render, one response, one cache policy. ISR and PPR both assume a single build knows which parts are dynamic, and a remote that decides at runtime breaks that assumption. In practice you fall back to request-time SSR for the whole page, losing the CDN entirely.</No> |
+
+Composition also multiplies the PPR crawler trap from <Mod to="rendering-modes" />: if the static shell depends on build-time data from several teams, a crawler's full dynamic render has several more ways to fail than a person's cached one.
+
+### SSR with micro-frontends: three patterns
+
+#### 1. Fragment services — when SEO and first paint matter
+
+Each micro-frontend exposes an HTTP endpoint returning an HTML fragment plus its asset manifest. A layout service fetches them in parallel and streams them into one document as they arrive. <Mod to="streaming" /> covers the mechanics.
+
+#### 2. Routing-level split — the pragmatic default
+
+Each micro-frontend owns a URL prefix and is a complete, independent application behind a reverse proxy. [Next.js formalises this as Multi-Zones](https://nextjs.org/docs/app/guides/multi-zones); plain Nginx does it too.
+
+<Source>
+<p><q>Multi-Zones are an approach to micro-frontends that separate a large application on a domain into smaller Next.js applications that each serve a set of paths.</q> … <q>Since applications are decoupled, Multi-Zones also allows other applications on the domain to use their own choice of framework.</q></p>
+
+And the behaviour you must design around: <q>Navigating between pages in the same zone will perform soft navigations… Navigating from a page in one zone to a page in another zone… will perform a hard navigation.</q> Consequently, <q>Links to paths in a different zone should use an `a` tag instead of the Next.js `<Link>` component.</q>
+
+<Cite>— [Next.js, Multi-Zones](https://nextjs.org/docs/app/guides/multi-zones)</Cite>
+</Source>
+
+This is an MPA of SPAs, and it is dramatically more robust than the alternatives: no shared bundler configuration, no runtime version negotiation, independent failure domains. The cost is one full page load when crossing a zone boundary. Speculation rules can prerender the next zone so the load is fast everywhere they are supported; cross-document View Transitions smooth the swap in Chromium and Safari but not yet in Firefox (<Mod to="navigation" />). Design for the hard navigation and treat the smoothness as an enhancement.
+
+<Insight title="What “the shell” means once you have zones">
+A zone crossing is a document replacement, so by <Mod to="dividing-line" />'s definition **nothing in memory survives it** — no shell runtime, no open socket, no in-memory store. With zones, "the shell" is not a running program; it is a **shared layout package** (header, nav, tokens, the session client) that every zone renders, plus a contract for what must survive a crossing.
+
+That contract has exactly three carriers: the **URL**, **cookies** (the BFF session, <Mod to="auth" />) and **browser storage**. Anything else — a media player, an unsent draft — either lives inside one zone or is the signal that the boundary is in the wrong place (<Mod to="counter" />).
+
+Two rules from later modules change shape accordingly. *One owner for history* becomes one router **per document**: each zone's router owns the address bar while it is loaded, and cross-zone links are plain `<a>` tags. *One realtime connection* becomes one **per tab**, re-established on every zone load — or, if reconnect cost matters, one per browser held by a `SharedWorker` or a `BroadcastChannel` leader tab (<Mod to="transports" />).
+</Insight>
+
+#### 3. Federated SSR — most seamless, most operationally expensive
+
+The host imports remote modules over the network at request time and renders everything into one tree. Your server render now has a network fan-out on the critical path, so you need remote-entry caching, version pinning, and a degraded mode for every remote. It works. It is not where you start.
+
+### Specifically in Next.js
+
+Worth its own treatment, because Next.js is where most teams ask this question and because the options divide cleanly into **build-time** (one deployable, no independent release) and **runtime** (separately deployed, assembled when a request arrives). Teams routinely believe they have the second and have built the first.
+
+| Mechanism | When composed | Independent deploy | App Router | Status |
+| --- | --- | --- | --- | --- |
+| **Workspace packages**<Sub>shared UI imported by the shell</Sub> | Build | <No>No</No> | <Ok>Yes</Ok> | Fine — just not micro-frontends |
+| **Turborepo / Nx orchestration** | Build | <Ok>Yes, per app</Ok> | <Ok>Yes</Ok> | Each app is still whole; this is delivery, not composition |
+| **[Multi-Zones](https://nextjs.org/docs/app/guides/multi-zones)** | Runtime, routing | <Ok>Yes</Ok> | <Ok>Yes</Ok> | <Ok>Framework-native. The default answer.</Ok> |
+| **[Vercel Microfrontends](https://vercel.com/docs/microfrontends)** | Runtime, routing at the network layer | <Ok>Yes</Ok> | <Ok>Yes</Ok> | <Ok>Generally available; each app is its own project</Ok> |
+| **Your own reverse proxy**<Sub>Nginx, Cloudflare, ALB</Sub> | Runtime, routing | <Ok>Yes</Ok> | <Ok>Yes</Ok> | <Ok>Same shape, no vendor coupling</Ok> |
+| **Server-side fetch in an RSC** | Runtime, server | <Ok>Yes</Ok> | <Ok>Yes</Ok> | Underused — see below |
+| **iframes / Web Components** | Runtime, browser | <Ok>Yes</Ok> | <Ok>Yes</Ok> | Framework-agnostic, unaffected by any of this |
+| **Module Federation** | Runtime, module | <Ok>Yes</Ok> | <No>Never supported</No> | <No>Deprecated, and Turbopack cannot load the plugin</No> |
+
+**The RSC row is the interesting one.** A server component can simply `await fetch()` another team's endpoint and render the result into its own tree — which is server-side fragment composition without a composition framework, using nothing but the language. It gets you independent deploys and no shared client runtime. What it does not get you is the fragment contract that Podium's manifest provides: you own the timeouts, the fallbacks, the caching and the versioning yourself, and there is nothing stopping a fragment's shape from changing underneath you.
+
+<Trap title="Build-time composition sold as micro-frontends">
+Extracting shared components into a workspace package feels like splitting the frontend. It is not. Every consumer still has to rebuild and redeploy to pick up a change, so you have added a versioning step and gained nothing on release independence.
+
+The test is one question: **can one team ship a user-visible change without any other team's pipeline running?** If no, it is a modular monolith — which is often the right answer (<Mod to="delivery" />), but should be called by its name so nobody budgets for the wrong thing.
+</Trap>
+
+<Recap>
+- Micro-frontends solve independent deployment for many teams. Nothing else. If that is not your problem, stop.
+- Composition point is the real taxonomy: build-time, server, edge, or runtime.
+- Seamlessness and decoupling trade against each other directly. Choose deliberately.
+- Routing-level split is the pragmatic default; fragment streaming when SEO demands it; federated SSR last.
+- Styling and shared state are the two problems that follow you onto every screen; <Mod to="sharing" /> covers both.
+</Recap>
+
+<Check>
+1. Four teams share one release train and complain that builds are slow. Should they adopt micro-frontends?
+2. One team adds a per-user “recently viewed” fragment to a composed page that was fully CDN-cached. What happens, and what are the options?
+3. A team extracted its shared components into a workspace package and calls it micro-frontends. What single question tests the claim?
+
+<Answers>
+1. **No.** Micro-frontends solve independent deployment, and these teams already deploy together. Nx says it directly: if teams can deploy together and mainly want faster builds, runtime composition is the wrong tool. Remote caching and affected-task builds (<Mod to="delivery" />) address build time; enforced module boundaries give the discipline without the runtime cost.
+2. **The cacheability floor drops the whole page.** A composed page is only as cacheable as its least cacheable fragment, so the assembled document is now uncacheable at the CDN. Either the composition layer caches each fragment separately (ESI, Podium), or the personalised fragment moves behind its own boundary — streamed per request or fetched on the client — so the rest stays cacheable.
+3. **Can one team ship a user-visible change without any other team's pipeline running?** If every consumer must rebuild and redeploy to pick up the change, it is build-time composition — a modular monolith. That is often the right answer, but it should be budgeted as one.
+</Answers>
+</Check>

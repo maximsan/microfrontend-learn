@@ -1,0 +1,8 @@
+<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MPA · page a</title><link rel="stylesheet" href="/style.css">
+<h1>MPA · page A</h1>
+<nav><a href="/mpa/b">Go to page B</a><a href="/mpa/b?unload">…with an unload handler</a><a href="/">Lab home</a></nav>
+<p id="badge"></p>
+<button id="click">Click to add to in-memory state</button>
+<p>Back/forward: <b id="bfcache">…</b></p>
+<script type="module">import { mountBadge } from '/runtime.js'; mountBadge();</script>

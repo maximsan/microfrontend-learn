@@ -1,0 +1,7 @@
+body{font:16px/1.6 system-ui,sans-serif;max-width:60rem;margin:0 auto;padding:1rem;color:#1b1f24}
+header{padding:.5rem 0 1rem;border-bottom:1px solid #cfd5de;margin-bottom:1rem}
+.grid{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr);gap:2rem}
+@media (max-width:640px){.grid{grid-template-columns:1fr}}
+.skeleton{color:#8b95a3;font-style:italic}
+aside{border-left:3px solid #cfd5de;padding-left:1rem}
+.fallback{color:#a83f26}

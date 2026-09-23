@@ -1,0 +1,103 @@
+---
+id: "library"
+part: "Back matter"
+title: "Reference library"
+standfirst: "Every source cited here, grouped by topic, labelled where a project's health is part of the information."
+appendix: true
+wide: true
+---
+
+<RefGroup title="Specifications & RFCs">
+- [RFC 10017 — OAuth 2.0 for Browser-Based Applications](https://www.rfc-editor.org/info/rfc10017/)<Badge kind="spec">BCP 212</Badge><Src>Published 21 Aug 2026. The single most important document in <Mod to="auth" />.</Src>
+- [RFC 9700 — Best Current Practice for OAuth 2.0 Security](https://www.rfc-editor.org/info/rfc9700)<Badge kind="spec">BCP 240</Badge>
+- [RFC 6749 — The OAuth 2.0 Authorization Framework](https://www.rfc-editor.org/info/rfc6749)
+- [RFC 6750 — Bearer Token Usage](https://www.rfc-editor.org/info/rfc6750)
+- [RFC 7636 — PKCE](https://www.rfc-editor.org/info/rfc7636)
+- [RFC 6455 — The WebSocket Protocol](https://www.rfc-editor.org/rfc/rfc6455)
+- [RFC 8441 — Bootstrapping WebSockets with HTTP/2](https://www.rfc-editor.org/rfc/rfc8441)
+- [RFC 6202 — Long Polling and Streaming in Bidirectional HTTP](https://www.rfc-editor.org/rfc/rfc6202.html)
+- [WHATWG HTML — Import maps](https://html.spec.whatwg.org/multipage/webappapis.html#import-map)<Badge kind="spec">Living</Badge>
+- [WHATWG HTML — Server-sent events](https://html.spec.whatwg.org/multipage/server-sent-events.html#the-eventsource-interface)
+- [GraphQL Specification](https://spec.graphql.org/October2021/) · [GraphQL over HTTP (draft)](https://graphql.github.io/graphql-over-http/draft/)
+- [OASIS MQTT 5.0](https://docs.oasis-open.org/mqtt/mqtt/v5.0/mqtt-v5.0.html)
+- [W3C WebRTC](https://www.w3.org/TR/webrtc/) · [W3C WebTransport](https://w3c.github.io/webtransport/)
+</RefGroup>
+
+<RefGroup title={<>Navigation platform (<Mod to="navigation" />)</>}>
+- [MDN — Navigation API](https://developer.mozilla.org/en-US/docs/Web/API/Navigation_API)<Badge kind="live">Baseline 2026</Badge>
+- [MDN — History.pushState()](https://developer.mozilla.org/en-US/docs/Web/API/History/pushState)
+- [MDN — History.scrollRestoration](https://developer.mozilla.org/en-US/docs/Web/API/History/scrollRestoration)
+- [web.dev — Back/forward cache](https://web.dev/articles/bfcache)
+- [MDN — Speculation Rules API](https://developer.mozilla.org/en-US/docs/Web/API/Speculation_Rules_API)
+- [MDN — @view-transition](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/At-rules/@view-transition)<Badge kind="dead">Not in Firefox</Badge>
+- [Google — Deprecating our AJAX crawling scheme (2015)](https://developers.google.com/search/blog/2015/10/deprecating-our-ajax-crawling-scheme)
+- [single-spa — API reference](https://single-spa.js.org/docs/api)<Badge kind="live">Live, partly stale text</Badge>
+- [micro-frontends.tech — Routing and Navigation](https://micro-frontends.tech/architecture/routing-and-navigation/)<Src>Secondary source; useful catalogue of router-conflict symptoms.</Src>
+</RefGroup>
+
+<RefGroup title={<>Micro-frontend composition (Modules <Mod to="micro-frontends" num />–<Mod to="streaming" num />)</>}>
+- [Cam Jackson — Micro Frontends (martinfowler.com)](https://martinfowler.com/articles/micro-frontends.html)<Src>The canonical taxonomy. Written 2019; the taxonomy holds, the tool names have moved on.</Src>
+- [Michael Geers — micro-frontends.org](https://micro-frontends.org/)<Src>The opposing position: isolate team code, don't share a runtime.</Src>
+- [React 18 WG #37 — New Suspense SSR Architecture](https://github.com/reactwg/react-18/discussions/37)<Src>The primary source on out-of-order streaming. Read this one in full.</Src>
+- [eBay Engineering — Async Fragments with Marko](https://tech.ebayinc.com/engineering/async-fragments-rediscovering-progressive-html-rendering-with-marko/)<Src>The same technique, described before React shipped it.</Src>
+- [Jason Miller — Islands Architecture (2020)](https://jasonformat.com/islands-architecture/)
+- [Astro — Islands](https://docs.astro.build/en/concepts/islands/)
+- [react.dev — hydrateRoot](https://react.dev/reference/react-dom/client/hydrateRoot) · [renderToPipeableStream](https://react.dev/reference/react-dom/server/renderToPipeableStream)
+- [Next.js — Multi-Zones](https://nextjs.org/docs/app/guides/multi-zones)
+- [Podium](https://podium-lib.io/)<Badge kind="live">Maintained</Badge>
+- [OpenComponents](https://opencomponents.github.io/)<Badge kind="live">Maintained</Badge> · [Piral](https://piral.io/)<Badge kind="live">Maintained</Badge> · [qiankun](https://qiankun.umijs.org)<Badge kind="live">Maintained</Badge>
+- [Zalando Tailor](https://github.com/zalando/tailor)<Badge kind="dead">Archived 2022</Badge><Src>Still worth reading for the design goals in its README.</Src>
+</RefGroup>
+
+<RefGroup title={<>Bundlers & federation (<Mod to="federation" />)</>}>
+- [webpack — ModuleFederationPlugin](https://webpack.js.org/plugins/module-federation-plugin/)
+- [Module Federation 2.0](https://module-federation.io/) · [Stable release, Feb 2026](https://module-federation.io/blog/v2-stable-version.html)
+- [MF — shared configuration](https://module-federation.io/configure/shared.html)<Src>Includes the `react-dom/client` subpath trap.</Src>
+- [Rspack — Module Federation](https://rspack.rs/guide/advanced/module-federation)<Badge kind="live">First-class</Badge>
+- [@module-federation/vite](https://module-federation.io/integrations/build-tool/vite.html)<Badge kind="live">Maintained</Badge>
+- [MF — Next.js integration](https://module-federation.io/integrations/framework/nextjs/index.html)<Badge kind="dead">Deprecated</Badge>
+- [module-federation/core #1400 — Next.js: RSC/App Dir](https://github.com/module-federation/core/issues/1400)<Badge kind="dead">Closed, not planned</Badge><Src>The maintainers' account of why RSC does not federate.</Src>
+- [MF — Modern.js (the supported SSR path)](https://module-federation.io/integrations/framework/modernjs/index.html)
+- [Next.js — Turbopack](https://nextjs.org/docs/app/api-reference/turbopack)<Src>Source for “does not support webpack plugins”.</Src>
+- [Parcel — Code splitting](https://parceljs.org/features/code-splitting/)<Src>What Parcel offers instead of federation.</Src>
+- [react.dev — Invalid hook call warning](https://react.dev/warnings/invalid-hook-call-warning)
+- [single-spa — Recommended setup](https://single-spa.js.org/docs/recommended-setup/)
+- [Native Federation (Angular)](https://native-federation.com/)<Badge kind="live">Community project</Badge>
+- [WICG import-maps](https://github.com/WICG/import-maps)<Badge kind="dead">Archived Feb 2025</Badge><Src>Cite the HTML Standard instead.</Src>
+</RefGroup>
+
+<RefGroup title={<>Transports (<Mod to="transports" />)</>}>
+- [MDN — EventSource](https://developer.mozilla.org/en-US/docs/Web/API/EventSource)<Src>Source for the six-connection limit.</Src>
+- [MDN — WebSocket constructor](https://developer.mozilla.org/en-US/docs/Web/API/WebSocket/WebSocket)
+- [OWASP — WebSocket Security Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/WebSocket_Security_Cheat_Sheet.html) · [CWE-1385](https://cwe.mitre.org/data/definitions/1385.html)
+- [OWASP — CSRF Prevention Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html)<Src>Source for the SameSite limitations and the signed double-submit recommendation.</Src>
+- [OWASP — Session Management Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Session_Management_Cheat_Sheet.html)<Src>Session ID rotation, idle vs absolute timeouts, server-side invalidation.</Src>
+- [MDN — WebTransport](https://developer.mozilla.org/en-US/docs/Web/API/WebTransport_API)<Badge kind="live">Baseline 2026</Badge>
+- [grpc.io — The state of gRPC in the browser](https://grpc.io/blog/state-of-grpc-web/)
+- [gRPC-Web](https://github.com/grpc/grpc-web) · [Connect protocol](https://connectrpc.com/docs/protocol/)
+- [MDN — Signaling and video calling](https://developer.mozilla.org/en-US/docs/Web/API/WebRTC_API/Signaling_and_video_calling)
+- [Apollo Federation](https://www.apollographql.com/docs/graphos/schema-design/federated-schemas/federation)
+- [graphql-ws](https://github.com/enisdenjo/graphql-ws)<Badge kind="live">Maintained</Badge> · [graphql-sse](https://github.com/enisdenjo/graphql-sse)<Badge kind="live">Maintained</Badge>
+- [subscriptions-transport-ws](https://github.com/apollographql/subscriptions-transport-ws)<Badge kind="dead">Archived Apr 2023</Badge>
+</RefGroup>
+
+<RefGroup title={<>Auth, cookies & sessions (Modules <Mod to="auth" num />–<Mod to="sessions" num />)</>}>
+- [MDN — Set-Cookie](https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Set-Cookie)<Src>HttpOnly, Secure, SameSite, `__Host-` prefixes, Domain semantics.</Src>
+- [MDN — CORS: credentials with wildcard origin](https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/CORS/Errors/CORSNotSupportingCredentials)
+- [MDN — CHIPS / partitioned cookies](https://developer.mozilla.org/en-US/docs/Web/Privacy/Guides/Third-party_cookies/Partitioned_cookies)
+- [Privacy Sandbox — Update on plans (Oct 2025)](https://privacysandbox.google.com/blog/update-on-plans-for-privacy-sandbox-technologies)<Src>The reversal, and which APIs survive.</Src>
+- [Sam Newman — Backends For Frontends](https://samnewman.io/patterns/architectural/bff/) · [Phil Calçado — The BFF Pattern (2015)](https://philcalcado.com/2015/09/18/the_back_end_for_front_end_pattern_bff.html)
+- [draft-ietf-httpbis-rfc6265bis](https://datatracker.ietf.org/doc/draft-ietf-httpbis-rfc6265bis/)<Src>Cookie spec revision; check for an assigned RFC number.</Src>
+</RefGroup>
+
+<RefGroup title={<>Monorepo & delivery (<Mod to="delivery" />)</>}>
+- [Turborepo](https://turborepo.dev/docs)<Src>Current domain — turbo.build and turborepo.com both redirect here.</Src>
+- [Remote Caching](https://turborepo.dev/docs/core-concepts/remote-caching) · [turbo prune](https://turborepo.dev/docs/reference/prune) · [Microfrontends (dev-only proxy)](https://turborepo.dev/docs/guides/microfrontends)
+- [Nx — Micro Frontend Architecture](https://nx.dev/docs/kb/micro-frontend-architecture)<Src>The best single argument for monorepo + independent deploys.</Src>
+- [Nx affected](https://nx.dev/docs/features/ci-features/affected) · [enforce-module-boundaries](https://nx.dev/docs/features/enforce-module-boundaries)
+- [pnpm workspaces](https://pnpm.io/workspaces) · [pnpm motivation (phantom dependencies)](https://pnpm.io/motivation) · [Yarn workspaces](https://yarnpkg.com/features/workspaces)
+- [Changesets](https://github.com/changesets/changesets)
+- [Bazel rules_js](https://github.com/aspect-build/rules_js)
+- [Vercel — Microfrontends](https://vercel.com/docs/microfrontends) · [Vercel — Monorepos](https://vercel.com/docs/monorepos)
+- [Thoughtworks Radar — Micro frontend anarchy](https://www.thoughtworks.com/en-ca/radar/techniques/micro-frontend-anarchy)<Src>On the cost of mixing competing frameworks.</Src>
+</RefGroup>

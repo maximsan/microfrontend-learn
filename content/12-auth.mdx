@@ -1,0 +1,156 @@
+---
+id: "auth"
+part: "Part III · The wire"
+title: "Auth architecture"
+section: "The wire"
+standfirst: "Where tokens live, which cookies to set, and how to hold them — the one-way door, against the IETF's August 2026 BCP."
+prereqs: ["micro-frontends"]
+lab: "labs/13-bff-session/"
+objectives:
+  - "Compare the three RFC 10017 architectures by where tokens live"
+  - "Set BFF session cookies to the RFC's checklist"
+  - "Explain why micro-frontends strengthen the case for a BFF"
+---
+
+[**RFC 10017, “OAuth 2.0 for Browser-Based Applications”**](https://www.rfc-editor.org/info/rfc10017/) was published on **21 August 2026** as a Best Current Practice. It sits in [BCP 212](https://www.rfc-editor.org/info/bcp212/) alongside [RFC 8252](https://www.rfc-editor.org/info/rfc8252/) (native apps) — worth stating because BCP numbers can contain several RFCs and this is easy to get wrong.
+
+### Three architectures, ranked by the RFC itself
+
+<Source title="Pattern 1, BFF">
+<Quote>A browser-based application that relies on a backend component for handling OAuth responsibilities and forwards all requests through the backend component ('Backend for Frontend' or 'BFF').</Quote>
+
+Its three responsibilities: act as a confidential OAuth client; <q>manage OAuth access and refresh tokens in the context of a cookie-based session, avoiding the direct exposure of any tokens to the browser-based application</q>; and forward all requests to resource servers, <q>augmenting them with the correct access token.</q>
+
+Verdict: <q>This architecture is strongly recommended for business applications, sensitive applications, and applications that handle personal data.</q>
+
+<Cite>— [RFC 10017 §6.1](https://www.rfc-editor.org/info/rfc10017/)</Cite>
+</Source>
+
+**Pattern 2, token-mediating backend:** the backend does OAuth but the browser calls resource servers directly with the token. <q>From a security perspective, the token-mediating backend is less secure than a BFF but still offers significant advantages over an OAuth client application running directly in the browser.</q>
+
+**Pattern 3, browser-based OAuth client:** everything in the browser. <q>If an attacker is able to execute malicious code in the browser, this application architecture is vulnerable to all attack scenarios discussed earlier… This architecture is not recommended for business applications, sensitive applications, and applications that handle personal data.</q>
+
+### The three, as request flows
+
+The whole difference is one question: **does an access token ever exist inside the browser?** The boxes flagged *token here* are where it does.
+
+#### 1 — BFF · strongly recommended
+
+<Flow>
+<Box kind="good" title="Browser">Holds a cookie. Never sees a token.</Box>
+<Arrow>session cookie<br />HttpOnly, Strict</Arrow>
+<Box kind="good" title="BFF">Confidential client. Holds access + refresh tokens server-side.</Box>
+<Arrow>Bearer token<br />attached here</Arrow>
+<Box title="Resource server">Your API</Box>
+</Flow>
+
+<FlowCaption>The BFF also talks to the authorisation server, as a confidential client. An XSS in the browser can make requests *through* the session, but cannot steal a token to replay elsewhere.</FlowCaption>
+
+#### 2 — Token-mediating backend
+
+<Flow>
+<Box kind="hot" title="Browser · token here">Receives the access token and calls APIs with it.</Box>
+<Arrow sym="↔">sends its cookie,<br />gets a token back</Arrow>
+<Box title="Backend">Does the OAuth exchange, hands the token over.</Box>
+</Flow>
+
+<Flow>
+<Box kind="hot" title="Browser · token here">Token in memory.</Box>
+<Arrow>Bearer token<br />direct</Arrow>
+<Box title="Resource server">Your API</Box>
+</Flow>
+
+<FlowCaption>The refresh token stays server-side, which is the improvement over pattern 3. The access token does not, which is the gap against pattern 1.</FlowCaption>
+
+#### 3 — Browser-based OAuth client · not recommended for sensitive apps
+
+<Flow>
+<Box kind="hot" title="Browser · token here">Public client. Runs the whole flow, holds every token.</Box>
+<Arrow sym="↔">Authorization Code<br />+ PKCE</Arrow>
+<Box title="Authorisation server">Issues tokens straight to the browser</Box>
+<Arrow>Bearer token</Arrow>
+<Box title="Resource server">Your API</Box>
+</Flow>
+
+<FlowCaption>Every credential lives inside the XSS blast radius. In a micro-frontend that radius contains every other team's code and every dependency any of them added.</FlowCaption>
+
+### The cookie checklist
+
+§6.1.3.2 is unusually prescriptive for an RFC. Treat it as a literal checklist:
+
+- <q>The BFF **MUST** enable the `Secure` flag for its cookies.</q>
+- <q>The BFF **MUST** enable the `HttpOnly` flag for its cookies.</q>
+- <q>The BFF **SHOULD** enable the `SameSite=Strict` flag for its cookies.</q>
+- <q>The BFF **SHOULD** set its cookie path to `/`.</q>
+- <q>The BFF **SHOULD NOT** set the `Domain` attribute for cookies.</q>
+- <q>The BFF SHOULD start the name of its cookie with a prefix indicating the cookie was set via HTTP, for example, by using the `__Host-Http-` prefix.</q>
+
+<Moved title="The Domain rule">
+The common advice for micro-frontends is “set a cookie on the shared parent domain so every sub-app can use it.” The RFC says not to, and it is right.
+
+A cookie without `Domain` is [host-only](https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Set-Cookie): <q>If omitted, the cookie is returned only to the host that sent it.</q> With `Domain=example.com` it is readable by *every* subdomain, so one compromised subdomain compromises the session everywhere. `__Host-` prefixed cookies structurally cannot carry `Domain` at all.
+
+**The reconciliation:** the BFF design makes the parent-domain cookie *unnecessary* rather than merely forbidden. If all API traffic is proxied through the BFF's own origin, a host-only cookie already reaches everything. Needing a `Domain` cookie is a signal that you have sub-apps calling different backends directly — that is the smell, not the cookie.
+</Moved>
+
+<Trap title={<><code>SameSite=Strict</code> and inbound links</>}>
+A `Strict` cookie is not sent on cross-site navigation. A user following a link from email or a partner site arrives *logged out* until a same-site request fires. The RFC still says `Strict` — so handle it with a silent re-authentication bounce, not by quietly downgrading to `Lax`.
+</Trap>
+
+### Token storage — the RFC is blunt
+
+<Source>
+On `localStorage`: <q>localStorage does not protect against unauthorized access from malicious JavaScript, as the attacker would be running code within the same origin, and as such, would be able to read the contents of the localStorage.</q>
+
+On JavaScript-readable cookies: <q>this practice is NOT RECOMMENDED.</q>
+
+And the honest general conclusion: <q>none of these options can fully mitigate token exfiltration when the attacker can execute malicious code in the application's execution environment.</q>
+
+Also non-negotiable: <q>Browser-based clients MUST use the Authorization Code grant type and MUST NOT use the Implicit grant type to obtain access tokens.</q>
+
+<Cite>— [RFC 10017 §8](https://www.rfc-editor.org/info/rfc10017/)</Cite>
+</Source>
+
+<Insight title="Why this compounds in micro-frontends">
+N teams' code, **one origin, one JavaScript heap.** Every micro-frontend sits inside every other one's XSS blast radius. A third-party dependency added by any team can read what any other team put in memory.
+
+The strongest argument for keeping tokens out of the browser entirely — stronger here than in a monolith.
+</Insight>
+
+### Supporting specs and the practical rules
+
+- [RFC 9700](https://www.rfc-editor.org/info/rfc9700) (BCP **240**, not 212): <q>Refresh tokens for public clients MUST be sender-constrained or use refresh token rotation.</q> Also <q>The resource owner password credentials grant \[RFC6749\] MUST NOT be used.</q>
+- Foundations: [RFC 6749](https://www.rfc-editor.org/info/rfc6749) (framework), [RFC 6750](https://www.rfc-editor.org/info/rfc6750) (bearer tokens), [RFC 7636](https://www.rfc-editor.org/info/rfc7636) (PKCE).
+- **The shell owns token refresh.** Never let each micro-frontend run its own refresh loop — you get a thundering herd on expiry and a race on rotation that logs users out at random. Common, and very hard to diagnose.
+- **Proxy API calls through one origin** rather than configuring CORS with credentials across N origins. Note [a wildcard origin is rejected when credentials are used](https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/CORS/Errors/CORSNotSupportingCredentials) — the server must echo the specific origin.
+- **Deduplicate the fan-out.** Five micro-frontends each calling `/me` on load is the signature performance bug of this architecture.
+- **On the server side:** SSR calls go over the internal network, propagate the inbound auth context and a trace ID, and never cache user data at module scope — in a long-lived Node process that is a cross-user data leak.
+
+### Third-party cookies: the ground moved twice
+
+<Moved>
+If your micro-frontends live on different origins or in iframes, this matters directly. Chrome **reversed** the third-party cookie deprecation, and in an [October 2025 Privacy Sandbox post](https://privacysandbox.google.com/blog/update-on-plans-for-privacy-sandbox-technologies) announced it is retiring most of the replacement APIs — including Topics, Protected Audience, Attribution Reporting, Related Website Sets and Shared Storage.
+
+What survives: <q>CHIPS and FedCM… We'll continue to support those APIs. We'll also maintain Private State Tokens.</q> So [CHIPS / partitioned cookies](https://developer.mozilla.org/en-US/docs/Web/Privacy/Guides/Third-party_cookies/Partitioned_cookies) is the durable mechanism for cross-origin embedded micro-frontends.
+</Moved>
+
+<Recap>
+- RFC 10017 (Aug 2026) strongly recommends the BFF for anything sensitive, and does not recommend a pure browser OAuth client for it.
+- Cookies: `Secure` + `HttpOnly` MUST; `SameSite=Strict`, path `/`, `__Host-Http-` prefix and *no* `Domain` SHOULD.
+- Cookie sessions reopen CSRF and bring their own lifecycle; <Mod to="sessions" /> covers both.
+- No token storage in the browser is safe against XSS — and micro-frontends enlarge the blast radius.
+- The shell owns refresh. One origin for API traffic. Deduplicate `/me`.
+- Third-party cookies survive in Chrome; CHIPS and FedCM are the surviving Privacy Sandbox pieces.
+</Recap>
+
+<Check>
+1. For each of RFC 10017's three architectures, where does the access token live?
+2. Setting the session cookie on `Domain=example.com` would let every sub-app use it. Why does the RFC say not to, and what makes it unnecessary?
+3. “Our tokens are in memory, not `localStorage`, so XSS cannot steal them.” Evaluate the claim.
+
+<Answers>
+1. **BFF:** never in the browser — the BFF holds access and refresh tokens and the browser holds only a session cookie. **Token-mediating backend:** the access token is in the browser, the refresh token stays server-side. **Browser-based OAuth client:** every token is in the browser. The RFC strongly recommends the first for business, sensitive and personal-data applications.
+2. **A `Domain` cookie is readable by every subdomain**, so one compromised subdomain compromises the session everywhere; `__Host-` cookies cannot carry `Domain` at all. Proxy all API traffic through the BFF's own origin and a host-only cookie already reaches everything — needing a `Domain` cookie is a sign that sub-apps call different backends directly.
+3. **It is weaker than it sounds.** RFC 10017 concludes that none of the browser storage options can fully prevent exfiltration once an attacker executes code in the application. In a micro-frontend estate every team's code and dependencies share one origin and one heap, so the blast radius is larger than in a monolith — the strongest argument for keeping tokens out of the browser entirely.
+</Answers>
+</Check>

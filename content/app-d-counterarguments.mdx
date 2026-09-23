@@ -1,0 +1,51 @@
+---
+id: "counter"
+part: "Back matter"
+title: "When this guide is wrong"
+standfirst: "The strongest cases against this guide's main positions, made as their defenders would make them."
+appendix: true
+---
+
+Every recommendation here has a defensible opposite. If your situation matches one of these, the guide's default is the wrong answer for you and you should be able to say why.
+
+### “Routing-level zones by default”
+
+**The case against:** zones are an admission of defeat on the actual problem. If your product is one coherent application — a shared left nav, a persistent player, a cart that must never lose state — a full page load at every boundary is a visible product regression that users feel and you will be asked to fix. At that point you build a shell to preserve state across zones, and you have arrived at runtime composition anyway, having paid twice. Teams that went straight to Module Federation got one integration problem instead of two.
+
+**When they are right:** when boundaries fall inside a single continuous workflow rather than between them. Test it by asking what must survive a boundary crossing. If the honest answer is “a media player, an open draft, and a cart,” zones will fight you.
+
+### “Never put tokens in the browser”
+
+**The case against:** a BFF is a stateful, always-on service on the critical path of every request — something to deploy, scale, monitor, and page someone about. For a small team shipping a low-sensitivity product, that operational cost is real and the threat it mitigates is not: if an attacker is executing script in your origin, they can drive the session through the BFF regardless. You have bought protection against token *exfiltration and replay elsewhere*, which is narrower than it first appears.
+
+**When they are right:** low-sensitivity data, short sessions, narrowly-scoped tokens, a small team with no platform capacity. Note that [RFC 10017](https://www.rfc-editor.org/info/rfc10017/) anticipates this — it reserves its strongest language for <q>business applications, sensitive applications, and applications that handle personal data.</q> If you are none of those, the BCP is not addressed to you.
+
+### “Runtime lifetime is the dividing line”
+
+**The case against:** this is the guide's own framing and it is a choice, not a fact. You could organise the same territory by *who owns the data*, or by *what the network boundary costs*, and get different and equally coherent groupings. The runtime framing makes LiveView look exotic when it is a straightforward client-server terminal, and it undersells how much of the real difficulty is cache invalidation rather than lifetime.
+
+**Why it is still used here:** it predicts the most downstream consequences from one property. That is a claim about usefulness, not truth.
+
+### “Micro-frontends only for independent deployment”
+
+**The case against:** build time is a real engineering cost and at some scale it dominates everything else. A twenty-minute CI run changes how often people refactor, which changes the code. Splitting for build performance alone — without any deploy independence — is a legitimate use that this guide and Nx both dismiss slightly too quickly.
+
+**The counter:** remote caching and affected-task graphs (<Mod to="delivery" />) usually solve build time at a fraction of the cost. Try those first, then re-measure.
+
+### “Next.js federation is a dead end”
+
+**The case against:** deprecated is not the same as broken. Pages Router plus `NEXT_PRIVATE_LOCAL_WEBPACK` still works, and for a team already there, a working deprecated setup can outlast a migration that competes with product work. “Do not start here” and “rip out what you have” are different recommendations and the guide runs them together.
+
+**The limit:** you are pinned below Next.js 16 and off the App Router permanently. Treat it as a deliberate freeze with an exit date, not as a supported position.
+
+### “The best shared state is no shared state”
+
+**The case against:** pushed far enough this produces its own pathology — six teams each fetching `/me`, six near-identical cart representations, and cross-cutting concerns smeared across boundaries because nobody was allowed to own them. A small, explicitly-owned shared store is sometimes simply correct, and the URL cannot carry everything.
+
+**Where the line actually is:** shared *reads* are cheap and usually fine. Shared *writes* are what couples teams. The principle is really about mutation, and the guide states it more absolutely than that.
+
+<Insight title="How to use this appendix">
+If you are about to depart from one of this guide's defaults, the relevant section above is the argument you will need to make to your team — and the conditions listed are the ones you should be able to point at.
+
+If you cannot point at them, you are not departing from the default for a reason. You are departing from it by preference.
+</Insight>

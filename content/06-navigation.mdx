@@ -1,0 +1,156 @@
+---
+id: "navigation"
+part: "Part II · The machinery"
+title: "Location, history, URL"
+section: "The machinery"
+standfirst: "History, its traps, the Navigation API that replaces it, and what breaks when several routers share one address bar."
+prereqs: ["dividing-line"]
+lab: "labs/06-router/"
+objectives:
+  - "Avoid the three documented pushState traps"
+  - "Build routing on the Navigation API, including focus, title and scroll"
+  - "Give one router ownership of history when several apps share the URL"
+---
+
+### The History API and its three documented traps
+
+[`history.pushState(state, unused, url)`](https://developer.mozilla.org/en-US/docs/Web/API/History/pushState) is the call that legitimised the SPA. MDN documents three behaviours that routinely surprise people.
+
+#### It fires nothing
+
+<Source>
+<Quote>pushState() never causes a hashchange event to be fired.</Quote>
+
+<Cite>— [MDN, History.pushState()](https://developer.mozilla.org/en-US/docs/Web/API/History/pushState). It does not fire `popstate` either — only user-initiated traversal does. This is exactly why every micro-frontend framework has historically monkey-patched `history`.</Cite>
+</Source>
+
+#### The state object has a size cap
+
+<Source>
+<Quote>Some browsers save state objects to the user's disk so they can be restored after the user restarts the browser, and impose a size limit on the serialized representation of a state object, and will throw an exception if you pass a state object whose serialized representation is larger than that size limit.</Quote>
+
+<Cite>— [MDN](https://developer.mozilla.org/en-US/docs/Web/API/History/pushState). MDN does not print the number; the widely-cited Firefox figure traces to [Bugzilla](https://bugzilla.mozilla.org/show_bug.cgi?id=1522706). See <Mod to="caveats" />.</Cite>
+</Source>
+
+#### It is rate-limited
+
+MDN lists a `SecurityError` <q>Thrown if… the method is called too frequently.</q> The specific thresholds are not specified anywhere normative — [MDN has an open issue to document them](https://github.com/mdn/content/issues/35504). This matters the moment you sync a scroll position, a slider or a map viewport into the URL.
+
+Also worth knowing: [`history.scrollRestoration`](https://developer.mozilla.org/en-US/docs/Web/API/History/scrollRestoration), with values `"auto"` and `"manual"`, is the switch you flip when your router and the browser are fighting over scroll position.
+
+### The Navigation API — the genuinely new thing
+
+This is the most significant change to web navigation since `pushState`, and it crossed the availability line recently: MDN marks it **Baseline 2026, “Newly available” since January 2026**.
+
+<Source>
+<Quote>This is a successor to previous web platform features such as the History API and window.location… specifically aimed at the needs of single-page applications (SPAs).</Quote>
+
+And on the central capability: the `navigate` event <q>is fired when any type of navigation is initiated, meaning that you can control all page navigations from one central place, ideal for routing functionality in SPA frameworks. (This is not the case with the History API…)</q>
+
+<Cite>— [MDN, Navigation API](https://developer.mozilla.org/en-US/docs/Web/API/Navigation_API)</Cite>
+</Source>
+
+Beyond that central interception point it adds `intercept()` for handling a navigation with custom behaviour including scroll and focus control, `entries()` for the real same-origin history list, and `traverseTo(key)`. Documented limitations: no `navigate` event on first load, single-frame only, and you cannot delete or rearrange entries.
+
+<Insight title="Why this matters for micro-frontends">
+Every micro-frontend framework patches `history.pushState` for one reason: the History API never fired an event for *programmatic* navigation. No hook existed, so frameworks manufactured one.
+
+The Navigation API removes that need. Build new shells on the `navigate` event, not on a decade of monkey-patching.
+</Insight>
+
+### The surrounding navigation platform
+
+#### bfcache
+
+<Source>
+<Quote>The most important way to optimize for bfcache in all browsers is to never use the unload event. Ever!</Quote>
+
+And, critically for this guide's thesis: <q>Because bfcache works with browser-managed navigations, it doesn't work for 'soft navigations' within a single-page app (SPA).</q>
+
+<Cite>— [web.dev, Back/forward cache](https://web.dev/articles/bfcache). `Cache-Control: no-store` on the document also disqualifies it.</Cite>
+</Source>
+
+Read that second quote next to <Mod to="dividing-line" />: a well-built MPA gets instant back-navigation from the platform, for free. Your SPA has to build it.
+
+#### Speculation Rules
+
+The [Speculation Rules API](https://developer.mozilla.org/en-US/docs/Web/API/Speculation_Rules_API) declares prefetch and prerender intent as JSON, either in a `<script type="speculationrules">` block or via the [`Speculation-Rules`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Speculation-Rules) header. This is what lets a well-tuned MPA feel instant. Chromium-led; support elsewhere is unconfirmed here (<Mod to="caveats" />).
+
+#### Cross-document View Transitions
+
+Both documents opt in with `@view-transition { navigation: auto; }` and the browser animates between them — smooth transitions with no client-side router. But MDN currently marks [`@view-transition`](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/At-rules/@view-transition) as **“Limited availability… because it does not work in some of the most widely-used browsers.”** Firefox has not shipped it.
+
+<Moved tag="Ground has moved — carefully">
+“MPAs can now feel like SPAs” is a popular 2025–2026 claim and it is *partly* true. bfcache and speculation rules are broadly available. Cross-document View Transitions are not — they work in Chromium and Safari and not in Firefox. Design the navigation to be correct without the transition and treat the animation as an enhancement.
+</Moved>
+
+### Routing libraries
+
+| Library | Relationship to history |
+| --- | --- |
+| [React Router v7](https://reactrouter.com/) | The standalone [`history`](https://github.com/remix-run/history) package still exists, but v7 **internalised** history management. Legacy history APIs are exported only as `UNSAFE_*` for v6 migration — do not reach for `history` directly in new code. |
+| [TanStack Router](https://tanstack.com/router/latest/docs) | Ships its own `@tanstack/history` with [browser, hash and memory modes](https://tanstack.com/router/latest/docs/framework/react/guide/history-types). |
+| [Vue Router](https://router.vuejs.org/) | HTML5, hash and memory history modes. |
+| [Angular Router](https://angular.dev/guide/routing) | `@angular/router`, built in; customisable via `LocationStrategy` — the hook you need for micro-frontends. |
+| [wouter](https://github.com/molefrog/wouter) | Minimal — its README claims 2.1 KB gzipped against React Router's 18.7 KB. |
+
+### What the browser did for free, and your router does not
+
+<Mod to="choosing" /> lists “reimplementing the browser” as the SPA's largest hidden cost. This is the concrete version, and it is the part most often shipped broken — because it is invisible unless you test without a mouse.
+
+On a real navigation the browser does four things automatically. A client-side router does **none** of them:
+
+| Browser does | You must | Broken when |
+| --- | --- | --- |
+| Moves focus to the new document | Move focus to the new view — its `<h1>` or a skip target, with `tabindex="-1"` so it can receive focus programmatically | Keyboard users stay focused on a link that no longer exists; the next Tab starts from the wrong place |
+| Announces the new page | Write the new page name into a visually-hidden `aria-live="polite"` region | Screen-reader users get silence — nothing tells them the page changed |
+| Updates the document title | Set `document.title` on every route change | Tab list, window switcher, history and bookmarks all show the first page visited |
+| Manages scroll position | Set [`history.scrollRestoration`](https://developer.mozilla.org/en-US/docs/Web/API/History/scrollRestoration) and restore it yourself | New views open mid-page; going back loses the reading position |
+
+Focus is the one to fix first. It affects keyboard and screen-reader users equally, it is invisible in ordinary QA, and every other item on the list is easier.
+
+<Insight title="The Navigation API knows about this">
+This is the second reason to build new routing on the [Navigation API](https://developer.mozilla.org/en-US/docs/Web/API/Navigation_API) rather than `pushState`. Its `intercept()` takes options for **focus and scroll handling**, with sensible defaults, so the platform does the resetting instead of each router reinventing it.
+
+Under `pushState` this behaviour did not exist to inherit — which is a large part of why a decade of SPAs shipped without it.
+</Insight>
+
+### Several routers, one address bar
+
+This is the concrete mechanism behind “how do micro-frontends share the URL,” and where a lot of production pain lives.
+
+<Source>
+<Quote>single-spa fires PopStateEvent events when it wants to instruct all active applications to re-render. This occurs when one application calls history.pushState, history.replaceState, or triggerAppChange.</Quote>
+
+<Cite>— [single-spa API documentation](https://single-spa.js.org/docs/api)</Cite>
+</Source>
+
+So the mechanism is: patch `history`, tag the synthetic events (`evt.singleSpa = true`), and rebroadcast a single `popstate` so every child router re-evaluates. Applications declare URL ownership through an activity function — <q>a pure function… called with `window.location` as the first argument</q> returning whether that app should be active. A `urlRerouteOnly` option, default `true`, stops pushState calls that do not change the route from triggering a reroute.
+
+<Trap title="What breaks without a single owner">
+From [micro-frontends.tech](https://micro-frontends.tech/architecture/routing-and-navigation/): <q>When each micro frontend has its own router (e.g., React Router), conflicts arise: Duplicate history entries — Each router may push its own state. Scroll restoration — Multiple routers can fight over scroll position. Route change events — The shell needs to know when a micro frontend navigates internally.</q>
+
+Real instances: [Vue Router #3152](https://github.com/vuejs/vue-router/issues/3152) (multiple instances cannot independently clean up `popstate` listeners) and [Angular #47789](https://github.com/angular/angular/issues/47789).
+</Trap>
+
+The recommended resolution from that same source: <q>The shell owns the primary History API interaction. Micro frontends receive the current path as a prop and render accordingly, or use hash-based sub-routing to avoid conflicting with the shell.</q>
+
+<Recap>
+- `pushState` fires no event, has an unspecified size cap, and is rate-limited. All three are documented and all three surprise people.
+- The Navigation API reached Baseline in January 2026 and gives you one central interception point — build new shells on it.
+- bfcache gives MPAs instant back-navigation free and explicitly does not apply to SPA soft navigations. `unload` handlers and `Cache-Control: no-store` disqualify you.
+- Cross-document View Transitions are not yet in Firefox. Treat as enhancement.
+- **One router owns history; everyone else receives the path.** This is the rule.
+</Recap>
+
+<Check>
+1. A map view writes its viewport into the URL on every pan. In production it starts throwing `SecurityError`. Why, and what is the fix?
+2. Why has every micro-frontend framework monkey-patched `history`, and what should new shells use instead?
+3. After a route change, a screen-reader user hears nothing and keyboard focus stays on the link they activated. What two things did the router fail to do?
+
+<Answers>
+1. **`pushState` is rate-limited** — MDN documents a `SecurityError` when it is called too frequently, and the thresholds are not specified anywhere normative. Write the URL on idle (debounced), use `replaceState` for intermediate positions, and push a history entry only for positions the user would want to go *back* to.
+2. **`pushState` fires no event**, so there was no hook for programmatic navigation and frameworks manufactured one by patching it. The Navigation API's `navigate` event fires for every kind of navigation from one central place, and `intercept()` adds focus and scroll handling — build new shells on that.
+3. **Move focus and announce the change.** Move focus to the new view's `<h1>` (with `tabindex="-1"`), and write the page name into a visually hidden `aria-live="polite"` region. Set `document.title` while you are there. The browser did all three on a real navigation; a client router does none of them unless you make it.
+</Answers>
+</Check>

@@ -1,0 +1,79 @@
+---
+id: "choosing"
+part: "Part I · Foundations"
+title: "Choosing an architecture"
+section: "Foundations"
+standfirst: "Six drivers, how to measure the first one, and what each side honestly costs."
+prereqs: ["spectrum", "rendering-modes"]
+objectives:
+  - "Measure session length and interaction density from your own analytics"
+  - "List what a SPA makes you rebuild and what an MPA makes you give up"
+  - "Argue a choice in terms of where the complexity will live"
+---
+
+### The drivers, in priority order
+
+1. **Session length and interaction density.** Established in <Mod to="spectrum" /> as the discriminator. Measure it rather than guessing.
+2. **Content or application.** Public, indexable, first-visit-matters content pulls toward server rendering. Authenticated tools pull toward the client.
+3. **Offline and latency requirements.** A hard offline requirement settles the question immediately.
+4. **Team shape.** One full-stack team with a server language is a strong signal for hypermedia. A separate frontend team plus multiple clients consuming one API amortises the SPA's cost.
+5. **Client device constraints.** Low-end mobile and emerging markets punish JavaScript far harder than your development laptop suggests.
+6. **Existing API needs.** If a public or mobile API already exists, the SPA's biggest structural cost is already paid.
+
+### How to actually measure driver 1
+
+Saying “measure session length and interaction density” is useless without the recipe. Both numbers are usually already in your analytics, or are two lines of instrumentation away.
+
+| Number | Where to get it | Roughly where the answer flips |
+| --- | --- | --- |
+| **Median session duration**<Sub>per authenticated area, not site-wide</Sub> | GA4: `Engagement → Pages and screens`, average engagement time. Amplitude/Mixpanel: session length distribution. Segment by logged-in vs anonymous — the blended figure is meaningless. | **\< 2 min** → server-rendered<br />**> 10 min** → SPA<br />In between, driver 2 decides |
+| **Interactions per session**<Sub>state-changing actions, not pageviews</Sub> | Count events that would be a server round trip in an MPA: filter changes, inline edits, drag, expand/collapse. If you are not tracking them, a one-off `click` listener sampling `[data-action]` for a week is enough. | **\< 10** → server-rendered<br />**> 50** → SPA |
+| **Return-visit rate**<Sub>the tiebreaker</Sub> | GA4 new vs returning users, over 30 days. | Mostly first-visit traffic makes bundle cost unamortisable — it pushes toward the server regardless of the other two |
+
+Two cautions. Site-wide averages blend a marketing site with an authenticated tool and will tell you nothing — segment first. And session duration is inflated by idle tabs, so prefer *engaged* time where your tool distinguishes it.
+
+These thresholds are judgement, not research. They are calibrated to be roughly right at the extremes, which is where the decision is actually easy; the middle band is where drivers 2 through 6 do the work.
+
+### What a SPA actually costs
+
+<Trap title="You are reimplementing the browser">
+Routing, history, scroll restoration, focus management, loading indicators, caching, error pages, form resubmission semantics, link prefetching. The browser gave you every one of these for free, correctly, and accessibly. You now own them all, and you will get several of them subtly wrong.
+</Trap>
+
+- **A second source of truth.** Server database plus client cache, and keeping them consistent is now your problem. This is the entire reason TanStack Query, SWR and Apollo's cache exist — most "SPA complexity" is cache-invalidation complexity under another name.
+- **A larger XSS blast radius.** One injection lands in a long-lived session with credentials in memory. <Mod to="auth" /> covers why this compounds in micro-frontends.
+- **Version skew.** Users run last week's bundle against today's API. You need a build-identifier header and a "new version available" path — before you need them.
+- **Accessibility work MPAs get free.** Route changes are not announced to screen readers unless you announce them. Focus does not move unless you move it.
+- **Memory leaks become real.** Detached DOM nodes, orphaned subscriptions, retained closures. You will need to profile.
+
+### What an MPA or hypermedia approach costs
+
+- **Latency per interaction.** On a high-RTT connection this is the whole experience.
+- **A ceiling on interaction richness.** Drag-and-drop canvases, real-time collaborative editing and offline work are not reasonable to build this way.
+- **Client state discarded on navigation.** Scroll position, half-filled forms, media playback. bfcache and View Transitions have narrowed this considerably (<Mod to="navigation" />), but not closed it.
+- **More server work per interaction**, and harder to put behind a CDN.
+
+<Insight title="The real disagreement">
+When a team is torn between these, the argument is rarely technical. It is **where the team wants its complexity to live**: in a build pipeline and a client cache, or in server round-trips and a rendering layer.
+
+Both are legitimate. Neither makes complexity disappear.
+</Insight>
+
+<Recap>
+- Six drivers, led by session length × interaction density. The rest are tiebreakers.
+- The SPA's dominant hidden cost is reimplementing browser behaviour, followed by owning a second source of truth.
+- The MPA's dominant cost is per-interaction latency and a ceiling on interaction richness.
+- The choice is about where complexity lives, not whether you will have any.
+</Recap>
+
+<Check>
+1. A team proposes a SPA for a public product catalogue with high organic search traffic and a median session of ninety seconds. Which two drivers argue against it, and what would you propose instead?
+2. Why does “we already have a mobile app” materially change the calculus?
+3. Name the three browser behaviours you would have to reimplement first, and which is most often done badly.
+
+<Answers>
+1. **Session length and content-vs-application — drivers 1 and 2.** A ninety-second median session means the user pays the bundle cost and leaves before amortising it, and high organic search traffic makes first paint and indexability the product. Propose static generation or server rendering with *islands* for the interactive parts — filters, gallery, add-to-cart. That is the Netflix result in <Mod to="spectrum" />: the landing page got 50% faster by removing client-side React, not by tuning it.
+2. **Because the SPA's largest structural cost is already sunk.** A mobile app forces you to have an API, versioned and public, plus the server-side cache and auth story that goes with it. Driver 6 is really asking whether you are paying for that twice. If you already have it, the marginal cost of a web SPA is much lower — and conversely, building a SPA *in order to* have an API is paying for a second client you do not have.
+3. **Routing, history and scroll restoration first** — they are entangled and everything else depends on them. Then focus management, loading state, and error pages. The one most often done badly is **focus management on route change**: the browser moves focus to the new document automatically, a client router does not, so keyboard and screen-reader users are left focused on a link that no longer exists. It is invisible in QA unless someone tests without a mouse.
+</Answers>
+</Check>

@@ -1,0 +1,144 @@
+---
+id: "streaming"
+part: "Part II · The machinery"
+title: "Fragment streaming and hydration"
+nav: "Fragment streaming"
+section: "The machinery"
+standfirst: "How streaming works on the wire, why fragments hydrate themselves, and what fails when they don't."
+prereqs: ["rendering-modes", "micro-frontends"]
+lab: "labs/09-streaming/"
+objectives:
+  - "Describe what an out-of-order streamed response contains on the wire"
+  - "Confine a hydration failure to one fragment"
+  - "Diagnose the common causes of hydration mismatches"
+---
+
+### The mechanism, from the primary source
+
+The authoritative explanation is Dan Abramov's [“New Suspense SSR Architecture in React 18”](https://github.com/reactwg/react-18/discussions/37) in the official React working group. Two passages carry the mechanism.
+
+<Source>
+<Quote>When the data for the comments is ready on the server, React will send additional HTML into the same stream, as well as a minimal inline \<script> tag to put that HTML in the 'right place'.</Quote>
+
+And the property that makes it composition-friendly: <q>Unlike traditional HTML streaming, it doesn't have to happen in the top-down order… when the sidebar HTML is ready, React will stream it along with the \<script> tag that inserts it in the right place — even though the HTML for the post (which is further in the tree) has already been sent! There is no requirement that data loads in any particular order.</q>
+
+<Cite>— [React 18 Working Group, Discussion #37](https://github.com/reactwg/react-18/discussions/37)</Cite>
+</Source>
+
+So the wire format is: shell HTML containing placeholders, then hidden HTML blocks appended near the end of the document, then a tiny inline script that relocates each block into its slot. React explicitly credits prior art — <q>Marko is one of JavaScript web frameworks that implements a version of this pattern</q> — linking to [eBay's engineering writeup](https://tech.ebayinc.com/engineering/async-fragments-rediscovering-progressive-html-rendering-with-marko/), a second independent description of the same technique.
+
+The APIs: [`renderToPipeableStream`](https://react.dev/reference/react-dom/server/renderToPipeableStream) for Node streams and [`renderToReadableStream`](https://react.dev/reference/react-dom/server/renderToReadableStream) for Web streams. React's term for the synchronous part: <q>The part of your app outside of any \<Suspense> boundaries is called the shell.</q>
+
+### What actually goes over the wire
+
+The part that is hard to picture from prose. A single HTTP response, arriving in pieces, where a later piece repairs an earlier one.
+
+<Wire>
+<Step t="t0 · server" server>Render begins. Everything **outside** a `<Suspense>` boundary — the shell — is synchronous and ready immediately.</Step>
+<Step t="t0 · flushed">Shell HTML goes out: header, nav, layout, and a **placeholder** where each pending boundary sits. **The browser starts painting now**, before any data has resolved.</Step>
+<Step t="t0 · flushed">The bundle downloads in parallel. Hydration of the shell can begin before the rest of the document has arrived.</Step>
+<Step t="t1 · server" server>The *sidebar*'s data resolves — even though the *post* below it in the tree is still pending. **Order of completion, not order of markup.**</Step>
+<Step t="t1 · flushed">Two things append to the **same still-open response**: a hidden `<div>` holding the sidebar's real HTML, and a minimal inline `<script>`.</Step>
+<Step t="t1 · browser">That script runs the instant it is parsed and **moves the hidden block into the placeholder's slot**. The sidebar pops in. React need not have loaded yet — this step works without it.</Step>
+<Step t="t2 · server" server>The post resolves. Same two-part append, same relocation. Response closes.</Step>
+<Step t="t2+ · browser">Selective hydration attaches behaviour per boundary, prioritising whatever the user has already clicked.</Step>
+</Wire>
+
+Two consequences worth holding onto. Content arrives **in the order the data resolves**, so one slow fragment delays only itself. And the relocation is plain DOM work by an inline script, so the **HTML is complete for a crawler** even with the framework absent.
+
+<Moved title="Since React 19.2, reveals are batched">
+The step above describes React 18. <q>Starting in 19.2, React will batch reveals of server-rendered Suspense boundaries for a short time, to allow more content to be revealed together and align with the client-rendered behavior</q> — with a heuristic that stops batching as total load time approaches the 2.5 s LCP threshold ([React 19.2 release notes](https://react.dev/blog/2025/10/01/react-19-2#batching-suspense-boundaries-for-ssr)). On the wire the relocation script now queues blocks and flushes them on an animation frame. Streaming order and the crawler property are unchanged; what changed is that two blocks arriving a few milliseconds apart appear together. Lab 09 shows both on your own machine.
+</Moved>
+
+### Per-fragment hydration — supported, with a caveat
+
+<Source>
+<Quote>An app fully built with React will usually only have one hydrateRoot call with its root component.</Quote>
+
+But the API explicitly provides for the other case. On the `identifierPrefix` option: <q>A string prefix React uses for IDs generated by useId. Useful to avoid conflicts when using multiple roots on the same page.</q>
+
+<Cite>— [react.dev, hydrateRoot](https://react.dev/reference/react-dom/client/hydrateRoot)</Cite>
+</Source>
+
+<Trap title="One root means one blast radius">
+If the whole page hydrates from a single root, **one team's hydration error blanks the entire page** — including the fragments that rendered perfectly. In a page owned by several teams, that is an unacceptable coupling of failure domains.
+
+Use one hydration root per fragment, and give each a distinct `identifierPrefix` or you will get duplicate DOM ids from `useId`.
+</Trap>
+
+### Why hydration mismatches happen
+
+The characteristic failure of every architecture in this module: the server rendered one tree, the client rendered a different one, and React discards the server's work and re-renders. Slower than not server-rendering at all, and often silent in development.
+
+The causes are a short and finite list:
+
+- **Values that differ between the two renders** — `Date.now()`, `Math.random()`, `crypto.randomUUID()`. Anything non-deterministic in render.
+- **Locale and timezone.** The server formats a date in UTC, the browser in the user's zone. The single most common cause in production, and invisible to a developer sitting in UTC.
+- **Reading `window`, `localStorage` or `matchMedia` during render** instead of in an effect. The server has no equivalent, so branches diverge — a theme toggle reading stored preference is the classic.
+- **Invalid HTML nesting.** A `<div>` inside a `<p>`, or a `<p>` inside a `<p>`. The parser silently corrects the server's HTML, so the real DOM no longer matches what React expects. Baffling until you know it.
+- **Browser extensions** mutating the DOM before hydration. Not your bug, but it produces the same error report.
+- **Duplicate ids across fragments** — the composition-specific one. Two independently hydrated subtrees using `useId` without distinct `identifierPrefix` values, exactly as above.
+
+Two of these bite composed pages harder than single applications. Locale is usually resolved by the shell and must be propagated to every fragment — Podium's context headers again — or team A renders in the user's locale and team B in the server's default. And a mismatch inside one fragment only destroys that fragment, provided you took the one-root-per-fragment advice above; with a single root it takes down the page.
+
+### Islands are the same idea at a different granularity
+
+[Astro's documentation](https://docs.astro.build/en/concepts/islands/) describes islands as <q>rendering the majority of your page to fast, static HTML with smaller 'islands' of JavaScript added when interactivity or personalization is needed on the page.</q> The lineage is documented there too: the term came from Etsy's Katie Sylor-Miller in 2019, expanded in [Jason Miller's August 2020 post](https://jasonformat.com/islands-architecture/).
+
+<Source>
+<Quote>This may seem similar to 'micro-frontends' at first glance. Both approaches share the idea of breaking applications up into independent units, however 'micro-frontends' do not typically imply that composition of those units is achieved using HTML.</Quote>
+
+And the isolation property that makes per-fragment hydration robust: <q>Each part of the page is an isolated unit, and a performance issue in one unit doesn't affect the others.</q>
+
+<Cite>— [Jason Miller, “Islands Architecture”](https://jasonformat.com/islands-architecture/)</Cite>
+</Source>
+
+### What is actually alive in server composition
+
+<Moved>
+Zalando's Tailor is the tool most often cited as the reference implementation of fragment streaming. It was **[archived by Zalando on 5 December 2022](https://github.com/zalando/tailor)** and is read-only. Project Mosaic, its umbrella, resolves but serves no content. Do not start a new system there — though the README remains the clearest statement of the design goals.
+</Moved>
+
+| Tool | Status, <VerifiedDate /> | Notes |
+| --- | --- | --- |
+| [Zalando Tailor](https://github.com/zalando/tailor) | <No>Archived Dec 2022</No> | Still the clearest README on the idea |
+| Project Mosaic | <No>Effectively dead</No> | Domain resolves, no content |
+| [Podium](https://podium-lib.io/) | <Ok>Alive — FINN.no</Ok> | Podlets + layouts + JSON manifest |
+| [OpenComponents](https://opencomponents.github.io/) | <Ok>Alive, actively released</Ok> | Born at OpenTable, 2014 |
+| [Piral](https://piral.io/) | <Ok>Alive</Ok> | “pilets” as runtime-loaded modules |
+| [qiankun](https://qiankun.umijs.org) | <Ok>Alive</Ok> | Built on single-spa |
+| Ara Framework | <Warn>Dormant</Warn> | Not archived; packages \~3 years stale |
+
+Tailor's README still states the requirements better than anything written since — and the last one is what teams forget:
+
+<Source>
+<Quote>Tailor requests fragments in parallel and streams them as soon as possible, without blocking the rest of the page.</Quote>
+
+<Quote>Fault Tolerance. Render the meaningful output, even if a page fragment has failed or timed out.</Quote>
+
+<Cite>— [zalando/tailor README](https://github.com/zalando/tailor) (archived)</Cite>
+</Source>
+
+[Podium](https://podium-lib.io/docs/introduction/hello-podium/) is the maintained equivalent, and its vocabulary is worth learning: <q>In Podium there are two types of servers: Podlets that serve page fragments / Layouts that compose podlets and serve the finished page.</q> The contract is explicit — <q>The contract between a podlet and a layout is defined in a JSON manifest</q> — and so is context propagation: <q>The layout is also responsible for providing a Podium context on requests made to each podlet. This context is a set of HTTP headers with information the podlet can use to generate dynamic content.</q>
+
+That last mechanism is how you propagate identity and locale into fragments during server rendering — the SSR half of the identity discussion in <Mod to="sessions" />.
+
+<Recap>
+- Out-of-order streaming works by appending hidden HTML plus a tiny inline script that relocates it. React documents this; Marko did it first.
+- Hydrate per fragment, not per page, and set `identifierPrefix` — one root couples every team's failure domain.
+- Islands are the same technique at component granularity; Jason Miller's post distinguishes them from micro-frontends precisely.
+- Tailor is archived. Podium, OpenComponents, Piral and qiankun are alive.
+- Per-fragment timeouts, fallbacks and error boundaries are not optional — one slow team must not block the page.
+</Recap>
+
+<Check>
+1. The sidebar's data resolves before the post's. What does the browser receive, and in what order?
+2. One team's fragment throws a hydration error and the entire page goes blank, including fragments that rendered correctly. What was the architecture, and what is the fix?
+3. Dates look right in development but cause hydration mismatches for users in Tokyo. Why?
+
+<Answers>
+1. **Order of completion, not order of markup.** The shell with placeholders arrives first and paints. When the sidebar resolves, a hidden block with its HTML and a tiny inline script are appended to the *same open response*; the script moves the block into its slot. The post follows the same way. The relocation is plain DOM work, so it runs before React has loaded.
+2. **A single hydration root for the whole page**, which couples every team's failure domain. Hydrate each fragment from its own root and give each a distinct `identifierPrefix`, so `useId` does not produce duplicate ids and one fragment's mismatch destroys only that fragment.
+3. **Timezone.** The server formats the date in UTC; the browser formats it in the user's zone, so the two trees differ — invisible to a developer sitting in UTC. In a composed page, resolve locale and timezone once in the shell and propagate them to every fragment (Podium's context headers are the mechanism), or format in an effect on the client.
+</Answers>
+</Check>

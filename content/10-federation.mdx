@@ -1,0 +1,340 @@
+---
+id: "federation"
+part: "Part II · The machinery"
+title: "Bundlers and Module Federation"
+nav: "Bundlers & federation"
+section: "The machinery"
+standfirst: "Sharing semantics, the React singleton problem, working setup code, and which tools are dead ends."
+prereqs: ["micro-frontends", "sharing"]
+lab: "labs/10-federation/"
+objectives:
+  - "Configure shared dependencies with correct singleton and strictVersion semantics"
+  - "Avoid the react-dom/client duplicate-React trap"
+  - "Choose between Module Federation, import maps, single-spa and Web Components"
+---
+
+### The `shared` configuration, precisely
+
+<Source>
+**`singleton`**: <q>This hint only allows a single version of the shared module in the shared scope (disabled by default). Some libraries use a global internal state (e.g. react, react-dom). Thus, it is critical to have only one instance of the library running at a time. In cases where there are multiple versions of the same dependency in the shared scope, the highest semantic version is used.</q>
+
+**`strictVersion`**: <q>This hint allows webpack to reject the shared module if version is not valid (defaults to `true` when local fallback module is available and shared module is not a singleton, otherwise `false`)… Throws a runtime error if the required version is not found.</q>
+
+<Cite>— [webpack, ModuleFederationPlugin](https://webpack.js.org/plugins/module-federation-plugin/)</Cite>
+</Source>
+
+<Trap title="A widely-repeated wrong default">
+A large number of blog posts state that `strictVersion` defaults to `false`. The official documentation says it defaults to **`true`** when a local fallback exists and the module is not a singleton. Trust the doc; this determines whether your build fails loudly or degrades silently.
+</Trap>
+
+### The React singleton problem, stated correctly
+
+“You must share React as a singleton” is the standard advice and it is slightly wrong in a way that matters.
+
+<Source>
+<Quote>In order for Hooks to work, the react import from your application code needs to resolve to the same module as the react import from inside the react-dom package. If these react imports resolve to two different exports objects, you will see this warning.</Quote>
+
+And the nuance most summaries drop: <q>In general, React supports using multiple independent copies on one page (for example, if an app and a third-party widget both use it). It only breaks if require('react') resolves differently between the component and the react-dom copy it was rendered with.</q>
+
+<Cite>— [react.dev, Invalid hook call warning](https://react.dev/warnings/invalid-hook-call-warning)</Cite>
+</Source>
+
+So two fully independent micro-frontends, each with their own React, are fine — provided nothing crosses the boundary. It is sharing components, context or hooks across the boundary that forces the singleton, and therefore forces the version coupling micro-frontends were supposed to eliminate. That is the tension from <Mod to="micro-frontends" /> in its most concrete form.
+
+<Trap title="The subpath that silently duplicates React">
+From [Module Federation's documentation](https://module-federation.io/configure/shared.html): <q>Writing 'react-dom' (no trailing slash) only intercepts import 'react-dom'. Any code that does import \{ createRoot \} from 'react-dom/client' will load a second copy of React DOM, which breaks React singleton requirements and causes hydration errors.</q>
+
+Every modern React 18+ codebase imports from `react-dom/client`. This will bite you.
+</Trap>
+
+### Tool status, September 2026
+
+[Module Federation 2.0 went stable on 10 February 2026](https://module-federation.io/blog/v2-stable-version.html) and is now an independent project rather than a webpack feature — adding <q>dynamic type hinting, Manifest, Federation Runtime, and Runtime Plugin System</q> on top of the original sharing model.
+
+| Bundler | Module Federation | Detail |
+| --- | --- | --- |
+| **webpack 5** | <Ok>Yes — native</Ok> | `ModuleFederationPlugin`, the original implementation |
+| **Rspack** | <Ok>Yes — first class</Ok> | <q>The Rspack team works closely with the Module Federation development team and provides first-class support</q> ([source](https://rspack.rs/guide/advanced/module-federation)) |
+| **Vite** | <Ok>Yes</Ok> | [`@module-federation/vite`](https://module-federation.io/integrations/build-tool/vite.html) — actively maintained through September 2026 |
+| **Vite (legacy)** | <Warn>Stale</Warn> | [`@originjs/vite-plugin-federation`](https://www.npmjs.com/package/@originjs/vite-plugin-federation) — last release April 2025, predates MF 2.0 |
+| **Parcel** | <No>Does not exist</No> | Zero mentions of federation across [parceljs.org](https://parceljs.org/features/code-splitting/); no npm adapter |
+| **esbuild** | <No>No</No> | Its role here is as the engine under Angular's Native Federation |
+| **Turbopack** | <No>Structurally impossible</No> | <q>Turbopack does not support webpack plugins</q> ([source](https://nextjs.org/docs/app/api-reference/turbopack)) — and it is the Next.js 16 default |
+
+#### On Parcel specifically
+
+Parcel has no micro-frontend story. What it offers is [automatic shared bundles](https://parceljs.org/features/code-splitting/) — <q>When multiple parts of your application depend on the same common modules, they are automatically deduplicated into a separate bundle</q> — plus experimental `manualSharedBundles`. That is build-time code splitting within one application, not runtime composition across independently-deployed ones. If micro-frontends are the requirement, Parcel is the wrong tool.
+
+<Moved tag="Ground has moved — the big one">
+**Next.js + Module Federation is a dead end for new work.**
+
+The [official integration page](https://module-federation.io/integrations/framework/nextjs/index.html) carries two banners: <q>App Router Not Supported</q> and <q>Project Deprecation — Support for Next.js is ending</q>. Independently, Turbopack is the Next.js 16 default and cannot load webpack plugins, so `ModuleFederationPlugin` cannot run at all.
+
+The supported SSR-federation path is [Modern.js](https://module-federation.io/integrations/framework/modernjs/index.html), which notes: <q>For a better performance experience, Module Federation & Modern.js SSR only supports stream SSR.</q>
+</Moved>
+
+### The standards-based alternative
+
+[Import maps are part of the WHATWG HTML Standard](https://html.spec.whatwg.org/multipage/webappapis.html#import-map) — note the [WICG explainer repository was archived in February 2025](https://github.com/WICG/import-maps) and is explicitly out of date, so it should not be cited as the spec. Baseline support is universal in evergreen browsers (Chrome/Edge 89, Firefox 108, Safari 16.4, per MDN's browser-compat data); the newer extensions — `integrity` and multiple import maps — are considerably more recent.
+
+[single-spa builds on this](https://single-spa.js.org/docs/recommended-setup/): <q>We recommend a setup that uses in-browser ES modules + import maps (or SystemJS to polyfill these if you need better browser support).</q> And on the choice: <q>The single-spa core team recommends choosing either import maps or module federation for your shared, third-party dependencies. We do not recommend sharing some third-party dependencies via import map and others via module federation.</q>
+
+<Trap title="That page is partly stale">
+single-spa's recommended-setup page is live but contains text written around 2020. It still claims Module Federation is <q>Only webpack@>=5</q> — now false, given Rspack, Vite, Rolldown and Metro support — and references `output.jsonpFunction`, renamed `output.chunkLoadingGlobal` in webpack 5. Quote it for its architectural position, not its facts.
+</Trap>
+
+For Angular, [Native Federation](https://native-federation.com/) is the de-facto path: <q>brings the proven mental model of webpack Module Federation to the browser — built on ESM and Import Maps, independent of any specific build tool</q>, with <q>Full support for Angular's Server-Side Rendering and Incremental Hydration since version 18.</q> It is a community project rather than an Angular-team product, and actively maintained.
+
+### A minimal setup, end to end
+
+Two applications: a **remote** (`cart`) that exposes a component, and a **host** (`shell`) that loads it at runtime. Nothing is linked at build time — the host has no `cart` in `node_modules`.
+
+```js file="apps/cart/webpack.config.js" label="Remote — exposes" warn={[19]}
+const { ModuleFederationPlugin } = require('webpack').container;
+
+module.exports = {
+  entry: './src/index',
+  output: {
+    // absolute — the host loads chunks from here, not from its own origin
+    publicPath: 'https://cart.example.com/',
+  },
+  plugins: [
+    new ModuleFederationPlugin({
+      name: 'cart',                 // global the host looks for
+      filename: 'remoteEntry.js',   // the manifest the host fetches
+      exposes: {
+        './CartWidget': './src/CartWidget',
+      },
+      shared: {
+        react:        { singleton: true, requiredVersion: '^19.0.0' },
+        'react-dom':  { singleton: true, requiredVersion: '^19.0.0' },
+        'react-dom/': { singleton: true },  // trailing slash: catches react-dom/client
+      },
+    }),
+  ],
+};
+```
+
+```js file="apps/shell/webpack.config.js" label="Host — consumes"
+const { ModuleFederationPlugin } = require('webpack').container;
+
+module.exports = {
+  entry: './src/index',
+  plugins: [
+    new ModuleFederationPlugin({
+      name: 'shell',
+      remotes: {
+        // <remote's name>@<url of its manifest>
+        cart: 'cart@https://cart.example.com/remoteEntry.js',
+      },
+      shared: {
+        // must match the remote, or you get two Reacts
+        react:        { singleton: true, requiredVersion: '^19.0.0' },
+        'react-dom':  { singleton: true, requiredVersion: '^19.0.0' },
+        'react-dom/': { singleton: true },
+      },
+    }),
+  ],
+};
+```
+
+Both sides now need an **async boundary** at the entry point. Shared modules resolve asynchronously, so a synchronous entry cannot use them — this two-file dance is the single most common setup error.
+
+```js file="src/index.js & src/bootstrap.jsx" label="The async boundary"
+// index.js — the real entry does nothing but defer
+import('./bootstrap');
+
+// bootstrap.jsx — everything actually starts here
+import { createRoot } from 'react-dom/client';
+import App from './App';
+
+createRoot(document.getElementById('root')).render(<App />);
+```
+
+```jsx file="apps/shell/src/App.jsx" label="Consuming the remote" warn={[9]}
+import { lazy, Suspense } from 'react';
+import { ErrorBoundary } from 'react-error-boundary';
+
+// resolved over the network at runtime — this import has no build-time target
+const CartWidget = lazy(() => import('cart/CartWidget'));
+
+export default function App() {
+  return (
+    <ErrorBoundary fallback={<CartUnavailable />}>  {/* not optional */}
+      <Suspense fallback={<CartSkeleton />}>
+        <CartWidget />
+      </Suspense>
+    </ErrorBoundary>
+  );
+}
+```
+
+What happens when that page loads, step by step (the dots mark which side does the work — the remote's server only serves files):
+
+<Wire>
+<Step t="1 · shell boots">Populates its **share scope** with the versions of `react` and `react-dom` it carries.</Step>
+<Step t="2 · first render of the remote" server>The runtime fetches `remoteEntry.js` from `cart.example.com` — a network call on the render path.</Step>
+<Step t="3 · negotiation">The remote registers *its* versions into the same share scope. Both declare `singleton`, so one copy of React wins — the higher semver — with a console warning to the loser.</Step>
+<Step t="4 · chunks" server>The runtime fetches only the chunks for `./CartWidget` that the share scope does not already satisfy.</Step>
+<Step t="5 · render">The component renders inside the shell's React tree, sharing its context and its reconciler.</Step>
+</Wire>
+
+<Trap title="Step 2 is a network call you do not control">
+If `cart.example.com` is slow or down, that dynamic `import()` rejects and — without the error boundary above — takes down the shell's whole subtree. Every remote needs a boundary and a fallback. The team that owns the shell will be paged for the team that owns the remote.
+</Trap>
+
+**Rspack:** the config above is a drop-in — swap `require('webpack').container` for `require('@rspack/core').container`. **Vite:** the same shape via [`createModuleFederationConfig`](https://module-federation.io/integrations/build-tool/vite.html) from `@module-federation/vite`.
+
+### The three main alternatives, in code
+
+All three solve the same problem — load another team's code at runtime — and differ in *who does the resolving*.
+
+#### 1. Import maps — the browser resolves
+
+No bundler runtime at all. The mapping is a standard [HTML feature](https://html.spec.whatwg.org/multipage/webappapis.html#import-map); "singleton" just means the map has one entry.
+
+```html file="shell/index.html" label="Import maps"
+<!-- one entry per dependency = one copy, enforced by the browser -->
+<script type="importmap">
+{
+  "imports": {
+    "react":       "https://cdn.example.com/react@19.2.0/index.js",
+    "react-dom/":  "https://cdn.example.com/react-dom@19.2.0/",
+    "@acme/cart":  "https://cart.example.com/main.js"
+  }
+}
+</script>
+
+<script type="module">
+  const { mount } = await import('@acme/cart');
+  mount(document.getElementById('cart-slot'));
+</script>
+```
+
+You deploy a new cart by rewriting one line of JSON — which is exactly what single-spa's `import-map-deployer` automates. The cost: no automatic version negotiation, no build-time type sharing, and you manage the CDN yourself.
+
+<Trap title="An import map is strict JSON">
+No comments, no trailing commas. MDN: <q>The import map must be a valid JSON object</q> ([MDN, `<script type="importmap">`](https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/script/type/importmap)). A map that fails to parse does not partly work — none of its specifiers resolve, and every `import('@acme/…')` on the page fails. Put explanations in an HTML comment beside the `<script>`, as above, never inside it.
+</Trap>
+
+#### 2. single-spa — an orchestrator resolves
+
+Adds lifecycle and routing on top of whichever loader you chose. Each application declares *when* it is active rather than being imported by a parent.
+
+```js file="shell/root-config.js" label="single-spa"
+import { registerApplication, start } from 'single-spa';
+
+registerApplication({
+  name: '@acme/cart',
+  app: () => System.import('@acme/cart'),
+  // pure function of location — this is the app's URL ownership
+  activeWhen: (location) => location.pathname.startsWith('/cart'),
+  customProps: { getAccessToken: () => shell.getAccessToken() },
+});
+
+registerApplication({
+  name: '@acme/catalog',
+  app: () => System.import('@acme/catalog'),
+  activeWhen: ['/catalog', '/search'],
+});
+
+// don't reroute on pushState calls that didn't change the route
+start({ urlRerouteOnly: true });
+```
+
+```js file="cart/src/main.js" label="What a child app must export"
+export async function bootstrap()        { /* once, before first mount */ }
+export async function mount(props)       { /* render into props.domElement */ }
+export async function unmount(props)     { /* tear down — must actually clean up */ }
+```
+
+The `unmount` contract is the part teams under-build. It runs on every route change away from the app, and a leaked listener or interval there accumulates for the whole session.
+
+#### 3. Web Components — the DOM is the contract
+
+No shared runtime, real CSS isolation via Shadow DOM, and the integration surface is attributes in, events out. The most decoupled option, and the most manual.
+
+```js file="cart/src/cart-widget.js" label="Custom element"
+class CartWidget extends HTMLElement {
+  static observedAttributes = ['user-id'];
+
+  constructor() {
+    super();
+    // Shadow DOM: the host's CSS cannot reach in, and yours cannot leak out.
+    // Attach it here, once — connectedCallback runs again every time the element moves.
+    this.attachShadow({ mode: 'open' });
+  }
+  connectedCallback()        { this.render(); }
+  attributeChangedCallback() { this.render(); }  // may run before connectedCallback
+  disconnectedCallback()     { /* same teardown duty as single-spa's unmount */ }
+
+  render() {
+    this.shadowRoot.innerHTML = `<button part="badge">Cart · user ${this.getAttribute('user-id')}</button>`;
+  }
+
+  addItem(item) {
+    // events up — the host listens, it does not reach in
+    this.dispatchEvent(new CustomEvent('cart:item-added', {
+      detail: item, bubbles: true, composed: true,  // composed: crosses the shadow boundary
+    }));
+  }
+}
+customElements.define('acme-cart', CartWidget);
+```
+
+```html file="shell/index.html" label="Host side"
+<script type="module" src="https://cart.example.com/cart-widget.js"></script>
+
+<acme-cart user-id="42"></acme-cart>   <!-- props down as attributes -->
+
+<script>
+  document.querySelector('acme-cart')
+    .addEventListener('cart:item-added', e => shell.refreshBadge(e.detail));
+</script>
+```
+
+<Trap title="Two lifecycle orders that break naive custom elements">
+**Attributes arrive before connection.** When the browser upgrades an element that is already in the page — the normal case when the definition script loads after the HTML — it queues `attributeChangedCallback` for every existing attribute *before* `connectedCallback` ([WHATWG HTML, upgrade an element, steps 4–5](https://html.spec.whatwg.org/multipage/custom-elements.html#concept-upgrade-an-element)). A `render()` that assumes the shadow root was created in `connectedCallback` crashes on first paint.
+
+**Connection happens more than once.** Moving the element fires `disconnectedCallback` then `connectedCallback` again, and a second `attachShadow()` on an element that is already a shadow host throws `NotSupportedError` ([MDN, attachShadow()](https://developer.mozilla.org/en-US/docs/Web/API/Element/attachShadow#calling_this_method_on_an_element_that_is_already_a_shadow_host)). Attach the shadow root in the constructor; keep `connectedCallback` idempotent.
+</Trap>
+
+This is the approach [micro-frontends.org](https://micro-frontends.org/) advocates, and the reason is visible in the code: there is no version to negotiate, because nothing is shared.
+
+### Choosing between them
+
+<Table>
+<thead><tr><th></th><th>Module Federation</th><th>Import maps</th><th>single-spa</th><th>Web Components</th></tr></thead>
+<tbody>
+<tr><th>Who resolves</th><td>Bundler runtime</td><td>Browser</td><td>Orchestrator + loader</td><td>Browser (script tag)</td></tr>
+<tr><th>Dependency sharing</th><td className="ok">Automatic, versioned</td><td className="warn">Manual, one entry each</td><td className="warn">Whatever the loader does</td><td className="no">None — duplicated</td></tr>
+<tr><th>Bundle size</th><td className="ok">Best — real dedup</td><td>Good</td><td>Good</td><td className="no">Worst — N copies</td></tr>
+<tr><th>Coupling</th><td className="no">Highest — shared graph</td><td>Medium</td><td>Medium</td><td className="ok">Lowest</td></tr>
+<tr><th>Framework mixing</th><td className="warn">Painful</td><td className="ok">Fine</td><td className="ok">Fine</td><td className="ok">Fine</td></tr>
+<tr><th>CSS isolation</th><td className="no">None by default</td><td className="no">None</td><td className="no">None</td><td className="ok">Real (Shadow DOM)</td></tr>
+<tr><th>Type safety across teams</th><td className="ok">Yes (MF 2.0)</td><td className="no">No</td><td className="no">No</td><td className="no">No</td></tr>
+<tr><th>Bundler lock-in</th><td className="no">webpack / Rspack / Vite</td><td className="ok">None</td><td>Low</td><td className="ok">None</td></tr>
+</tbody>
+</Table>
+
+The pattern in that table is the same trade-off from <Mod to="micro-frontends" />, now visible as configuration: **Module Federation wins on bundle size and developer ergonomics precisely because it couples the dependency graph. Web Components win on isolation precisely because they ship React twice.**
+
+<Recap>
+- `singleton` exists because some libraries hold global internal state. `strictVersion` defaults to `true` more often than blogs claim.
+- React permits multiple copies on a page; it breaks only when `react` resolves differently for a component and the `react-dom` that rendered it.
+- Sharing `react-dom` without the subpath silently duplicates React in every React 18+ codebase.
+- Next.js federation is deprecated and Turbopack cannot run webpack plugins. Rspack or Vite for MF; Modern.js for federated SSR.
+- Parcel, esbuild and Turbopack have no Module Federation. Import maps are the standards-based alternative.
+</Recap>
+
+<Check>
+1. `react` and `react-dom` are shared as singletons, yet the app still reports “Invalid hook call”. What is the most likely cause?
+2. A blog post says `strictVersion` defaults to `false`. Why does it matter that this is wrong?
+3. A Next.js 16 App Router team wants Module Federation. What do you tell them?
+
+<Answers>
+1. **The `react-dom/client` subpath is not shared.** The key `'react-dom'` only intercepts `import 'react-dom'`; code importing `createRoot` from `react-dom/client` loads a second copy. Add the trailing-slash key `'react-dom/': { singleton: true }` on both host and remote.
+2. **It decides whether a version mismatch fails loudly or degrades silently.** The webpack documentation says it defaults to `true` when a local fallback exists and the module is not a singleton. Relying on the blog's default, you would expect a silent fallback and get a runtime error — or vice versa.
+3. **It is a dead end for new work.** The official integration page says the App Router is not supported and Next.js support is ending, and Turbopack — the Next.js 16 default — cannot load webpack plugins at all. Use Multi-Zones for independent deployment within Next.js, federate with Rspack or Vite outside it, or use Modern.js for federated SSR.
+</Answers>
+</Check>

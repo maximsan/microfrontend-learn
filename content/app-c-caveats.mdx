@@ -1,0 +1,60 @@
+---
+id: "caveats"
+part: "Back matter"
+title: "Caveats and misconceptions"
+nav: "Caveats & misconceptions"
+standfirst: "Two lists: claims here that rest on secondary sources — verify those yourself — and widely repeated claims that are wrong."
+appendix: true
+---
+
+### Claims not verified to primary-source standard
+
+Each of these is probably true and is repeated widely, but was not confirmed against a normative document. Treat them as leads rather than facts.
+
+- **Firefox's `pushState` state-object size limit** (commonly cited as 640k characters). MDN documents that a limit exists but does not print a number. The figure traces to [Bugzilla](https://bugzilla.mozilla.org/show_bug.cgi?id=1522706).
+- **`pushState` / `replaceState` rate-limit thresholds** (roughly 100 calls per 10 s in Chrome, 100 per 30 s in Safari). From bug trackers and community reports; [MDN has an open issue to document them](https://github.com/mdn/content/issues/35504).
+- **Navigation API's exact Firefox and Safari version numbers.** The Baseline 2026 status is from MDN directly; the specific version numbers came from a secondary summary. Check MDN's compatibility table.
+- **Cross-document View Transitions ship versions.** The “Limited availability” status and Firefox's absence are from MDN; exact Chrome and Safari versions are secondary.
+- **Speculation Rules support outside Chromium.** Not confirmed.
+- **CHIPS browser version numbers.** The mechanism and Chrome's commitment are sourced; specific versions are not.
+- **`rfc6265bis` status.** It was in the RFC Editor queue as of late 2025 and may have an RFC number by the time you read this.
+- **Cam Jackson's article — exact wording.** The URL and taxonomy are confirmed; individual sentences were not quoted verbatim from a full read. Read the original before quoting it.
+- **SSE vs WebSocket comparison.** No single first-party page canonically compares them. The decision rule in <Mod to="transports" /> is assembled from the primary docs for each, not quoted from one source.
+
+### What will expire, and roughly when
+
+<Mod to="library" />'s links are stable. The claims below are not — each is a snapshot of a moving target. Re-check before relying on any of them.
+
+| Claim | Re-check | Why it moves |
+| --- | --- | --- |
+| Module Federation support per bundler (<Mod to="federation" />) | <Expiry>6 months</Expiry> | Rolldown, Turbopack and Vite are all changing position; the Next.js deprecation may complete |
+| Nx generator surface — `consumer`/`provider` | <Expiry>Each major</Expiry> | v23 removed the previous API with no codemod; v24 removes the deprecated one |
+| Cross-document View Transitions in Firefox | <Expiry>6 months</Expiry> | In progress; will change the MPA-feels-like-SPA claim when it lands |
+| PPR and Cache Components API surface | <Expiry>6 months</Expiry> | New enough that directive names and defaults are still settling |
+| Navigation API browser versions | <Expiry>12 months</Expiry> | Baseline is recent; the polyfill advice changes as the floor rises |
+| Third-party cookies and Privacy Sandbox | <Expiry>12 months</Expiry> | Reversed once already in 2025; treat any position here as provisional |
+| Which composition tools are maintained (<Mod to="streaming" />) | <Expiry>12 months</Expiry> | Tailor was archived quietly; the others can be too |
+| The measurement thresholds in <Mod to="choosing" /> | <Expiry>Judgement</Expiry> | Calibrated, not researched — they were never a fact to expire |
+
+Everything else in the guide — runtime lifetime, coupling, cacheability floors, reversibility, the RFCs — ages in years, not months.
+
+### Common misconceptions
+
+Each of these is repeated confidently in articles, tutorials or earlier versions of this guide, and is wrong. They are recorded because the direction of each error is instructive.
+
+- **“Tailor is the reference implementation of fragment streaming.”** It was [archived in December 2022](https://github.com/zalando/tailor). The pattern is alive; that implementation is not. *Lesson: architecture patterns outlive their reference implementations, and citations rot silently.*
+- **“Use HttpOnly cookies on a shared parent domain.”** [RFC 10017](https://www.rfc-editor.org/info/rfc10017/) says <q>The BFF SHOULD NOT set the Domain attribute for cookies.</q> The cookie-over-token advice was right; the scoping advice was wrong, and the correct design makes parent-domain scoping unnecessary. *Lesson: a plausible mechanism is not a substitute for reading the current BCP.*
+- **“Escalate to Module Federation when you need seamless composition”** — stated without caveats. [Next.js federation is deprecated](https://module-federation.io/integrations/framework/nextjs/index.html) and [Turbopack cannot run webpack plugins](https://nextjs.org/docs/app/api-reference/turbopack). The advice holds for Rspack and Vite; on Next.js it is a dead end. *Lesson: general architectural advice needs a per-stack feasibility check.*
+- **“React requires a single copy across federated boundaries.”** Overstated. [React permits multiple independent copies](https://react.dev/warnings/invalid-hook-call-warning); it breaks only when `react` resolves differently for a component and the `react-dom` that rendered it. *Lesson: the precise condition is more useful than the safe generalisation, because it tells you which designs are actually available.*
+- **“MPAs can now feel like SPAs” via View Transitions** — true in Chromium and Safari, not in Firefox. *Lesson: “the platform can do this now” usually means “most of the platform can.”*
+- **“With zones, the shell owns history and the realtime connection.”** A zone crossing is a document replacement, so no shell runtime survives it; the shell is a shared package, history has one owner *per document*, and the connection is re-opened per zone (<Mod to="micro-frontends" />). *Lesson: check every recommendation against the definition it is built on — here, <Mod to="dividing-line" />'s runtime lifetime.*
+- **“Keep tokens in web storage.”** Still common in state-management advice. RFC 10017 is explicit that `localStorage` does not protect against script running in the same origin (<Mod to="auth" />). *Lesson: a convenience recommendation from one layer can silently contradict a security recommendation from another.*
+- **Sample code that looks right.** An import map with a `//` comment, and a custom element that calls `attachShadow()` in `connectedCallback`, both appear in many tutorials. The first is invalid JSON and disables the whole map; the second throws when the element moves (<Mod to="federation" />). *Lesson: run the sample.*
+
+<Insight title="Two layers age differently">
+Most of these share a shape: **the principle was sound, the specific recommendation had expired** — or was never checked against the rest of the design.
+
+Runtime lifetime, coupling, where state lives — these age in years. Tool names, version numbers, browser support — months. Check the second layer yourself against <Mod to="library" />.
+</Insight>
+
+<Colophon>Sources verified <VerifiedDate />. Where this guide and a linked primary source disagree, the source is correct.</Colophon>

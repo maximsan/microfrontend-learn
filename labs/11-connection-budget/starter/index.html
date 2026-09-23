@@ -1,0 +1,15 @@
+<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Lab 11 · Connection budget</title>
+<style>
+  body{font:15px/1.5 system-ui,sans-serif;max-width:48rem;margin:1.5rem auto;padding:0 1rem;color:#1b1f24}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(13rem,1fr));gap:.6rem}
+  .mf{border:1px solid #cfd5de;border-radius:6px;padding:.6rem .8rem;font:13px/1.4 ui-monospace,monospace}
+  .mf b{display:block;font-family:system-ui}
+  .stale{color:#a83f26}
+  button{font:inherit;padding:.4rem .8rem}
+</style>
+<h1>Seven micro-frontends, one page</h1>
+<p>Each box is owned by a different team and wants live updates. Server-side, streams open right now: <b id="streams">?</b></p>
+<p><button id="ping">Call the API</button> <span id="pong"></span></p>
+<div class="grid" id="grid"></div>
+<script type="module" src="/app.js"></script>
