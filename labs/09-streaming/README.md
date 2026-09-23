@@ -61,6 +61,20 @@ Open <http://localhost:5109/?boom>. The sidebar throws, but only in the browser,
 
 This lab keeps one React root and contains failures with per-fragment error boundaries. When fragments belong to *different teams with different deploys*, the chapter goes further: give each fragment its own `hydrateRoot` with a distinct `identifierPrefix`, so they do not even share a React tree.
 
+## Tests
+
+4 Node tests + 3 browser tests. On the starter the time-zone tests (Node and browser) and the crash test fail; the wire and observation tests pass on both.
+
+```sh
+# from the repository root, once:  npm install   (and Google Chrome, or: npx playwright install chromium)
+LAB_VARIANT=starter npx playwright test labs/09-streaming --project=chrome   # your copy: red until you finish
+npx playwright test labs/09-streaming --project=chrome                       # the reference: green
+```
+
+The Node tests run from this folder with `LAB_VARIANT=starter npm test` (yours) or `npm test` (reference).
+
+Tests named *observe* describe the platform and pass on both. Tests named *exercise* are the ones you turn green.
+
 ## Check your understanding
 
 - Why can a crawler read the full post even if `/client.js` never loads?
