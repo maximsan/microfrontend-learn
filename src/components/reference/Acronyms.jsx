@@ -1,7 +1,8 @@
+import { classed } from '../../lib/classed.jsx';
 import { DefinitionRow } from './DefinitionRow.jsx';
 
 /** Container for <Acro> rows. */
-export const Acronyms = ({ children }) => <dl className="acro">{children}</dl>;
+export const Acronyms = classed('dl', 'acro');
 
 /**
  * One acronym. The row id is "acro-<term in lower case>", which the client

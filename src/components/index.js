@@ -24,8 +24,8 @@ import { Tree, Branch, Leaf } from './diagrams/Tree.jsx';
 import { Acronyms, Acro } from './reference/Acronyms.jsx';
 import { Glossary, Term } from './reference/Glossary.jsx';
 import { RefGroup } from './reference/RefGroup.jsx';
-import { Pre } from './code/Pre.jsx';
-import { Table } from './code/Table.jsx';
+import { Pre } from './markdown/Pre.jsx';
+import { Table } from './markdown/Table.jsx';
 import { Mod, Mods } from './xref/Mod.jsx';
 
 export const mdxComponents = {

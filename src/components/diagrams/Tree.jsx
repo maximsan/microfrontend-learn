@@ -17,7 +17,7 @@ export const Branch = ({ chip, label, q, children }) => (
   <>
     <div className="row">
       <AnswerChip chip={chip} label={label} />
-      <span className="q" style={{ padding: 0 }}>{q}</span>
+      <span className="q">{q}</span>
     </div>
     <div className="kids">{children}</div>
   </>

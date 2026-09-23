@@ -1,4 +1,7 @@
-export const Timeline = ({ children }) => <ul className="tl">{children}</ul>;
+import { classed } from '../../lib/classed.jsx';
+
+/** A vertical history of <Era>s. */
+export const Timeline = classed('ul', 'tl');
 
 /** One era. dir = "server" | "client" (which way the pendulum swung). Body is Markdown. */
 export const Era = ({ yr, dir, title, children }) => (

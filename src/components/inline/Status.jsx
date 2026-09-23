@@ -2,12 +2,9 @@
  * Status colouring for a table cell. When <Ok>, <No> or <Warn> is the only
  * thing in a cell, the rehypeCellStatus plugin moves the class onto the <td>.
  */
+import { classed } from '../../lib/classed.jsx';
+import { STATUS_CLASS } from '../../lib/statusClass.js';
 
-/** Component name → CSS class. The rehypeCellStatus plugin reads the same map. */
-export const STATUS_CLASS = { Ok: 'ok', No: 'no', Warn: 'warn' };
-
-const status = (className) => ({ children }) => <span className={className}>{children}</span>;
-
-export const Ok = status(STATUS_CLASS.Ok);
-export const No = status(STATUS_CLASS.No);
-export const Warn = status(STATUS_CLASS.Warn);
+export const Ok = classed('span', STATUS_CLASS.Ok);
+export const No = classed('span', STATUS_CLASS.No);
+export const Warn = classed('span', STATUS_CLASS.Warn);

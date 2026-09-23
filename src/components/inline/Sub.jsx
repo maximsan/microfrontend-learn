@@ -1,4 +1,4 @@
+import { classed } from '../../lib/classed.jsx';
+
 /** Small muted second line under a table-cell heading. */
-export const Sub = ({ children }) => (
-  <span style={{ display: 'block', color: 'var(--muted)', fontSize: 12 }}>{children}</span>
-);
+export const Sub = classed('span', 'sub');

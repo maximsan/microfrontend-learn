@@ -1,4 +1,5 @@
 import { Children } from 'react';
+import { classed } from '../../lib/classed.jsx';
 
 /** A left-to-right chain of <Box> and <Arrow>. */
 export const Flow = ({ children }) => {
@@ -22,4 +23,4 @@ export const Arrow = ({ sym = '→', children }) => (
   </div>
 );
 
-export const FlowCaption = ({ children }) => <p className="flowcap">{children}</p>;
+export const FlowCaption = classed('p', 'flowcap');

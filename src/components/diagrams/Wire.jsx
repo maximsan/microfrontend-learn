@@ -1,6 +1,8 @@
+import { classed } from '../../lib/classed.jsx';
 import { Rev } from '../inline/Rev.jsx';
 
-export const Wire = ({ children }) => <div className="wire">{children}</div>;
+/** A vertical sequence of <Step>s. */
+export const Wire = classed('div', 'wire');
 
 /**
  * One step. `t` is the small label; `server` colours the dot as server-side;

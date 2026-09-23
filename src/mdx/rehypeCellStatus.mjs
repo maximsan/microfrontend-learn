@@ -1,6 +1,6 @@
 // When a table cell contains nothing but <Ok>, <No> or <Warn>, colour the cell
 // itself: <td><Ok>Yes</Ok></td>  →  <td class="ok">Yes</td>
-import { STATUS_CLASS as STATUS } from '../components/inline/Status.jsx';
+import { STATUS_CLASS as STATUS } from '../lib/statusClass.js';
 
 export default function rehypeCellStatus() {
   return (tree) => walk(tree);

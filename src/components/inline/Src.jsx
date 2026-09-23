@@ -1,2 +1,4 @@
+import { classed } from '../../lib/classed.jsx';
+
 /** Grey note under a reference-library entry. */
-export const Src = ({ children }) => <span className="src">{children}</span>;
+export const Src = classed('span', 'src');

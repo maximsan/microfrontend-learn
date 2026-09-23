@@ -1,9 +1,5 @@
-import { SIDE_COLOR } from '../../lib/sideColor.js';
-
-const sideText = (side) => ({ children }) => (
-  <span style={{ color: SIDE_COLOR[side], fontWeight: 600 }}>{children}</span>
-);
+import { classed } from '../../lib/classed.jsx';
 
 /** Text coloured as the server end or the client end of the spectrum. */
-export const ServerSide = sideText('server');
-export const ClientSide = sideText('client');
+export const ServerSide = classed('span', 'side-server');
+export const ClientSide = classed('span', 'side-client');
