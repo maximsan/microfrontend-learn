@@ -74,3 +74,12 @@ export async function readBody(req) {
 
 /** Pick the starter or the solution from the command line: `node server.mjs --solution`. */
 export const variant = () => (process.argv.includes('--solution') ? 'solution' : 'starter');
+
+/** True when this module is the script Node was started with (not imported by a test). */
+export const isMain = (metaUrl) => process.argv[1] && fileURLToPath(metaUrl) === process.argv[1];
+
+/** Close a server started by serve(), including long-lived connections such as SSE. */
+export const close = (server) => new Promise((r) => { server.closeAllConnections?.(); server.close(() => r()); });
+
+/** Resolve once the server is listening. */
+export const listening = (server) => new Promise((r) => (server.listening ? r(server) : server.once('listening', () => r(server))));
