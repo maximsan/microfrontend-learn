@@ -97,7 +97,7 @@ Check both directions before merging: `npm run test:browser` must be all green, 
 
 - Cut a short-lived branch from `main`, named `<type>/<topic>` with a type from the table below (`feat/router-lab`, `fix/ch09-sample`).
 - Keep it small. Merge it back into `main` as soon as it passes the merge gate below, with a merge commit (`git merge --no-ff`, never squash, so the individual commits survive), then delete it.
-- A release is a tag `vX.Y.Z` on `main`. It ships from a `chore/release-X.Y.Z` branch whose one commit, `chore(release): X.Y.Z`, bumps `package.json` and adds the `CHANGELOG.md` entry. After that branch is merged, the maintainer tags the merge commit; nobody tags without the maintainer's approval.
+- A release is a tag `vX.Y.Z` on `main`. It ships from a `chore/release-X.Y.Z` branch whose one commit, `chore(release): X.Y.Z`, bumps the version in `package.json` and `package-lock.json` and adds the `CHANGELOG.md` entry. After that branch is merged, the maintainer tags the merge commit; nobody tags without the maintainer's approval.
 
 **Commits: [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/).** One logical change per commit.
 
