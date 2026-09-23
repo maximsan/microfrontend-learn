@@ -33,12 +33,12 @@ content/               one .mdx file per chapter; file order = chapter order
   _hero.mdx            the introduction on the title screen
 src/
   components/          the MDX components, one CamelCase file per component family,
-                       grouped in inline/ callouts/ diagrams/ reference/ code/ xref/
+                       grouped in inline/ callouts/ diagrams/ reference/ markdown/ xref/
   layout/              the page shell: Page, TopBar, Sidebar, Hero, Chapter, ModuleBrief, Pager
   lib/                 code that is not a component: chapter registry, highlighter, helpers
   styles/book.css      all styles, light and dark
   client/book.js       the only JavaScript the reader runs (no React in the browser)
-  mdx/                 rehype plugins
+  mdx/                 the rehype plugin that colours status table cells
 scripts/               build, check, test-labs
 labs/  capstone/       hands-on material
 tools/devices.html     preview the build at several widths side by side

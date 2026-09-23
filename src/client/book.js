@@ -1,7 +1,6 @@
 (function(){
   "use strict";
 
-
   /* ---- first use of each acronym in each module links to its glossary row ---- */
   function linkAcronyms(){
     var rows = document.querySelectorAll('.acro .row2[id]');
