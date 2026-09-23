@@ -1,9 +1,7 @@
+import { DefinitionRow } from './DefinitionRow.jsx';
+
 /** Container for <Term> rows. */
 export const Glossary = ({ children }) => <dl className="gloss">{children}</dl>;
 
-export const Term = ({ name, children }) => (
-  <div className="gterm">
-    <dt>{name}</dt>
-    <dd>{children}</dd>
-  </div>
-);
+/** One glossary entry. */
+export const Term = ({ name, children }) => <DefinitionRow className="gterm" term={name}>{children}</DefinitionRow>;

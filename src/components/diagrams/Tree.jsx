@@ -16,7 +16,7 @@ export const Tree = ({ q, children }) => (
 export const Branch = ({ chip, label, q, children }) => (
   <>
     <div className="row">
-      <Chip kind={chip}>{label ?? cap(chip)}</Chip>
+      <AnswerChip chip={chip} label={label} />
       <span className="q" style={{ padding: 0 }}>{q}</span>
     </div>
     <div className="kids">{children}</div>
@@ -26,7 +26,7 @@ export const Branch = ({ chip, label, q, children }) => (
 /** An answer that ends in an outcome. side = "srv" | "cli" | "mid". */
 export const Leaf = ({ chip, label, side, why, children }) => (
   <div className="row">
-    <Chip kind={chip}>{label ?? cap(chip)}</Chip>
+    <AnswerChip chip={chip} label={label} />
     <span className={`out ${side}`}>
       {children}
       {why ? <span className="why">{why}</span> : null}
@@ -34,4 +34,5 @@ export const Leaf = ({ chip, label, side, why, children }) => (
   </div>
 );
 
-const cap = (s) => s.charAt(0).toUpperCase() + s.slice(1);
+/** The answer that leads into a branch or leaf: "Yes" / "No" unless a label is given. */
+const AnswerChip = ({ chip, label }) => <Chip kind={chip}>{label ?? chip.charAt(0).toUpperCase() + chip.slice(1)}</Chip>;

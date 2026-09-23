@@ -1,4 +1,4 @@
-const SIDE_COLOR = { server: 'var(--server)', mid: 'var(--ink-2)', client: 'var(--client)' };
+import { SIDE_COLOR } from '../../lib/sideColor.js';
 
 /** The server-owned → client-owned axis. Children are <Point>s. */
 export const Spectrum = ({ children }) => (

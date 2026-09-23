@@ -1,10 +1,7 @@
+import { LabelledBox } from './LabelledBox.jsx';
+
 /** Self-check questions: a numbered list, optionally followed by <Answers>. */
-export const Check = ({ children }) => (
-  <div className="check">
-    <span className="tag">Check yourself</span>
-    {children}
-  </div>
-);
+export const Check = ({ children }) => <LabelledBox className="check" label="Check yourself">{children}</LabelledBox>;
 
 /** Collapsible answers inside <Check>. */
 export const Answers = ({ children }) => (
