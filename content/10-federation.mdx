@@ -229,7 +229,8 @@ registerApplication({
   app: () => System.import('@acme/cart'),
   // pure function of location — this is the app's URL ownership
   activeWhen: (location) => location.pathname.startsWith('/cart'),
-  customProps: { getAccessToken: () => shell.getAccessToken() },
+  // the shell's small contract; never tokens (Auth architecture)
+  customProps: { getCsrfToken: () => shell.getCsrfToken() },
 });
 
 registerApplication({
