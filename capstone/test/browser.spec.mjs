@@ -49,8 +49,9 @@ test.describe('M1 · zones', () => {
   });
 
   test('inside the account zone, navigation is client-side and moves focus', async ({ page }) => {
-    await page.goto(`${BASE}/account/orders`);
-    await expect(page.locator('main h1')).toBeVisible(); // the first view has rendered
+    // Start and end on views that need no data (an unknown route, then Overview),
+    // so this passes with the zone and its router alone: no shell, no BFF.
+    await page.goto(`${BASE}/account/no-such-page`);
     await markDocument(page);
     await page.getByRole('navigation', { name: 'Account' }).getByRole('link', { name: 'Overview' }).click();
     await expect(page).toHaveURL(`${BASE}/account`);
@@ -99,6 +100,22 @@ test.describe('M6 · session', () => {
     await signIn(page);
     await page.getByRole('button', { name: 'Add to cart' }).first().click();
     await expect(page.locator('[data-acme-cart]').first()).toHaveText(/^[1-9]\d*$/);
+  });
+
+  test('a slow view does not paint over the page the reader has moved to', async ({ page }) => {
+    await signIn(page);
+    await page.route('**/bff/api/orders', async (route) => { await new Promise((r) => setTimeout(r, 1_000)); await route.continue(); });
+    const ordersRequested = page.waitForRequest('**/bff/api/orders');
+    const ordersAnswered = page.waitForResponse('**/bff/api/orders');
+    await page.goto(`${BASE}/account/orders`);
+    await ordersRequested; // the Orders view is now waiting for its data
+    await page.getByRole('navigation', { name: 'Account' }).getByRole('link', { name: 'Overview' }).click();
+    const heading = page.getByRole('heading', { level: 1, name: 'Account', exact: true });
+    await expect(heading).toBeFocused();
+    await ordersAnswered;
+    await page.waitForTimeout(300); // let the late Orders render finish, if it is going to paint
+    await expect(heading, 'the late Orders view replaced the page the reader navigated to').toBeVisible();
+    await expect(page.locator('main')).not.toContainText('#1042');
   });
 
   test('signing out in one tab signs out the others', async ({ context }) => {
