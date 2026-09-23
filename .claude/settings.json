@@ -1,0 +1,32 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run build *)",
+      "Bash(npm run check *)",
+      "Bash(npm run test:labs *)",
+      "Bash(npm run test:browser *)",
+      "Bash(npm run test:browser:starter *)",
+      "Bash(npx playwright test *)",
+      "Bash(git status *)",
+      "Bash(git diff *)",
+      "Bash(git log *)",
+      "Bash(git show *)",
+      "Bash(git worktree list *)"
+    ],
+    "ask": [
+      "Bash(git merge *)",
+      "Bash(git -C * merge *)",
+      "Bash(git tag *)",
+      "Bash(git -C * tag *)",
+      "Bash(git push *)",
+      "Bash(git -C * push *)",
+      "Bash(git branch -d *)",
+      "Bash(git branch -D *)",
+      "Bash(git branch --delete *)",
+      "Bash(git checkout *)",
+      "Bash(git switch *)",
+      "Bash(git reset --hard *)",
+      "Bash(git rebase *)"
+    ]
+  }
+}
