@@ -36,7 +36,6 @@ On 2026-09-23 a branch was merged and `v2.1.0` was tagged without asking, which 
 - **Machine:** Max's Mac, Apple Silicon (`darwin-arm64`), time zone Europe/Warsaw.
 - **Git:** no remote.
 - **npm:** it skips dependencies' install scripts that `allowScripts` doesn't list, with a warning ([docs](https://docs.npmjs.com/cli/v12/using-npm/config#strict-allow-scripts)). The warning for esbuild is harmless. Its binary comes from an optional dependency, not from its install script ([docs](https://esbuild.github.io/getting-started/#additional-npm-flags)).
-- **Safari:** it refuses `Secure` cookies from `http://localhost` ([WebKit bug 232088](https://bugs.webkit.org/show_bug.cgi?id=232088), still open). [Lab 13](labs/13-bff-session/README.md) and the [capstone](capstone/gateway/server.mjs) set `__Host-` cookies, which must be `Secure`, so use Chrome or Firefox for them. Re-check the bug before saying Safari works.
 
 ## Max's checkout and worktrees
 
