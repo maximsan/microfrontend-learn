@@ -96,7 +96,7 @@ Check both directions before merging: `npm run test:browser` must be all green, 
 **Branches: [trunk-based development](https://trunkbaseddevelopment.com/).** `main` is the only long-lived branch; there is no `develop`.
 
 - Cut a short-lived branch from `main`, named `<type>/<topic>` with a type from the table below (`feat/router-lab`, `fix/ch09-sample`).
-- Keep it small. Merge it back into `main` through a GitHub pull request as soon as it passes the merge gate below. Use "Create a merge commit", never squash, so the individual commits survive. The maintainer then deletes the branch.
+- Keep it small. Merge it back into `main` through a GitHub pull request as soon as it passes the merge gate below. GitHub allows only a merge commit, so the individual commits survive, and it deletes the branch after the merge.
 - A release is a tag `vX.Y.Z` on `main`. It ships from a `chore/release-X.Y.Z` branch whose one commit, `chore(release): X.Y.Z`, bumps the version in `package.json` and `package-lock.json` and adds the `CHANGELOG.md` entry. After that branch is merged, the maintainer tags the merge commit; nobody tags without the maintainer's approval.
 
 **Commits: [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/).** One logical change per commit.
