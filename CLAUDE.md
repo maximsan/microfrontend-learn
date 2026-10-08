@@ -34,7 +34,7 @@ On 2026-09-23 a branch was merged and `v2.1.0` was tagged without asking, which 
 ## Environment
 
 - **Machine:** Max's Mac, Apple Silicon (`darwin-arm64`), time zone Europe/Warsaw.
-- **Git:** no remote.
+- **Git:** `origin` is the public GitHub repository [maximsan/microfrontend-learn](https://github.com/maximsan/microfrontend-learn).
 - **npm:** it skips dependencies' install scripts that `allowScripts` doesn't list, with a warning ([docs](https://docs.npmjs.com/cli/v12/using-npm/config#strict-allow-scripts)). The warning for esbuild is harmless. Its binary comes from an optional dependency, not from its install script ([docs](https://esbuild.github.io/getting-started/#additional-npm-flags)).
 
 ## Max's checkout and worktrees
@@ -48,7 +48,7 @@ Max runs tests in his own checkout. A branch switch there once removed a spec fi
   git worktree add .claude/worktrees/<topic> -b <type>/<topic> main
   ```
 
-  Then work inside that directory. Don't use `claude --worktree <name>` here: it names the branch `worktree-<name>`, and with no remote it branches from whatever Max has checked out.
+  Then work inside that directory. Don't use `claude --worktree <name>` here: it names the branch `worktree-<name>`, and it branches from GitHub's `main`, not Max's local one ([docs](https://code.claude.com/docs/en/worktrees#choose-the-base-branch)).
 - **Run `npm install` in a new worktree first.** It starts without `node_modules`, and the lab scripts install the per-lab dependencies themselves.
 - **Keep unverified work on its branch.** Remove the worktree only after the branch is merged.
 
