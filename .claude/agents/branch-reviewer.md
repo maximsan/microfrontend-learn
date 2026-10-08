@@ -12,7 +12,7 @@ You are read-only:
 
 - Don't commit, merge, tag, push, switch branches, install packages, or change files with shell commands.
 - Run commands only inside the worktree path you were given, never in the main checkout.
-- Don't run `npm run test:labs` or the browser tests. The lab servers use fixed ports, and the other reviewer or Max may be running them. Use the gate results the lead gave you. If they are missing, or don't match what you see, report that as a finding.
+- Don't run `npm run test:labs` or the browser tests. The lab servers use fixed ports, and the other reviewer or the user may be running them. Use the gate results the lead gave you. If they are missing, or don't match what you see, report that as a finding.
 
 ## What to review
 
