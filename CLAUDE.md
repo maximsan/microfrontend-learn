@@ -34,8 +34,9 @@ On 2026-09-23 a branch was merged and `v2.1.0` was tagged without asking, which 
 ## Environment
 
 - **Machine:** Max's Mac, Apple Silicon (`darwin-arm64`), time zone Europe/Warsaw.
-- **Git:** no remote. Every branch and tag is local.
-- **npm:** version 12 blocks dependencies' install scripts that `allowScripts` doesn't list, with a warning ([docs](https://docs.npmjs.com/cli/v12/using-npm/config#strict-allow-scripts)). The warning about esbuild is harmless: its binary comes from the `@esbuild/<platform>` optional dependency.
+- **Git:** no remote.
+- **npm:** it skips dependencies' install scripts that `allowScripts` doesn't list, with a warning ([docs](https://docs.npmjs.com/cli/v12/using-npm/config#strict-allow-scripts)). The warning for esbuild is harmless. Its binary comes from an optional dependency, not from its install script ([docs](https://esbuild.github.io/getting-started/#additional-npm-flags)).
+- **Safari:** it refuses `Secure` cookies from `http://localhost` ([WebKit bug 232088](https://bugs.webkit.org/show_bug.cgi?id=232088), still open). [Lab 13](labs/13-bff-session/README.md) and the [capstone](capstone/gateway/server.mjs) set `__Host-` cookies, which must be `Secure`, so use Chrome or Firefox for them. Re-check the bug before saying Safari works.
 
 ## Max's checkout and worktrees
 
@@ -51,7 +52,6 @@ Max runs tests in his own checkout. A branch switch there once removed a spec fi
   Then work inside that directory. Don't use `claude --worktree <name>` here: it names the branch `worktree-<name>`, and with no remote it branches from whatever Max has checked out.
 - **Run `npm install` in a new worktree first.** It starts without `node_modules`, and the lab scripts install the per-lab dependencies themselves.
 - **Keep unverified work on its branch.** Remove the worktree only after the branch is merged.
-- **A `/sessions/...` path in `git worktree list` belongs to a Cowork sandbox.** Cowork is where Max ran Claude sessions before Claude Code, in a Linux sandbox, so the path doesn't exist on the Mac. Don't run `git worktree prune` until Max confirms every Cowork session on this repo is closed, because pruning earlier breaks them.
 
 ## Finishing a branch (lead session only)
 
@@ -76,7 +76,7 @@ Do this for every branch, however small.
 - **Say whether each red result is the intended one.** On a starter, every `exercise` test must fail on an assertion, not a crash, timeout or port clash.
 - **Report counts, not "all good".** For example: "N of N passed", or "X red, Y green".
 - **Lab servers use fixed ports** (51xx for labs, 52xx for the capstone). Two test runs at once collide, Node or browser, including a run Max has going. Run one suite at a time. Add `--workers=1` when running several browser projects in one command.
-- **Only the `chrome` browser project runs without an install.** It is defined in [`playwright.config.mjs`](playwright.config.mjs) and drives the installed Google Chrome, and the `test:browser` scripts use only that project. The `chromium` and `firefox` projects need `npx playwright install chromium firefox` first ([docs](https://playwright.dev/docs/browsers)). Safari may refuse the `__Host-` cookies that [lab 13](labs/13-bff-session/README.md) and the [capstone](capstone/gateway/server.mjs) set on `http://localhost`: WebKit restricts `Secure` cookies to HTTPS ([WebKit bug 281149](https://bugs.webkit.org/show_bug.cgi?id=281149)). A fix was committed on 2026-04-03 and the bug was reopened on 2026-04-20. Which Safari version ships the fix is unconfirmed.
+- **Browser tests run in the installed Google Chrome.** [`playwright.config.mjs`](playwright.config.mjs) says which other projects need an install first.
 - **Don't copy `node_modules` between machines.** Labs 09 and 10 carry native binaries (Rspack, esbuild). `npm run setup:labs` reinstalls them when `node_modules/.installed-for` names another platform.
 - **No CI for now.** Max doesn't want GitHub Actions yet.
 
