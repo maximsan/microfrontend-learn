@@ -42,7 +42,13 @@
       "Bash(git clean *)",
       "Bash(git stash drop *)",
       "Bash(git worktree remove *)",
-      "Bash(git worktree prune *)"
+      "Bash(git worktree prune *)",
+      "Bash(git pull)",
+      "Bash(git pull *)",
+      "Bash(git -C * pull *)",
+      "Bash(gh pr merge *)",
+      "Bash(gh pr close *)",
+      "Bash(gh repo delete *)"
     ]
   }
 }
