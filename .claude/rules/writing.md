@@ -10,7 +10,7 @@ paths:
 
 # Writing the book
 
-Max agreed these with Claude while writing the first edition. They add to the evidence rule and component table in CONTRIBUTING.md.
+The user agreed these with Claude while writing the first edition. They add to the evidence rule and component table in CONTRIBUTING.md.
 
 ## Voice
 
