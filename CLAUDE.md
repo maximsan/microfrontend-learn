@@ -21,8 +21,9 @@ This file adds only what `CONTRIBUTING.md` and `README.md` leave out: how you wo
 
 ## What needs the user's explicit yes
 
-Ask first, then wait for a clear "merge" or "yes", before you:
+Ask first, then wait for a clear yes, before you:
 
+- push a branch or open a pull request
 - merge anything into `main`
 - create a release tag (CONTRIBUTING: the maintainer tags)
 - delete a branch or remove a worktree someone may be using
@@ -36,7 +37,7 @@ If you get one wrong, say so straight away and offer the undo.
 
 The user runs tests in the main checkout. A branch switch there once removed a spec file mid-run ("Cannot find module …browser.spec.mjs"). So:
 
-- **Never switch branches in the main checkout without asking.** Before you update `main` there, run `git status -sb`. If it isn't on `main`, ask the user whether a test run is going before you `git checkout main`. They often leave it on the branch they were testing, and twice an update landed on the wrong branch.
+- **Never switch branches in the main checkout without asking.** Before you pull `main` there, run `git status -sb`. If it isn't on `main`, ask the user whether a test run is going before you `git checkout main`. They often leave it on the branch they were testing, and twice a merge landed on the wrong branch.
 - **Put branch work in a worktree under `.claude/worktrees/`**, which is Claude Code's default location ([docs](https://code.claude.com/docs/en/worktrees)). Keep the `<type>/<topic>` branch names from CONTRIBUTING:
 
   ```sh
@@ -63,7 +64,7 @@ Do this for every branch, however small.
    - what you fixed
    - what you rejected and why (this also goes into the PR description)
    - test results as counts
-5. **Push the branch and open a PR against `main`.** End the recap with its link. The user merges it on GitHub.
+5. **End the recap with one yes/no question: "open the PR?"** On a yes, push the branch and open a PR against `main`. The user merges it on GitHub.
 
 ## Tests
 

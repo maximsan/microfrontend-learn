@@ -10,7 +10,7 @@ paths:
 
 # Writing the book
 
-These add to the evidence rule and component table in CONTRIBUTING.md.
+The rules below add to the evidence rule and component table in CONTRIBUTING.md.
 
 ## Voice
 
