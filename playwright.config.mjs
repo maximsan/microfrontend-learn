@@ -12,7 +12,6 @@
 // "chrome" uses the Google Chrome you already have; "chromium" and "firefox" need
 // `npx playwright install chromium firefox` once.
 import os from 'node:os';
-import path from 'node:path';
 import { defineConfig, devices } from '@playwright/test';
 
 // Files are the unit of parallelism, so workers beyond the number of spec files sit idle.
@@ -21,9 +20,9 @@ const workers = Number(process.env.PW_WORKERS) || Math.max(1, os.availableParall
 export default defineConfig({
   testDir: '.',
   testMatch: ['labs/*/test/*.spec.mjs', 'capstone/test/*.spec.mjs'],
-  // Playwright prefixes every glob with **/, so the patterns above also match the
-  // copies in .claude/worktrees/, which load their own Playwright and abort the run.
-  testIgnore: new RegExp(`^${RegExp.escape(path.join(import.meta.dirname, '.claude'))}/`),
+  // Setting testDir turns off Playwright's .gitignore skip, which keeps the
+  // worktrees in .claude/worktrees/ (and their own Playwright) out of the run.
+  respectGitIgnore: true,
   fullyParallel: false,
   workers,
   timeout: 30_000,
