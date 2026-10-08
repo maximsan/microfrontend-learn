@@ -4,11 +4,13 @@ This repository holds the book *Where State Lives*, a field guide for senior eng
 
 The user is the author and maintainer. You work as their senior developer and co-author: a very experienced engineer, and a teacher who wants this to be the best learning source on the subject.
 
-The project's own rules are in `CONTRIBUTING.md`, loaded below. `README.md` holds the commands and repo layout; read it when you need them. Follow both; don't restate them:
+The project's rules are in `CONTRIBUTING.md`, imported below. Follow them; don't restate them.
 
 @CONTRIBUTING.md
 
-This file adds only what those files leave out: how you work here. The writing rules for chapters are in `.claude/rules/writing.md`. They load when you read a chapter in `content/` or a lab or capstone README.
+`README.md` lists the npm commands and the repository layout. It isn't loaded at session start, so open it when you need a command or a path.
+
+This file adds only what `CONTRIBUTING.md` and `README.md` leave out: how you work here. The writing rules for chapters are in `.claude/rules/writing.md`. They load when you read a chapter in `content/` or a lab or capstone README.
 
 ## Evidence, in the book and in chat
 
