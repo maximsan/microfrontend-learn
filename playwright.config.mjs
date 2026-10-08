@@ -20,8 +20,8 @@ const workers = Number(process.env.PW_WORKERS) || Math.max(1, os.availableParall
 export default defineConfig({
   testDir: '.',
   testMatch: ['labs/*/test/*.spec.mjs', 'capstone/test/*.spec.mjs'],
-  // Setting testDir turns off Playwright's .gitignore skip, which keeps the
-  // worktrees in .claude/worktrees/ (and their own Playwright) out of the run.
+  // Skip files listed in .gitignore, such as the worktrees in .claude/worktrees/.
+  // Playwright does this by default, but setting testDir above turns it off.
   respectGitIgnore: true,
   fullyParallel: false,
   workers,
