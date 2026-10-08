@@ -31,12 +31,6 @@ On 2026-09-23 a branch was merged and `v2.1.0` was tagged without asking, which 
 
 `.claude/settings.json` backs this up: Claude Code prompts before merges, tags, pushes, branch deletes, branch switches, destructive resets, worktree removal and artifact publishing. The prompt is a backstop. It doesn't replace asking.
 
-## Environment
-
-- **Machine:** Max's Mac, Apple Silicon (`darwin-arm64`), time zone Europe/Warsaw.
-- **Git:** `origin` is the public GitHub repository [maximsan/microfrontend-learn](https://github.com/maximsan/microfrontend-learn).
-- **npm:** it skips dependencies' install scripts that `allowScripts` doesn't list, with a warning ([docs](https://docs.npmjs.com/cli/v12/using-npm/config#strict-allow-scripts)). The warning for esbuild is harmless. Its binary comes from an optional dependency, not from its install script ([docs](https://esbuild.github.io/getting-started/#additional-npm-flags)).
-
 ## Max's checkout and worktrees
 
 Max runs tests in his own checkout. A branch switch there once removed a spec file mid-run ("Cannot find module …browser.spec.mjs"). So:
@@ -49,7 +43,7 @@ Max runs tests in his own checkout. A branch switch there once removed a spec fi
   ```
 
   Then work inside that directory. Don't use `claude --worktree <name>` here: it names the branch `worktree-<name>`, and it branches from GitHub's `main`, not Max's local one ([docs](https://code.claude.com/docs/en/worktrees#choose-the-base-branch)).
-- **Run `npm install` in a new worktree first.** It starts without `node_modules`, and the lab scripts install the per-lab dependencies themselves.
+- **Run `npm install` in a new worktree first.** It starts without `node_modules`, and the lab scripts install the per-lab dependencies themselves. npm then warns that it skipped install scripts that `allowScripts` doesn't list ([docs](https://docs.npmjs.com/cli/v12/using-npm/config#strict-allow-scripts)). The warning for esbuild is harmless: its binary comes from an optional dependency, not from its install script ([docs](https://esbuild.github.io/getting-started/#additional-npm-flags)).
 - **Keep unverified work on its branch.** Remove the worktree only after the branch is merged.
 
 ## Finishing a branch (lead session only)
