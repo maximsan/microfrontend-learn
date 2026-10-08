@@ -28,9 +28,9 @@ Ask first, then wait for a clear "merge" or "yes", before you:
 - delete a branch or remove a worktree someone may be using
 - republish the hosted copy (see below)
 
-On 2026-09-23 a branch was merged and `v2.1.0` was tagged without asking, which is why these rules exist. The user was offered the undo and didn't take it, so both stay unless they say otherwise. If you get one wrong, say so straight away and offer the undo.
+If you get one wrong, say so straight away and offer the undo.
 
-`.claude/settings.json` backs this up: Claude Code prompts before merges, tags, pushes, branch deletes, branch switches, destructive resets, worktree removal and artifact publishing. The prompt is a backstop. It doesn't replace asking.
+`.claude/settings.json` makes Claude Code prompt before most of these. The prompt is a backstop. It doesn't replace asking.
 
 ## The main checkout and worktrees
 
