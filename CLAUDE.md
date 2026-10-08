@@ -36,7 +36,7 @@ On 2026-09-23 a branch was merged and `v2.1.0` was tagged without asking, which 
 
 The user runs tests in the main checkout. A branch switch there once removed a spec file mid-run ("Cannot find module …browser.spec.mjs"). So:
 
-- **Never switch branches in the main checkout without asking.** Before any merge, run `git status -sb` there. If it isn't on `main`, ask the user whether a test run is going before you `git checkout main`. They often leave it on the branch they were testing, and twice a merge landed on the wrong branch.
+- **Never switch branches in the main checkout without asking.** Before you update `main` there, run `git status -sb`. If it isn't on `main`, ask the user whether a test run is going before you `git checkout main`. They often leave it on the branch they were testing, and twice an update landed on the wrong branch.
 - **Put branch work in a worktree under `.claude/worktrees/`**, which is Claude Code's default location ([docs](https://code.claude.com/docs/en/worktrees)). Keep the `<type>/<topic>` branch names from CONTRIBUTING:
 
   ```sh
@@ -61,9 +61,9 @@ Do this for every branch, however small.
    - what the branch does
    - what the reviewers found
    - what you fixed
-   - what you rejected and why (this also goes into the merge commit body)
+   - what you rejected and why (this also goes into the PR description)
    - test results as counts
-5. **End the recap with one yes/no question: "merge?"**
+5. **Push the branch and open a PR against `main`.** End the recap with its link. The user merges it on GitHub.
 
 ## Tests
 

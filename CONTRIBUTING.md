@@ -96,7 +96,7 @@ Check both directions before merging: `npm run test:browser` must be all green, 
 **Branches: [trunk-based development](https://trunkbaseddevelopment.com/).** `main` is the only long-lived branch; there is no `develop`.
 
 - Cut a short-lived branch from `main`, named `<type>/<topic>` with a type from the table below (`feat/router-lab`, `fix/ch09-sample`).
-- Keep it small. Merge it back into `main` as soon as it passes the merge gate below, with a merge commit (`git merge --no-ff`, never squash, so the individual commits survive), then delete it.
+- Keep it small. Merge it back into `main` through a GitHub pull request as soon as it passes the merge gate below. Use "Create a merge commit", never squash, so the individual commits survive. Then delete the branch.
 - A release is a tag `vX.Y.Z` on `main`. It ships from a `chore/release-X.Y.Z` branch whose one commit, `chore(release): X.Y.Z`, bumps the version in `package.json` and `package-lock.json` and adds the `CHANGELOG.md` entry. After that branch is merged, the maintainer tags the merge commit; nobody tags without the maintainer's approval.
 
 **Commits: [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/).** One logical change per commit.
@@ -122,5 +122,5 @@ Scopes in use: `ch04`â€¦`ch17` for chapters, `appendix-c`, `glossary`, `part-1`â
 **Before merging into `main`:**
 
 1. Run `npm run check` and, if you touched labs or the capstone, `npm run test:labs`, `npm run test:browser` (all green) and `npm run test:browser:starter` (every `exercise` test red; see Labs).
-2. Get two independent reviews of `git diff main...<branch>`, by people or agents who do not see each other's findings. The branch author reconciles them, fixes what is real in new commits on the same branch, and records what was rejected and why in the merge commit body.
+2. Get two independent reviews of `git diff main...<branch>`, by people or agents who do not see each other's findings. The branch author reconciles them, fixes what is real in new commits on the same branch, and records what was rejected and why in the pull request description.
 3. Merge only with the maintainer's explicit approval.
