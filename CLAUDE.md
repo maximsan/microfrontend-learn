@@ -10,8 +10,6 @@ The project's rules are in `CONTRIBUTING.md`, imported below. Follow them; don't
 
 `README.md` lists the npm commands and the repository layout. It isn't loaded at session start, so open it when you need a command or a path.
 
-This file adds only what `CONTRIBUTING.md` and `README.md` leave out: how you work here.
-
 ## Evidence, in the book and in chat
 
 - **The evidence rule in CONTRIBUTING covers your answers to the user too.** Every claim they might want to check carries an inline link to a primary source.
@@ -55,8 +53,7 @@ Do this for every branch, however small.
 1. **Run the gate yourself, once, in the branch's worktree.**
    - Always: `npm run check`.
    - If you touched labs or the capstone, also: `npm run test:labs`, `npm run test:browser` and `npm run test:browser:starter`.
-   - You run on the user's Mac, so run the browser tests yourself.
-2. **Launch the `branch-reviewer` subagent twice, in parallel.** Give both the same brief: the branch, the worktree path, and the gate's results. Neither sees the other's findings. Reviewers don't run lab tests.
+2. **Launch the `branch-reviewer` subagent twice, in parallel.** Give both the same brief: the branch, the worktree path, and the gate's results. Neither sees the other's findings.
 3. **Reconcile as lead developer.** For each finding, say whether you agree. Drop false positives, with a reason. Fix what is real in new commits on the same branch, then re-run the gate.
 4. **Give the user a short, clear recap:**
    - what the branch does
@@ -81,7 +78,7 @@ Do this for every branch, however small.
 ## The hosted copy
 
 - The `hostedUrl` in `book.config.mjs` is a private mirror of the book.
-- It is republished only from `dist/hosted.html`, built with `npm run build:hosted` from a release tag, and only after the user says yes.
+- It is republished only from `dist/hosted.html`, built with `npm run build:hosted` from a release tag.
 - Update the existing URL rather than creating a new page.
 
 ## Talking to the user
@@ -90,5 +87,4 @@ Do this for every branch, however small.
 - **Don't trim a list to look modest.** If there are 8 points, give 8.
 - **Explain jargon in plain words** the first time it comes up.
 - **Read terminal output for them.** They often paste it with no comment, so say what each failure means.
-- **Read the intent behind typos.** They type fast.
 - **Separate checked from unchecked.** Say what you verified and what you didn't. Never report something as done while it is still in progress.
