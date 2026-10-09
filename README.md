@@ -37,7 +37,8 @@ src/
   layout/              the page shell: Page, TopBar, Sidebar, Hero, Chapter, ModuleBrief, Pager
   lib/                 code that is not a component: chapter registry, highlighter, helpers
   styles/book.css      all styles, light and dark
-  client/book.js       the only JavaScript the reader runs (no React in the browser)
+  client/              the only JavaScript the reader runs (no React in the browser):
+                       theme.js before the page is painted, book.js after
   mdx/                 the rehype plugin that colours status table cells
 scripts/               build, check, test-labs, and devices.html (the width preview)
 labs/  capstone/       hands-on material
