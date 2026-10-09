@@ -71,6 +71,20 @@ Choose which pain you accept — deliberately, not in month eight.
 
 It is worth noting that the other canonical reference takes the opposite side of this trade. [Michael Geers' micro-frontends.org](https://micro-frontends.org/) lists among its core principles: <q>Isolate Team Code — Don't share a runtime, even if all teams use the same framework.</q> and <q>Build a Resilient Site — Your feature should be useful, even if JavaScript failed or hasn't executed yet.</q> Both positions are defensible. Know that you are picking a side.
 
+#### The same shop, built at each composition point
+
+Comparing composition points in the abstract only goes so far. The **Tractor Store 2.0**, maintained by neuland, the firm Geers works at, fixes one product and lets the technique vary: a tractor shop with three teams, the same pages, the same fragments and the same interactions, built again and again. Its own description: <q>The Tractor Store aims to be to micro frontends what TodoMVC was to the advent of JavaScript frameworks in the late 2000s</q> ([micro-frontends.org/tractor-store](https://micro-frontends.org/tractor-store/)). Every implementation links its source code, and most link a live demo.
+
+| Implementation | Rendering, as listed | Integration, as listed | Composition point in the table above |
+| --- | --- | --- | --- |
+| [Blueprint](https://github.com/neuland/tractor-store-blueprint) | No frameworks, server-only | Template includes | None: one deployable |
+| [Preact](https://github.com/neuland/tractor-store-preact) | MPA (three SPAs), universal | ESI, Web Components | Edge or server, then browser |
+| [HTMX, Spring Boot](https://github.com/heerens/tractor-store-htmx-tailwind) | No frameworks, partial updates | nginx SSI | Server side |
+| [Piral & React](https://github.com/piral-samples/tractor-v2) | App shell (three SPAs), client-only | Piral | Runtime orchestrator |
+| [Webpack, Vite & Rspack](https://github.com/FlorianRappl/module-federation-tractor-v2) | App shell (three SPAs), client-only | Module Federation | Runtime Module Federation |
+
+The Blueprint row is the one to read first. It is one of the two repositories new versions are meant to start from ([how to contribute](https://micro-frontends.org/tractor-store/#contribute)), and its README says plainly that it <q>is a **modular monolith** and not a micro frontend architecture. It has to be deployed as a single unit.</q> ([tractor-store-blueprint](https://github.com/neuland/tractor-store-blueprint#about-the-blueprint-implementation)). That is the 1–3 team answer from the top of this module, labelled correctly, with code that is already split per team so it can be pulled apart later.
+
 ### Who actually does this
 
 Worth knowing because the published adoptions cluster in one place: large catalogue-and-checkout retail, where independent teams own genuinely separate parts of a single funnel.
