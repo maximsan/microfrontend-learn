@@ -30,6 +30,7 @@
   color-scheme:light;
   --measure:68ch;
   --sidebar:282px;
+  --bar-h:57px;   /* the phone top bar; anchors scroll clear of it */
 }
 /* Dark is for screens only: paper always gets the light palette. */
 @media screen and (prefers-color-scheme:dark){
@@ -129,6 +130,8 @@ a:hover{text-decoration-thickness:2px}
 .brand h1{font-family:var(--f-display);font-size:21px;line-height:1.2;margin:0 0 6px;font-weight:600;letter-spacing:-.01em}
 .brand p{margin:0;font-size:12px;line-height:1.5;color:var(--muted)}
 .themebtn{display:block;margin-top:14px;min-height:32px}
+/* theme.js marks <html> with .js; without a script the theme buttons would do nothing */
+html:not(.js) [data-theme-toggle]{display:none}
 #toc{padding:0 12px}
 #toc ol{list-style:none;margin:0;padding:0}
 #toc a{display:flex;gap:10px;align-items:baseline;padding:6px 10px;border-radius:3px;font-size:13px;line-height:1.4;color:var(--ink-2);text-decoration:none}
@@ -459,7 +462,7 @@ a.xref:hover{color:var(--client);border-bottom-color:var(--client)}
 }
 /* ============ TOUCH & NARROW ============ */
 @media(max-width:900px){
-  #bar{gap:8px;padding:8px max(12px, env(safe-area-inset-left)) 8px max(12px, env(safe-area-inset-right))}
+  #bar{height:var(--bar-h);gap:8px;padding:8px max(12px, env(safe-area-inset-left)) 8px max(12px, env(safe-area-inset-right))}
   .iconbtn{min-height:40px;padding:8px 12px;font-size:12.5px}
   #toc a{padding:10px 10px;font-size:14px}
   #toc .grp{padding-top:18px}
@@ -481,7 +484,7 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
 html.drawer-open{overflow:hidden}
 main p,main li,main dd,main td,main th{overflow-wrap:break-word}
 /* only narrow screens have the sticky top bar to clear */
-@media(max-width:900px){section[id]{scroll-margin-top:calc(57px + env(safe-area-inset-top,0px))}}
+@media(max-width:900px){main,section[id]{scroll-margin-top:calc(var(--bar-h) + env(safe-area-inset-top,0px))}}
 
 /* ============ PRINT ============ */
 @media print{

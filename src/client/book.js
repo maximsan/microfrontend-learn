@@ -96,18 +96,22 @@
   }
   themeBtns.forEach(function(b){b.addEventListener("click",toggle);});
   labelThemeButtons();
+  if(window.matchMedia){window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change",labelThemeButtons);}
 
   /* ---- a link to a chapter lands on it even though web fonts arrive after the first jump ---- */
   // Swapping in the fonts makes the text above the target taller, so the first jump falls short.
   // Wait for "load" first: by then the font files have been requested, so fonts.ready waits for them.
-  if(location.hash&&document.fonts){
+  // A reload or Back/Forward restores the reader's own position, which must win.
+  var nav=performance.getEntriesByType&&performance.getEntriesByType("navigation")[0];
+  if(location.hash&&document.fonts&&!(nav&&(nav.type==="reload"||nav.type==="back_forward"))){
     var readerMoved=false;
     ["wheel","touchstart","keydown","mousedown"].forEach(function(t){
       window.addEventListener(t,function(){readerMoved=true;},{once:true,passive:true});
     });
     window.addEventListener("load",function(){
       document.fonts.ready.then(function(){
-        var target=document.getElementById(decodeURIComponent(location.hash.slice(1)));
+        var target;
+        try{target=document.getElementById(decodeURIComponent(location.hash.slice(1)));}catch(e){return;}   // malformed %-escape
         if(target&&!readerMoved){target.scrollIntoView();}
       });
     });
