@@ -89,7 +89,7 @@ Every exercise needs a test that **fails on the starter and passes on the soluti
 - Otherwise add a Playwright test (`test/*.spec.mjs`), which drives a real browser. Name its groups `observe` (platform behaviour, green on both variants) and `exercise` (red until solved).
 - Tests call `readVariant()` from `labs/_shared/variant.mjs`, which reads `VARIANT` (`starter` | `solution`, default `solution`), and start the lab's servers themselves through the exported `start({ variant })`.
 
-Check both directions before merging: `npm run test:browser` must be all green, and `npm run test:browser:starter` must fail every `exercise` test. Prefer Node built-ins; add a dependency only when the lab is *about* it.
+Prefer Node built-ins; add a dependency only when the lab is *about* it.
 
 ## Git conventions
 

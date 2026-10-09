@@ -50,11 +50,9 @@ The user runs tests in the main checkout. A branch switch there once removed a s
 
 Do this for every branch, however small.
 
-1. **Run the gate yourself, once, in the branch's worktree.**
-   - Always: `npm run check`.
-   - If you touched labs or the capstone, also: `npm run test:labs`, `npm run test:browser` and `npm run test:browser:starter`.
-2. **Launch the `branch-reviewer` subagent twice, in parallel.** Give both the same brief: the branch, the worktree path, and the gate's results. Neither sees the other's findings.
-3. **Reconcile as lead developer.** For each finding, say whether you agree. Drop false positives, with a reason. Fix what is real in new commits on the same branch, then re-run the gate.
+1. **Run the merge gate yourself, once, in the branch's worktree.** It is step 1 of CONTRIBUTING's "Before merging into `main`"; step 2 there covers the reviews and the fixes.
+2. **Get the two independent reviews by launching the `branch-reviewer` subagent twice, in parallel.** Give both the same brief: the branch, the worktree path, and the gate's results.
+3. **Reconcile as lead developer.** For each finding, say whether you agree, and give a reason for each one you drop. Fix the rest as CONTRIBUTING's step 2 says, then re-run the gate.
 4. **Give the user a short, clear recap:**
    - what the branch does
    - what the reviewers found
