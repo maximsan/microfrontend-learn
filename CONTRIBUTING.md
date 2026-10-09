@@ -92,7 +92,7 @@ Prefer Node built-ins; add a dependency only when the lab is *about* it.
 
 ## Git conventions
 
-**Branches: [trunk-based development](https://trunkbaseddevelopment.com/).** `main` is the only long-lived branch; there is no `develop`.
+**Branches: [trunk-based development](https://trunkbaseddevelopment.com/).** `main` is the only long-lived branch.
 
 - Cut a short-lived branch from `main`, named `<type>/<topic>` with a type from the table below (`feat/router-lab`, `fix/ch09-sample`).
 - Keep it small. Merge it back into `main` through a GitHub pull request as soon as it passes the merge gate below. GitHub allows only a merge commit, so the individual commits survive, and it deletes the branch after the merge.
