@@ -10,13 +10,11 @@ paths:
 
 # Writing the book
 
-The rules below add to the evidence rule and component table in CONTRIBUTING.md.
-
 ## Voice
 
-- **Learning material, not prose.** "I don't need water in it."
-  - Cut filler, but don't make it dull: keep the callout boxes (`<Insight>`, `<Trap>`, `<Source>`, `<Moved>`) and write them tight.
-- **No slogans.** A line like "a reference you cannot audit is not a reference" tells the reader nothing. Say the concrete thing instead.
+- **Tight.** This is learning material, and the user's words are "I don't need water in it."
+  - Cut filler, and keep the callout boxes (`<Insight>`, `<Trap>`, `<Source>`, `<Moved>`) as tight as the text around them.
+- **Concrete lines.** Each sentence tells the reader something specific they can act on or check.
 - **Write numbers as numerals:** "35 years", not "thirty-five years".
 - **Standfirsts are one short sentence.**
 - **Real-world examples, sourced.** Name real adopters and "in the wild" cases, with links. If an example is widely repeated but poorly sourced, drop it or mark it as reported, not confirmed.
