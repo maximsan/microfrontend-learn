@@ -468,11 +468,12 @@ a.xref:hover{color:var(--client);border-bottom-color:var(--client)}
   .module{padding-block:40px}
 }
 
-@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important;scroll-behavior:auto!important}}
-html{scroll-behavior:smooth;-webkit-text-size-adjust:100%;text-size-adjust:100%}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
 html.drawer-open{overflow:hidden}
 main p,main li,main dd,main td,main th{overflow-wrap:break-word}
-section[id]{scroll-margin-top:70px}
+/* only narrow screens have the sticky top bar to clear */
+@media(max-width:900px){section[id]{scroll-margin-top:calc(57px + env(safe-area-inset-top,0px))}}
 
 /* ============ PRINT ============ */
 @media print{

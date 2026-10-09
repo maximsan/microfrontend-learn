@@ -93,6 +93,22 @@
   var t2=document.getElementById("theme2");
   if(t2){t2.addEventListener("click",toggle);}
 
+  /* ---- a link to a chapter lands on it even though web fonts arrive after the first jump ---- */
+  // Swapping in the fonts makes the text above the target taller, so the first jump falls short.
+  // Wait for "load" first: by then the font files have been requested, so fonts.ready waits for them.
+  if(location.hash&&document.fonts){
+    var readerMoved=false;
+    ["wheel","touchstart","keydown","mousedown"].forEach(function(t){
+      window.addEventListener(t,function(){readerMoved=true;},{once:true,passive:true});
+    });
+    window.addEventListener("load",function(){
+      document.fonts.ready.then(function(){
+        var target=document.getElementById(decodeURIComponent(location.hash.slice(1)));
+        if(target&&!readerMoved){target.scrollIntoView();}
+      });
+    });
+  }
+
   var bar=document.querySelector("#prog i");
   function progress(){
     if(!bar)return;
