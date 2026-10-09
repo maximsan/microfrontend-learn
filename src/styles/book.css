@@ -31,7 +31,8 @@
   --measure:68ch;
   --sidebar:282px;
 }
-@media (prefers-color-scheme:dark){
+/* Dark is for screens only: paper always gets the light palette. */
+@media screen and (prefers-color-scheme:dark){
   :root:not([data-theme="light"]){
     --paper:#0E1116;
     --surface:#151A21;
@@ -56,28 +57,30 @@
     color-scheme:dark;
   }
 }
-:root[data-theme="dark"]{
-  --paper:#0E1116;
-  --surface:#151A21;
-  --surface-2:#1E242D;
-  --ink:#E3E7ED;
-  --ink-2:#BFC7D2;
-  --muted:#9EA8B6;
-  --faint:#8590A0;
-  --rule:#262D37;
-  --rule-strong:#3A434F;
-  --client:#7C9DF2;
-  --client-soft:#1B2740;
-  --server:#DCA452;
-  --server-soft:#33270F;
-  --trap:#E0876A;
-  --trap-soft:#3A1E15;
-  --verified:#4FB5A6;
-  --verified-soft:#0F2B28;
-  --insight:#A88FE8;
-  --insight-soft:#231C3A;
-  --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 30px -14px rgba(0,0,0,.7);
-  color-scheme:dark;
+@media screen{
+  :root[data-theme="dark"]{
+    --paper:#0E1116;
+    --surface:#151A21;
+    --surface-2:#1E242D;
+    --ink:#E3E7ED;
+    --ink-2:#BFC7D2;
+    --muted:#9EA8B6;
+    --faint:#8590A0;
+    --rule:#262D37;
+    --rule-strong:#3A434F;
+    --client:#7C9DF2;
+    --client-soft:#1B2740;
+    --server:#DCA452;
+    --server-soft:#33270F;
+    --trap:#E0876A;
+    --trap-soft:#3A1E15;
+    --verified:#4FB5A6;
+    --verified-soft:#0F2B28;
+    --insight:#A88FE8;
+    --insight-soft:#231C3A;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 30px -14px rgba(0,0,0,.7);
+    color-scheme:dark;
+  }
 }
 
 /* ============ BASE ============ */
