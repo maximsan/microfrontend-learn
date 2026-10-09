@@ -48,9 +48,11 @@ Two operational rules worth adopting early. **Prefix everything** — class name
 **The best shared state is no shared state.** (Not original here — a common formulation in the field.)
 
 If two micro-frontends share a lot of *mutable* state, they are not two micro-frontends. You drew the boundary along screen regions instead of business domains. Redraw it before picking a mechanism.
+
+A worked example: the Tractor Store reference shop (<Mod to="micro-frontends" />) gives each team a step of the purchase, not a part of the page. <q>Three systems: Explore, Decide, Checkout are established along the customer journey (buying process)</q> ([tractor-store-blueprint](https://github.com/neuland/tractor-store-blueprint#about-this-project)). Explore still renders the header on Decide's product page, and Checkout's mini cart sits inside that header. Screen regions are shared freely; each team keeps its own data model.
 </Insight>
 
-One worked example of a domain boundary: the Tractor Store reference shop (<Mod to="micro-frontends" />) gives each team a step of the purchase, not a part of the page. <q>Three systems: Explore, Decide, Checkout are established along the customer journey (buying process)</q> ([tractor-store-blueprint](https://github.com/neuland/tractor-store-blueprint#about-this-project)). Explore still renders the header on Decide's product page, and Checkout's mini cart sits inside that header. Screen regions are shared freely; each domain's data stays with one team.
+The ladder, from the least coupled rung:
 
 1. **The URL.** Wildly underrated and almost always sufficient. Selected entity, filters, active tab, pagination, sort order. Zero coupling, no library, survives reload, deep-linkable, and the browser maintains it for you. Exhaust this before anything else.
 2. **Server state, not client state.** Most “shared state” is cached server data in disguise. Two micro-frontends that both need the cart count should both ask the API, backed by a shared HTTP cache (ETag, `Cache-Control`) or one shared query-client instance. *Reframing shared state as shared cache is the single biggest lever available to you.*
@@ -61,7 +63,7 @@ One worked example of a domain boundary: the Tractor Store reference shop (<Mod 
    - **Child to parent: a DOM event.** The store picker, owned by Explore, reports the chosen store to the checkout form around it.
    - **Sibling to sibling: an event on a shared ancestor.** The add-to-cart button tells the mini cart in the header to refresh.
 
-   Where both would work, prefer the attribute. [micro-frontends.org](https://micro-frontends.org/): <q>If possible the use of the declarative approach (attribute change) should be preferred.</q> An attribute is state the late-mounting element can read; an event is not (see the trap below).
+   To change a child, set an attribute rather than call a method on it. [micro-frontends.org](https://micro-frontends.org/): <q>If possible the use of the declarative approach (attribute change) should be preferred.</q> An attribute also stays readable by an element that mounts later; an event does not (see the trap below).
 6. **Web storage** for non-sensitive preferences only — never tokens, which belong server-side behind the BFF (<Mod to="auth" />). A poor reactive store: no same-tab event, strings only, quota limits.
 
 <Trap title="Events are not state">
