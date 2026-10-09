@@ -12,7 +12,7 @@ export const Sidebar = ({ chapters }) => (
       <span className="mark">{book.mark}</span>
       <h1>{book.title}</h1>
       <p>{book.tagline}</p>
-      <button className="iconbtn themebtn" data-theme-toggle>Switch colour theme</button>
+      <button className="iconbtn themebtn" data-theme-toggle="text">Switch colour theme</button>
     </div>
     <nav id="toc" aria-label="Contents">
       {groupConsecutive(chapters, (c) => c.meta.part).map(([part, items]) => (

@@ -83,9 +83,10 @@
   }
   function labelThemeButtons(){
     var text="Switch to "+(currentTheme()==="dark"?"light":"dark")+" theme";
+    // data-theme-toggle="text" says the action on the button; the short "Theme" button says it in its label
     themeBtns.forEach(function(b){
-      b.setAttribute("aria-label",text);
-      if(b.classList.contains("themebtn")) b.textContent=text;
+      if(b.getAttribute("data-theme-toggle")==="text"){b.textContent=text;}
+      else{b.setAttribute("aria-label",text);}
     });
   }
   function toggle(){
