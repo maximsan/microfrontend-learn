@@ -46,23 +46,23 @@ Labs 09, 10 and 13 also have Node tests that run without a browser: `VARIANT=sta
 
 ## More practice: the *Micro Frontends in Action* samples
 
-Michael Geers' book *Micro Frontends in Action* comes with runnable samples for techniques these labs leave out: iframes, SSI, Podium, Shadow DOM and fragment-to-fragment communication. Each sample is the same tractor shop page, owned by two or three teams. Try them in the browser at [the-tractor.store](https://the-tractor.store/), or run them from [the sample repository](https://github.com/naltatis/micro-frontends-in-action-code). It needs Node 18 or newer, and `nginx` installed for the samples that put a web server in front of the teams.
+Michael Geers' book [*Micro Frontends in Action*](https://www.manning.com/books/micro-frontends-in-action) comes with runnable samples for techniques these labs leave out: iframes, SSI, Podium, Shadow DOM and fragment-to-fragment communication. Each sample is the same tractor shop page, owned by two or three teams. Try them in the browser at [the-tractor.store](https://the-tractor.store/), or run them from [the sample repository](https://github.com/naltatis/micro-frontends-in-action-code). It needs Node 18 or newer, and `nginx` installed for the samples that put a web server in front of the teams.
 
 ```sh
 git clone https://github.com/naltatis/micro-frontends-in-action-code
 cd micro-frontends-in-action-code && npm install
-npm run 06_timeouts_long_delay      # one sample: npm run <folder name>
+npm run 06_timeouts_long_delay      # one sample; every script is in the repository's package.json
 ```
 
 The samples listen on ports 3000–3003, so they do not clash with these labs.
 
-| Sample folders | What they show | Read with |
+| npm scripts | What they show | Read with |
 | --- | --- | --- |
 | `02_iframe`, `03_ajax` | Composition in the browser without a framework | Micro-frontends |
-| `05_ssi`, `06_timeouts`, `07_podium` | Server-side composition with nginx SSI and Podium; a slow or missing fragment | Micro-frontends; Fragment streaming and hydration |
+| `05_ssi`, `06_timeouts_down`, `06_timeouts_long_delay`, `07_podium` | Server-side composition with nginx SSI and Podium; a slow or missing fragment | Micro-frontends; Fragment streaming and hydration |
 | `08_web_components`, `09_shadow_dom` | Fragments as custom elements; styles that cannot leak | Sharing a surface: styles and state; Bundlers and Module Federation |
-| `10_…`, `11_…`, `12_…_communication` | Parent to child, child to parent, sibling to sibling | Sharing a surface: styles and state |
-| `13_…`, `14_…_routing`, `15_single_spa` | One app shell router, two levels of routers, then single-spa | Location, history, URL |
+| `10_parent_child_communication`, `11_child_parent_communication`, `12_fragment_fragment_communication` | Parent to child, child to parent, sibling to sibling | Sharing a surface: styles and state |
+| `13_client_side_flat_routing`, `14_client_side_two_level_routing`, `15_single_spa` | One app shell router, two levels of routers, then single-spa | Location, history, URL |
 | `20_shared_vendor_rollup_absolute_imports` | One shared copy of a library through absolute ES module URLs | Bundlers and Module Federation |
 
 For a whole shop built many ways, see the Tractor Store 2.0 in the book's *Micro-frontends* chapter.
