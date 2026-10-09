@@ -27,6 +27,7 @@
   --f-ui:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
   --f-mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
 
+  color-scheme:light;
   --measure:68ch;
   --sidebar:282px;
 }
@@ -52,6 +53,7 @@
     --insight:#A88FE8;
     --insight-soft:#231C3A;
     --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 30px -14px rgba(0,0,0,.7);
+    color-scheme:dark;
   }
 }
 :root[data-theme="dark"]{
@@ -75,6 +77,7 @@
   --insight:#A88FE8;
   --insight-soft:#231C3A;
   --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 30px -14px rgba(0,0,0,.7);
+  color-scheme:dark;
 }
 
 /* ============ BASE ============ */
@@ -122,6 +125,7 @@ a:hover{text-decoration-thickness:2px}
 .brand .mark{font-family:var(--f-mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);display:block;margin-bottom:7px}
 .brand h1{font-family:var(--f-display);font-size:21px;line-height:1.2;margin:0 0 6px;font-weight:600;letter-spacing:-.01em}
 .brand p{margin:0;font-size:12px;line-height:1.5;color:var(--muted)}
+.themebtn{display:block;margin-top:14px;min-height:32px}
 #toc{padding:0 12px}
 #toc ol{list-style:none;margin:0;padding:0}
 #toc a{display:flex;gap:10px;align-items:baseline;padding:6px 10px;border-radius:3px;font-size:13px;line-height:1.4;color:var(--ink-2);text-decoration:none}
@@ -407,6 +411,7 @@ a.xref:hover{color:var(--client);border-bottom-color:var(--client)}
   #bar{display:flex}
   #side{position:fixed;inset:0 auto 0 0;width:min(86vw,320px);z-index:55;transform:translateX(-102%);visibility:hidden;transition:transform .22s ease,visibility 0s .22s;box-shadow:var(--shadow);height:100dvh}
   #side.open{transform:translateX(0);visibility:visible;transition:transform .22s ease}
+  .themebtn{display:none}   /* the top bar has its own Theme button */
   #scrim{position:fixed;inset:0;background:rgba(10,14,20,.45);z-index:54;opacity:0;pointer-events:none;transition:opacity .22s ease}
   #scrim.on{opacity:1;pointer-events:auto}
   #top{padding-block:46px 40px}

@@ -74,24 +74,28 @@
   try { addCopyButtons(); } catch(e) {}
   try { linkAcronyms(); } catch(e) {}
 
-  var root=document.documentElement;
-  try{
-    var saved=localStorage.getItem("rs-theme");
-    if(saved==="dark"||saved==="light"){root.setAttribute("data-theme",saved);}
-  }catch(e){}
-
-  function toggle(){
+  var root=document.documentElement;   // a saved theme was already applied by theme.js
+  var themeBtns=document.querySelectorAll("[data-theme-toggle]");
+  function currentTheme(){
     var cur=root.getAttribute("data-theme");
-    if(!cur){
-      var sysDark=window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches;
-      cur=sysDark?"dark":"light";
-    }
-    var next=cur==="dark"?"light":"dark";
+    if(cur) return cur;
+    return window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light";
+  }
+  function labelThemeButtons(){
+    var text="Switch to "+(currentTheme()==="dark"?"light":"dark")+" theme";
+    themeBtns.forEach(function(b){
+      b.setAttribute("aria-label",text);
+      if(b.classList.contains("themebtn")) b.textContent=text;
+    });
+  }
+  function toggle(){
+    var next=currentTheme()==="dark"?"light":"dark";
     root.setAttribute("data-theme",next);
     try{localStorage.setItem("rs-theme",next);}catch(e){}
+    labelThemeButtons();
   }
-  var t2=document.getElementById("theme2");
-  if(t2){t2.addEventListener("click",toggle);}
+  themeBtns.forEach(function(b){b.addEventListener("click",toggle);});
+  labelThemeButtons();
 
   /* ---- a link to a chapter lands on it even though web fonts arrive after the first jump ---- */
   // Swapping in the fonts makes the text above the target taller, so the first jump falls short.
