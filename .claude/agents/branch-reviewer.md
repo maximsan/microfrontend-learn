@@ -32,7 +32,7 @@ Start with `git log --oneline main..<branch>` and `git diff main...<branch>`. Th
    - Check this against the test code and the lead's results.
 6. **Mobile layout.** For CSS or layout changes: every rule in `.claude/rules/writing.md`, "Accessibility and phones", and CONTRIBUTING's line on tables on phones. Read writing.md; it may not be loaded.
 7. **Docs consistency.** README, CONTRIBUTING, the lab READMEs and the capstone chapter all agree with the change. That covers commands, test counts and variable names. CHANGELOG entries are written in the release commit, so a branch adds none.
-8. **Commit hygiene.** Every rule in CONTRIBUTING's "Commits", and no build output (`dist/`, `test-results/`) is committed.
+8. **Commit hygiene.** Every rule under **Commits** in CONTRIBUTING's "Git conventions", and no build output (`dist/`, `test-results/`) is committed.
 
 ## Report
 

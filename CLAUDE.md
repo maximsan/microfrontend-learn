@@ -87,4 +87,5 @@ Do this for every branch, however small.
 - **Don't trim a list to look modest.** If there are 8 points, give 8.
 - **Explain jargon in plain words** the first time it comes up.
 - **Read terminal output for them.** They often paste it with no comment, so say what each failure means.
+- **Read the intent behind typos.** They type fast.
 - **Separate checked from unchecked.** Say what you verified and what you didn't. Never report something as done while it is still in progress.

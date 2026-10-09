@@ -1,9 +1,11 @@
 ---
 paths:
   - "content/*.mdx"
+  - "labs/README.md"
   - "labs/*/README.md"
   - "capstone/**/README.md"
   - ".claude/worktrees/*/content/*.mdx"
+  - ".claude/worktrees/*/labs/README.md"
   - ".claude/worktrees/*/labs/*/README.md"
   - ".claude/worktrees/*/capstone/**/README.md"
 ---
@@ -13,8 +15,8 @@ paths:
 ## Voice
 
 - **Tight.** This is learning material, and the user's words are "I don't need water in it."
-  - Cut filler, and keep the callout boxes (`<Insight>`, `<Trap>`, `<Source>`, `<Moved>`) as tight as the text around them.
-- **Concrete lines.** Each sentence tells the reader something specific they can act on or check.
+  - Cut filler without making it dull. Keep the callout boxes (`<Insight>`, `<Trap>`, `<Source>`, `<Moved>`), and write them as tight as the text around them.
+- **Concrete claims, not aphorisms.** Replace a quotable line like "a reference you cannot audit is not a reference" with the concrete fact behind it.
 - **Write numbers as numerals:** "35 years", not "thirty-five years".
 - **Standfirsts are one short sentence.**
 - **Real-world examples, sourced.** Name real adopters and "in the wild" cases, with links. If an example is widely repeated but poorly sourced, drop it or mark it as reported, not confirmed.
