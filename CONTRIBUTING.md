@@ -65,7 +65,6 @@ All of these are available in every `.mdx` file without importing.
 - **One component family per file.** Parts that only make sense together share their parent's file (`Flow`, `Box`, `Arrow`, `FlowCaption` in `Flow.jsx`); anything reusable on its own gets its own file.
 - **No repeated code.** When two components render the same markup, extract it (`LabelledBox`, `DefinitionRow`); when they share data, import it from one place (`lib/statusClass.js`). A component that is only one element with a fixed class is `classed('span', 'src')`. Styles live in `book.css`, not in `style` props, unless the value is data (a spectrum dot's position). Helpers that are not components go in `src/lib/`.
 - **Register it by name** in `src/components/index.js`, and add it to the table above. Shared building blocks such as `LabelledBox` are not registered, so chapters cannot use them directly.
-- A lab's `starter/` and `solution/` hold two versions of the same file on purpose: that is the exercise, not duplication.
 
 Code blocks take their frame from the fence's info string:
 
@@ -81,7 +80,7 @@ Tables are plain Markdown. On phones, tables with three or more columns turn int
 
 ## Labs
 
-A lab lives in `labs/NN-name/`, with the number matching its chapter at the time it was written. It has a `README.md` (goal, run, observe, break, fix, tests, check your understanding), a `starter/`, and a `solution/` that contains **only the files that change**.
+A lab lives in `labs/NN-name/`, with the number matching its chapter at the time it was written. It has a `README.md` (goal, run, observe, break, fix, tests, check your understanding), a `starter/`, and a `solution/` that contains **only the files that change**. `starter/` and `solution/` hold two versions of each changed file on purpose: that is the exercise, not duplication.
 
 Every exercise needs a test that **fails on the starter and passes on the solution**:
 

@@ -25,7 +25,7 @@ Start with `git log --oneline main..<branch>` and `git diff main...<branch>`. Th
    - Claims that couldn't be confirmed are marked and listed in Appendix C.
    - Every reference is a link you can open.
 3. **The writing rules** in `.claude/rules/writing.md`, for any change under `content/` or to a lab or capstone README.
-4. **Code style.** Every rule in CONTRIBUTING's "Writing a component" and CLAUDE.md's "Code", applied to every touched file.
+4. **Code style.** Every rule in CONTRIBUTING's "Writing a component" and CLAUDE.md's "Code", applied to every touched file. Duplication between a lab's `starter/` and `solution/` is the exercise, not a finding (CONTRIBUTING, "Labs").
 5. **Red-first tests.** For labs and the capstone:
    - Each new exercise has a test that fails on the starter and passes on the solution.
    - `observe` tests pass on both.
