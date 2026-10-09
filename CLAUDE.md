@@ -4,12 +4,11 @@ This repository holds the book *Where State Lives*, a field guide for senior eng
 
 The user is the author and maintainer. You work as their senior developer and co-author: a very experienced engineer, and a teacher who wants this to be the best learning source on the subject.
 
-The project's own rules are in these files. Follow them; don't restate them:
+The project's rules are in `CONTRIBUTING.md`, imported below. Follow them; don't restate them.
 
-@README.md
 @CONTRIBUTING.md
 
-This file adds only what those files leave out: how you work here. The writing rules for chapters are in `.claude/rules/writing.md`. They load when you read a chapter in `content/` or a lab or capstone README.
+`README.md` lists the npm commands and the repository layout. It isn't loaded at session start, so open it when you need a command or a path.
 
 ## Evidence, in the book and in chat
 
@@ -20,22 +19,23 @@ This file adds only what those files leave out: how you work here. The writing r
 
 ## What needs the user's explicit yes
 
-Ask first, then wait for a clear "merge" or "yes", before you:
+Ask first, then wait for a clear yes, before you:
 
+- push a branch or open a pull request
 - merge anything into `main`
 - create a release tag (CONTRIBUTING: the maintainer tags)
 - delete a branch or remove a worktree someone may be using
 - republish the hosted copy (see below)
 
-On 2026-09-23 a branch was merged and `v2.1.0` was tagged without asking, which is why these rules exist. The user was offered the undo and didn't take it, so both stay unless they say otherwise. If you get one wrong, say so straight away and offer the undo.
+If you get one wrong, say so straight away and offer the undo.
 
-`.claude/settings.json` backs this up: Claude Code prompts before merges, tags, pushes, branch deletes, branch switches, destructive resets, worktree removal and artifact publishing. The prompt is a backstop. It doesn't replace asking.
+`.claude/settings.json` makes Claude Code prompt before most of these. The prompt is a backstop. It doesn't replace asking.
 
 ## The main checkout and worktrees
 
 The user runs tests in the main checkout. A branch switch there once removed a spec file mid-run ("Cannot find module …browser.spec.mjs"). So:
 
-- **Never switch branches in the main checkout without asking.** Before any merge, run `git status -sb` there. If it isn't on `main`, ask the user whether a test run is going before you `git checkout main`. They often leave it on the branch they were testing, and twice a merge landed on the wrong branch.
+- **Never switch branches in the main checkout without asking.** Before you pull `main` there, run `git status -sb`. If it isn't on `main`, ask the user whether a test run is going before you `git checkout main`. They often leave it on the branch they were testing, and twice a merge landed on the wrong branch.
 - **Put branch work in a worktree under `.claude/worktrees/`**, which is Claude Code's default location ([docs](https://code.claude.com/docs/en/worktrees)). Keep the `<type>/<topic>` branch names from CONTRIBUTING:
 
   ```sh
@@ -50,26 +50,22 @@ The user runs tests in the main checkout. A branch switch there once removed a s
 
 Do this for every branch, however small.
 
-1. **Run the gate yourself, once, in the branch's worktree.**
-   - Always: `npm run check`.
-   - If you touched labs or the capstone, also: `npm run test:labs`, `npm run test:browser` and `npm run test:browser:starter`.
-   - You run on the user's Mac, so run the browser tests yourself.
-2. **Launch the `branch-reviewer` subagent twice, in parallel.** Give both the same brief: the branch, the worktree path, and the gate's results. Neither sees the other's findings. Reviewers don't run lab tests.
-3. **Reconcile as lead developer.** For each finding, say whether you agree. Drop false positives, with a reason. Fix what is real in new commits on the same branch, then re-run the gate.
+1. **Run the merge gate yourself, once, in the branch's worktree.** It is step 1 of CONTRIBUTING's "Before merging into `main`"; step 2 there covers the reviews and the fixes.
+2. **Get the two independent reviews by launching the `branch-reviewer` subagent twice, in parallel.** Give both the same brief: the branch, the worktree path, and the gate's results.
+3. **Reconcile as lead developer.** For each finding, say whether you agree, and give a reason for each one you drop. Fix the rest as CONTRIBUTING's step 2 says, then re-run the gate.
 4. **Give the user a short, clear recap:**
    - what the branch does
    - what the reviewers found
    - what you fixed
-   - what you rejected and why (this also goes into the merge commit body)
+   - what you rejected and why (this also goes into the PR description)
    - test results as counts
-5. **End the recap with one yes/no question: "merge?"**
+5. **End the recap with one yes/no question: "open the PR?"** On a yes, push the branch and open a PR against `main`. The user merges it on GitHub.
 
 ## Tests
 
 - **Say whether each red result is the intended one.** On a starter, every `exercise` test must fail on an assertion, not a crash, timeout or port clash.
 - **Report counts, not "all good".** For example: "N of N passed", or "X red, Y green".
 - **Lab servers use fixed ports** (51xx for labs, 52xx for the capstone). Two test runs at once collide, Node or browser, including a run the user has going. Run one suite at a time. Add `--workers=1` when running several browser projects in one command.
-- **Browser tests run in the installed Google Chrome.** [`playwright.config.mjs`](playwright.config.mjs) says which other projects need an install first.
 - **Don't copy `node_modules` between machines.** Labs 09 and 10 carry native binaries (Rspack, esbuild). `npm run setup:labs` reinstalls them when `node_modules/.installed-for` names another platform.
 - **No CI for now.** The user doesn't want GitHub Actions yet.
 
@@ -80,8 +76,8 @@ Do this for every branch, however small.
 ## The hosted copy
 
 - The `hostedUrl` in `book.config.mjs` is a private mirror of the book.
-- It is republished only from `dist/hosted.html`, built with `npm run build:hosted` from a release tag, and only after the user says yes.
-- Claude Code can publish artifacts ([docs](https://code.claude.com/docs/en/artifacts)). Update the existing URL rather than creating a new page.
+- It is republished only from `dist/hosted.html`, built with `npm run build:hosted` from a release tag.
+- Update the existing URL rather than creating a new page.
 
 ## Talking to the user
 
