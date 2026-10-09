@@ -10,7 +10,7 @@ The project's rules are in `CONTRIBUTING.md`, imported below. Follow them; don't
 
 `README.md` lists the npm commands and the repository layout. It isn't loaded at session start, so open it when you need a command or a path.
 
-This file adds only what `CONTRIBUTING.md` and `README.md` leave out: how you work here. The writing rules for chapters are in `.claude/rules/writing.md`. They load when you read a chapter in `content/` or a lab or capstone README.
+This file adds only what `CONTRIBUTING.md` and `README.md` leave out: how you work here.
 
 ## Evidence, in the book and in chat
 
@@ -71,7 +71,6 @@ Do this for every branch, however small.
 - **Say whether each red result is the intended one.** On a starter, every `exercise` test must fail on an assertion, not a crash, timeout or port clash.
 - **Report counts, not "all good".** For example: "N of N passed", or "X red, Y green".
 - **Lab servers use fixed ports** (51xx for labs, 52xx for the capstone). Two test runs at once collide, Node or browser, including a run the user has going. Run one suite at a time. Add `--workers=1` when running several browser projects in one command.
-- **Browser tests run in the installed Google Chrome.** [`playwright.config.mjs`](playwright.config.mjs) says which other projects need an install first.
 - **Don't copy `node_modules` between machines.** Labs 09 and 10 carry native binaries (Rspack, esbuild). `npm run setup:labs` reinstalls them when `node_modules/.installed-for` names another platform.
 - **No CI for now.** The user doesn't want GitHub Actions yet.
 
@@ -83,7 +82,7 @@ Do this for every branch, however small.
 
 - The `hostedUrl` in `book.config.mjs` is a private mirror of the book.
 - It is republished only from `dist/hosted.html`, built with `npm run build:hosted` from a release tag, and only after the user says yes.
-- Claude Code can publish artifacts ([docs](https://code.claude.com/docs/en/artifacts)). Update the existing URL rather than creating a new page.
+- Update the existing URL rather than creating a new page.
 
 ## Talking to the user
 
