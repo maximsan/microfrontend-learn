@@ -405,8 +405,8 @@ a.xref:hover{color:var(--client);border-bottom-color:var(--client)}
 @media(max-width:900px){
   #shell{grid-template-columns:1fr}
   #bar{display:flex}
-  #side{position:fixed;inset:0 auto 0 0;width:min(86vw,320px);z-index:55;transform:translateX(-102%);transition:transform .22s ease;box-shadow:var(--shadow);height:100dvh}
-  #side.open{transform:translateX(0)}
+  #side{position:fixed;inset:0 auto 0 0;width:min(86vw,320px);z-index:55;transform:translateX(-102%);visibility:hidden;transition:transform .22s ease,visibility 0s .22s;box-shadow:var(--shadow);height:100dvh}
+  #side.open{transform:translateX(0);visibility:visible;transition:transform .22s ease}
   #scrim{position:fixed;inset:0;background:rgba(10,14,20,.45);z-index:54;opacity:0;pointer-events:none;transition:opacity .22s ease}
   #scrim.on{opacity:1;pointer-events:auto}
   #top{padding-block:46px 40px}

@@ -149,24 +149,38 @@
     map[id]=a;
     a.addEventListener("click",function(){setDrawer(false);});
   });
+  /* ---- the chapter being read: highlighted in the contents, named in the phone bar ---- */
   var sections=Array.prototype.slice.call(document.querySelectorAll("section[id]"));
-  function markActive(id){
-    links.forEach(function(a){a.classList.remove("on");});
-    if(map[id]){map[id].classList.add("on");}
+  var barTitle=document.querySelector("#bar strong");
+  var bookTitle=barTitle?barTitle.textContent:"";
+  var activeId=null;
+  function markActive(){
+    // The last section whose top has passed 30% of the viewport height.
+    var line=window.innerHeight*0.3, id=null;
+    for(var i=0;i<sections.length;i++){
+      if(sections[i].getBoundingClientRect().top>line) break;
+      id=sections[i].id;
+    }
+    if(id===activeId) return;
+    activeId=id;
+    links.forEach(function(a){a.classList.remove("on");a.removeAttribute("aria-current");});
+    var a=map[id];
+    if(a){
+      a.classList.add("on");
+      a.setAttribute("aria-current","location");
+      // keep the highlighted entry visible in the sidebar's own scroll area, without moving the page
+      var top=a.offsetTop, view=side.clientHeight;
+      if(top<side.scrollTop+40||top>side.scrollTop+view-80){side.scrollTop=top-view/2;}
+    }
+    if(barTitle){barTitle.textContent=a?a.lastElementChild.textContent:bookTitle;}
   }
-  if("IntersectionObserver" in window){
-    var visible={};
-    var io=new IntersectionObserver(function(entries){
-      entries.forEach(function(en){
-        visible[en.target.id]=en.isIntersecting?en.intersectionRatio:0;
-      });
-      var best=null,bestV=0;
-      sections.forEach(function(s){
-        var v=visible[s.id]||0;
-        if(v>bestV){bestV=v;best=s.id;}
-      });
-      if(best){markActive(best);}
-    },{rootMargin:"-15% 0px -60% 0px",threshold:[0,.1,.25,.5,1]});
-    sections.forEach(function(s){io.observe(s);});
+  var ticking=false;
+  function onScroll(){
+    if(ticking) return;
+    ticking=true;
+    requestAnimationFrame(function(){ticking=false;markActive();});
   }
+  window.addEventListener("scroll",onScroll,{passive:true});
+  window.addEventListener("resize",onScroll);
+  markActive();
 })();

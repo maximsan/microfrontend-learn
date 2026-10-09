@@ -2,9 +2,9 @@
 // that replaces the sidebar on narrow screens. src/client/book.js wires them up.
 import book from '../../book.config.mjs';
 
-export const TopBar = ({ firstId }) => (
+export const TopBar = () => (
   <>
-    <a className="skip" href={`#${firstId}`}>Skip to contents</a>
+    <a className="skip" href="#main">Skip to main content</a>
     <div id="prog"><i></i></div>
 
     <div id="bar">
