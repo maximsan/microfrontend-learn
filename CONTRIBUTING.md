@@ -117,7 +117,7 @@ from the diff. Wrap at 72 characters.
 | `style` | Visual or CSS-only changes |
 | `test`, `build`, `chore` | Tests, tooling, housekeeping |
 
-Scopes in use: `ch04`…`ch17` for chapters, `appendix-c`, `glossary`, `part-1`…`part-4`, `components`, `layout`, `client`, `labs`, `capstone`, `diagrams`, `mobile`, `nav`, `tools`, `release`.
+The scope names the area touched: `chNN` for a chapter, `appendix-c` or `glossary` for an appendix, `part-N` for a part's opener, otherwise the folder or topic, such as `labs`, `capstone`, `components` or `tools`.
 
 **Before merging into `main`:**
 
