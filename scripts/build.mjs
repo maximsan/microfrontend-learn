@@ -97,6 +97,7 @@ async function build() {
   const body = renderToStaticMarkup(h(Page, { hero, chapters, stats }));
   const css = await fs.readFile(rel('src/styles/book.css'), 'utf8');
   const js = await fs.readFile(rel('src/client/book.js'), 'utf8');
+  const themeJs = await fs.readFile(rel('src/client/theme.js'), 'utf8');
 
   const fonts = [
     '<link rel="preconnect" href="https://fonts.googleapis.com">',
@@ -104,7 +105,7 @@ async function build() {
     '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Serif:ital,wght@0,400;0,600;0,700;1,400&display=swap">',
   ].join('\n');
   const title = `<title>${escapeHtml(book.title)}</title>`;
-  const inner = `<style>\n${css}</style>\n\n${body}\n\n<script>\n${js}</script>\n`;
+  const inner = `<style>\n${css}</style>\n<script>\n${themeJs}</script>\n\n${body}\n\n<script>\n${js}</script>\n`;
 
   // Full document for opening locally.
   const full = `<!doctype html>
@@ -115,7 +116,7 @@ async function build() {
 <meta name="description" content="${escapeHtml(book.tagline)}">
 ${title}
 ${fonts}
-<style>:root{color-scheme:light}body{margin:0;padding:0}img{max-width:100%}</style>
+<style>body{margin:0;padding:0}img{max-width:100%}</style>
 </head>
 <body>
 ${inner}</body>

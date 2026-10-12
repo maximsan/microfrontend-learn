@@ -10,10 +10,10 @@ import { Chapter } from './Chapter.jsx';
 export function Page({ hero, chapters, stats }) {
   return (
     <>
-      <TopBar firstId={chapters[0]?.meta.id} />
+      <TopBar />
       <div id="shell">
         <Sidebar chapters={chapters} />
-        <main>
+        <main id="main">
           <Hero stats={stats}>{hero}</Hero>
           {chapters.map(({ meta, body }, i) => (
             <Chapter key={meta.id} meta={meta} prev={chapters[i - 1]?.meta} next={chapters[i + 1]?.meta}>

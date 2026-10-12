@@ -74,24 +74,49 @@
   try { addCopyButtons(); } catch(e) {}
   try { linkAcronyms(); } catch(e) {}
 
-  var root=document.documentElement;
-  try{
-    var saved=localStorage.getItem("rs-theme");
-    if(saved==="dark"||saved==="light"){root.setAttribute("data-theme",saved);}
-  }catch(e){}
-
-  function toggle(){
+  var root=document.documentElement;   // a saved theme was already applied by theme.js
+  var themeBtns=document.querySelectorAll("[data-theme-toggle]");
+  function currentTheme(){
     var cur=root.getAttribute("data-theme");
-    if(!cur){
-      var sysDark=window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches;
-      cur=sysDark?"dark":"light";
-    }
-    var next=cur==="dark"?"light":"dark";
+    if(cur) return cur;
+    return window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light";
+  }
+  function labelThemeButtons(){
+    var text="Switch to "+(currentTheme()==="dark"?"light":"dark")+" theme";
+    // data-theme-toggle="text" says the action on the button; the short "Theme" button says it in its label
+    themeBtns.forEach(function(b){
+      if(b.getAttribute("data-theme-toggle")==="text"){b.textContent=text;}
+      else{b.setAttribute("aria-label",text);}
+    });
+  }
+  function toggle(){
+    var next=currentTheme()==="dark"?"light":"dark";
     root.setAttribute("data-theme",next);
     try{localStorage.setItem("rs-theme",next);}catch(e){}
+    labelThemeButtons();
   }
-  var t2=document.getElementById("theme2");
-  if(t2){t2.addEventListener("click",toggle);}
+  themeBtns.forEach(function(b){b.addEventListener("click",toggle);});
+  labelThemeButtons();
+  if(window.matchMedia){window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change",labelThemeButtons);}
+
+  /* ---- a link to a chapter lands on it even though web fonts arrive after the first jump ---- */
+  // Swapping in the fonts makes the text above the target taller, so the first jump falls short.
+  // Wait for "load" first: by then the font files have been requested, so fonts.ready waits for them.
+  // A reload or Back/Forward restores the reader's own position, which must win.
+  var nav=performance.getEntriesByType&&performance.getEntriesByType("navigation")[0];
+  if(location.hash&&document.fonts&&!(nav&&(nav.type==="reload"||nav.type==="back_forward"))){
+    var readerMoved=false;
+    ["wheel","touchstart","keydown","mousedown"].forEach(function(t){
+      window.addEventListener(t,function(){readerMoved=true;},{once:true,passive:true});
+    });
+    window.addEventListener("load",function(){
+      document.fonts.ready.then(function(){
+        var target;
+        try{target=document.getElementById(decodeURIComponent(location.hash.slice(1)));}catch(e){return;}   // malformed %-escape
+        if(target&&!readerMoved){target.scrollIntoView();}
+      });
+    });
+  }
 
   var bar=document.querySelector("#prog i");
   function progress(){
@@ -133,24 +158,38 @@
     map[id]=a;
     a.addEventListener("click",function(){setDrawer(false);});
   });
+  /* ---- the chapter being read: highlighted in the contents, named in the phone bar ---- */
   var sections=Array.prototype.slice.call(document.querySelectorAll("section[id]"));
-  function markActive(id){
-    links.forEach(function(a){a.classList.remove("on");});
-    if(map[id]){map[id].classList.add("on");}
+  var barTitle=document.querySelector("#bar strong");
+  var bookTitle=barTitle?barTitle.textContent:"";
+  var activeId=null;
+  function markActive(){
+    // The last section whose top has passed 30% of the viewport height.
+    var line=window.innerHeight*0.3, id=null;
+    for(var i=0;i<sections.length;i++){
+      if(sections[i].getBoundingClientRect().top>line) break;
+      id=sections[i].id;
+    }
+    if(id===activeId) return;
+    activeId=id;
+    links.forEach(function(a){a.classList.remove("on");a.removeAttribute("aria-current");});
+    var a=map[id];
+    if(a){
+      a.classList.add("on");
+      a.setAttribute("aria-current","location");
+      // keep the highlighted entry visible in the sidebar's own scroll area, without moving the page
+      var top=a.offsetTop, view=side.clientHeight;
+      if(top<side.scrollTop+40||top>side.scrollTop+view-80){side.scrollTop=top-view/2;}
+    }
+    if(barTitle){barTitle.textContent=a?a.lastElementChild.textContent:bookTitle;}
   }
-  if("IntersectionObserver" in window){
-    var visible={};
-    var io=new IntersectionObserver(function(entries){
-      entries.forEach(function(en){
-        visible[en.target.id]=en.isIntersecting?en.intersectionRatio:0;
-      });
-      var best=null,bestV=0;
-      sections.forEach(function(s){
-        var v=visible[s.id]||0;
-        if(v>bestV){bestV=v;best=s.id;}
-      });
-      if(best){markActive(best);}
-    },{rootMargin:"-15% 0px -60% 0px",threshold:[0,.1,.25,.5,1]});
-    sections.forEach(function(s){io.observe(s);});
+  var ticking=false;
+  function onScroll(){
+    if(ticking) return;
+    ticking=true;
+    requestAnimationFrame(function(){ticking=false;markActive();});
   }
+  window.addEventListener("scroll",onScroll,{passive:true});
+  window.addEventListener("resize",onScroll);
+  markActive();
 })();

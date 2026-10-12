@@ -1,4 +1,4 @@
-// The sidebar: book title, table of contents grouped by part, and the sources note.
+// The sidebar: book title and theme switch, table of contents grouped by part, and the sources note.
 import book from '../../book.config.mjs';
 import { VerifiedDate } from '../components/inline/VerifiedDate.jsx';
 import { Mod } from '../components/xref/Mod.jsx';
@@ -12,6 +12,7 @@ export const Sidebar = ({ chapters }) => (
       <span className="mark">{book.mark}</span>
       <h1>{book.title}</h1>
       <p>{book.tagline}</p>
+      <button className="iconbtn themebtn" data-theme-toggle="text">Switch colour theme</button>
     </div>
     <nav id="toc" aria-label="Contents">
       {groupConsecutive(chapters, (c) => c.meta.part).map(([part, items]) => (
