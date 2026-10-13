@@ -41,6 +41,7 @@ src/
                        theme.js before the page is painted, book.js after
   mdx/                 the rehype plugin that colours status table cells
 scripts/               build, check, test-labs, and devices.html (the width preview)
+docs/rewrite-checklist.md  which chapters are rewritten for plain reading, and what each rewrite covers
 labs/  capstone/       hands-on material
 ```
 

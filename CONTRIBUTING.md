@@ -38,7 +38,8 @@ All of these are available in every `.mdx` file without importing.
 | `<Moved title="…">` | Something that changed recently; older material gets it wrong |
 | `<Callout kind tag>` | The frame the four above are built on; use it only for a one-off label |
 | `<Recap>` | End-of-module bullet list |
-| `<Check>` + `<Answers>` | Numbered questions, then collapsed numbered answers |
+| `<Check>` + `<Question>`, `<Option correct>`, `<Why>` | The end-of-module test: multiple-choice questions shown one at a time. Every option has a `<Why>`, shown after answering. Write each `<Option>` on one line. How to write the questions: `.claude/rules/writing.md` |
+| `<Answers>` | Collapsed answers under a numbered list in `<Check>`; only in chapters not yet converted to `<Question>` |
 | `<Mod to="id" />` | Cross-reference: renders a linked "Module 07" / "Appendix C". `num` for just the number, `title` to add the title. An unknown id fails the build |
 | `<Mods to={["a","b"]} />` | A comma-separated list of linked module numbers |
 | `<Ok>`, `<No>`, `<Warn>` | Colour a whole table cell: `| <Ok>Yes</Ok> |` |

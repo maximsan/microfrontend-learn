@@ -15,7 +15,7 @@ import { Callout, Insight, Trap, Source, Moved } from './callouts/Callout.jsx';
 import { Cite } from './callouts/Cite.jsx';
 import { Quote } from './callouts/Quote.jsx';
 import { Recap } from './callouts/Recap.jsx';
-import { Check, Answers } from './callouts/Check.jsx';
+import { Check, Answers, Question, Option, Why } from './callouts/Check.jsx';
 import { Spectrum, Point } from './diagrams/Spectrum.jsx';
 import { Timeline, Era } from './diagrams/Timeline.jsx';
 import { Flow, Box, Arrow, FlowCaption } from './diagrams/Flow.jsx';
@@ -30,7 +30,7 @@ import { Mod, Mods } from './xref/Mod.jsx';
 
 export const mdxComponents = {
   VerifiedDate, Ok, No, Warn, Sub, ServerSide, ClientSide, Light, Rev, Expiry, Badge, Src, Lede, Colophon, Chip,
-  Callout, Insight, Trap, Source, Moved, Cite, Quote, Recap, Check, Answers,
+  Callout, Insight, Trap, Source, Moved, Cite, Quote, Recap, Check, Answers, Question, Option, Why,
   Spectrum, Point, Timeline, Era, Flow, Box, Arrow, FlowCaption, Wire, Step, Tree, Branch, Leaf,
   Acronyms, Acro, Glossary, Term, RefGroup,
   Mod, Mods,

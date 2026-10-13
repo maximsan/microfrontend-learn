@@ -1,4 +1,4 @@
-/** The plain text of a React node tree (used to read table header labels). */
+/** The plain text of a React node tree (table header labels, quiz error messages). */
 export function textOf(node) {
   if (node == null || typeof node === 'boolean') return '';
   if (typeof node === 'string' || typeof node === 'number') return String(node);
