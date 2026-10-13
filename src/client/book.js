@@ -71,7 +71,77 @@
     });
   }
 
+  /* ---- "Check yourself": one question at a time, every option explained, a score at the end ---- */
+  function setUpQuizzes(){
+    document.querySelectorAll(".check").forEach(function(check){
+      var questions=Array.prototype.slice.call(check.querySelectorAll(".quiz-q"));
+      if(!questions.length) return;
+      var progress=document.createElement("p"); progress.className="quiz-progress";
+      var status=document.createElement("p"); status.className="quiz-status"; status.tabIndex=-1;
+      var next=document.createElement("button"); next.type="button"; next.className="quiz-next";
+      questions[0].parentNode.insertBefore(progress,questions[0]);
+      check.appendChild(status); check.appendChild(next);
+      var current=0, right=0;
+      questions.forEach(function(q){
+        q.setAttribute("role","group"); q.tabIndex=-1;
+        q.querySelectorAll(".quiz-opt").forEach(function(li){
+          li.querySelector(".quiz-why").tabIndex=-1;
+          li.querySelector("button").addEventListener("click",function(){ answer(q,li); });
+        });
+      });
+      // Explanations stay visible until this point, so the test still teaches if the script fails.
+      check.classList.add("quiz-ready");
+
+      function show(i){
+        current=i;
+        questions.forEach(function(q,qi){ q.hidden=qi!==i; });
+        progress.hidden=false;
+        progress.textContent="Question "+(i+1)+" of "+questions.length;
+        questions[i].setAttribute("aria-label",progress.textContent);
+        status.textContent=""; next.hidden=true;
+      }
+      function start(){
+        right=0;
+        questions.forEach(function(q){
+          q.classList.remove("answered");
+          var list=q.querySelector(".quiz-opts");
+          var opts=Array.prototype.slice.call(list.children);
+          // Shuffled on every start, so the answer's position gives nothing away.
+          for(var i=opts.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)), t=opts[i]; opts[i]=opts[j]; opts[j]=t; }
+          opts.forEach(function(li){ li.classList.remove("picked"); li.querySelector("button").disabled=false; list.appendChild(li); });
+        });
+        show(0);
+      }
+      function answer(q,li){
+        q.classList.add("answered"); li.classList.add("picked");
+        q.querySelectorAll(".quiz-opt button").forEach(function(b){ b.disabled=true; });
+        var ok=li.hasAttribute("data-correct");
+        if(ok) right++;
+        status.textContent=ok?"Right.":"Not quite. The right answer is marked \u2713.";
+        next.textContent=current<questions.length-1?"Next question":"See your score";
+        next.hidden=false;
+        li.querySelector(".quiz-why").focus();   // read the verdict first; Tab then reaches Next
+      }
+      next.addEventListener("click",function(){
+        if(current<questions.length-1){
+          show(current+1);
+          questions[current].focus();
+        } else if(!questions[current].hidden){
+          questions[current].hidden=true; progress.hidden=true;
+          status.textContent="You got "+right+" of "+questions.length+" right.";
+          next.textContent="Try again";
+          status.focus();
+        } else {
+          start();
+          questions[0].focus();
+        }
+      });
+      start();
+    });
+  }
+
   try { addCopyButtons(); } catch(e) {}
+  try { setUpQuizzes(); } catch(e) {}
   try { linkAcronyms(); } catch(e) {}
 
   var root=document.documentElement;   // a saved theme was already applied by theme.js

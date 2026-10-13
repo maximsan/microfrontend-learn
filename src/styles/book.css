@@ -324,6 +324,40 @@ span.pg{border:0;background:none}
 .check details li{margin-bottom:11px}
 .check details li:last-child{margin-bottom:0}
 
+/* ============ SELF-CHECK TEST ============ */
+.quiz-progress{font-family:var(--f-mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);margin:0 0 8px}
+.quiz-ask{font-size:16px;font-weight:600;color:var(--ink);margin-bottom:12px}
+.quiz-ask p{margin:0}
+.quiz-opts{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.check .quiz-opt{margin:0}
+.quiz-q:focus,.quiz-why:focus{outline:none}
+.quiz-opt button{
+  display:block;width:100%;min-height:44px;padding:10px 14px;text-align:left;cursor:pointer;
+  font:inherit;font-size:15px;line-height:1.45;color:var(--ink);
+  background:var(--surface);border:1px solid var(--rule-strong);border-radius:3px;
+}
+.quiz-opt button:hover:not(:disabled){border-color:var(--client)}
+.quiz-opt button:focus-visible,.quiz-next:focus-visible{outline:2px solid var(--client);outline-offset:2px}
+.quiz-opt button:disabled{cursor:default;color:var(--ink)}
+/* Visible until book.js marks the test ready, so a failed script still leaves the answers readable. */
+.quiz-why{padding:6px 2px 4px 14px;font-size:14.5px;color:var(--ink-2)}
+.quiz-ready .quiz-q:not(.answered) .quiz-why{display:none}
+/* the words carry the result too, so colour is never the only signal */
+.quiz-why::before{content:"\2717\00a0 Wrong. ";font-weight:600;color:var(--trap)}
+[data-correct] .quiz-why::before{content:"\2713\00a0 Correct. ";color:var(--verified)}
+.picked .quiz-why::before{content:"\2717\00a0 Your answer: wrong. "}
+.picked[data-correct] .quiz-why::before{content:"\2713\00a0 Your answer: correct. "}
+.answered [data-correct] button{border-color:var(--verified);background:var(--verified-soft)}
+.answered .picked:not([data-correct]) button{border-color:var(--trap);background:var(--trap-soft)}
+.quiz-status{margin:14px 0 0;font-family:var(--f-ui);font-size:15px;font-weight:600;color:var(--ink)}
+.quiz-status:empty{display:none}
+.quiz-status:focus{outline:none}
+.quiz-next{
+  margin-top:12px;min-height:44px;padding:0 16px;cursor:pointer;
+  font-family:var(--f-ui);font-size:14px;font-weight:600;color:var(--client);
+  background:transparent;border:1px solid var(--client);border-radius:3px;
+}
+
 /* ============ REVERSIBILITY ============ */
 .rev{
   font-family:var(--f-mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;
@@ -505,6 +539,9 @@ main p,main li,main dd,main td,main th{overflow-wrap:break-word}
   a{color:#000;text-decoration:underline}
   a[href^="http"]::after{content:" [" attr(href) "]";font-size:7pt;color:#555;word-break:break-all}
   .check details > *{display:block!important}
+  .quiz-q[hidden]{display:block!important;margin-bottom:12pt}
+  .quiz-progress,.quiz-status,.quiz-next{display:none!important}
+  .quiz-why{display:block!important}
   .flow{display:block}
   .flow .box{margin-bottom:4pt}
   .flow .arrow{padding:2pt 0}
